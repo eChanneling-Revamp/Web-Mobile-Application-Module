@@ -87,12 +87,12 @@ const Navbar = () => {
                             </span>
                         </button>
 
-                        <button
-                            className="p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-                            aria-label="Profile"
+                        <Link
+                            href="auth/login"
+                            className="px-4 py-1.5 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
                         >
-                            <User className="w-5 h-5" />
-                        </button>
+                            Sign In
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Button */}
