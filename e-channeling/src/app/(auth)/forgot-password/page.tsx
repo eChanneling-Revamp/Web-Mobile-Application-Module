@@ -19,7 +19,7 @@ const ForgotPasswordPage = () => {
         setTimeout(() => {
             setIsLoading(false);
             // Navigate to OTP verification page
-            router.push("/auth/forgot-password/otp-verification");
+            router.push("/forgot-password/otp-verification");
         }, 1000);
     };
 
@@ -59,7 +59,7 @@ const ForgotPasswordPage = () => {
 
                         <div className="pt-8">
                             <Link
-                                href="/auth/login"
+                                href="/login"
                                 className="text-blue-500 hover:text-blue-600 text-sm font-medium transition-colors"
                             >
                                 Back
@@ -75,8 +75,6 @@ const ForgotPasswordPage = () => {
                         </button>
                     </form>
                 </div>
-
-                
             </div>
         </div>
     );

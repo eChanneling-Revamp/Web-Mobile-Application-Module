@@ -54,7 +54,7 @@ const OTPVerificationPage = () => {
         setTimeout(() => {
             setIsLoading(false);
             // Navigate to new password page
-            router.push("/auth/forgot-password/new-password");
+            router.push("/forgot-password/new-password");
         }, 1000);
     };
 

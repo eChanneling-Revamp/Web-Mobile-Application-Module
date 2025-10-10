@@ -88,7 +88,7 @@ const Navbar = () => {
                         </button>
 
                         <Link
-                            href="/auth/login"
+                            href="/login"
                             className="px-4 py-1.5 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
                         >
                             Sign In

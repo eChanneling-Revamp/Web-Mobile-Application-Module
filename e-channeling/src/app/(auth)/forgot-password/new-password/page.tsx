@@ -32,12 +32,12 @@ const NewPasswordPage = () => {
         setTimeout(() => {
             setIsLoading(false);
             // Navigate to success page
-            router.push("/auth/forgot-password/success");
+            router.push("/forgot-password/success");
         }, 1000);
     };
 
     const handleCancel = () => {
-        router.push("/auth/login");
+        router.push("/login");
     };
 
     const isFormValid =

@@ -133,7 +133,7 @@ export default function SignInPage() {
             {/* Forget Password Link */}
             <div className="text-center">
               <Link
-               href={"/auth/forgot-password"}
+               href={"/forgot-password"}
                 className="text-blue-600 hover:text-blue-700 text-sm underline transition-colors"
               >Forget Password?</Link>
                 
