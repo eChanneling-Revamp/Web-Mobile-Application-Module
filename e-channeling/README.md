@@ -6,8 +6,13 @@ A web application for electronic channeling services built with Next.js, React, 
 
 -   Next.js 15.5.4
 -   React 19.1.0
--   TypeScript
--   Tailwind CSS
+-   React DOM 19.1.0
+-   TypeScript 5.x
+-   Tailwind CSS 4.x
+-   Redux Toolkit 2.9.0
+-   React Redux 9.2.0
+-   React Icons 5.5.0
+-   Lucide React 0.544.0
 
 ## Prerequisites
 
