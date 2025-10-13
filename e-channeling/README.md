@@ -41,6 +41,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 -   `npm run build` - Build for production
 -   `npm run start` - Start production server
 -   `npm run lint` - Run ESLint
+-   `npx tsx src/utils/api.ts` - Run single ts file
 
 ## Authentication Routes
 
