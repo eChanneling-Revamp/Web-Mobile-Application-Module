@@ -29,3 +29,21 @@ const initialState: BookingState = {
     reason: "",
   },
 };
+
+/* ---------- Slice ---------- */
+const bookingSlice = createSlice({
+  name: "booking",
+  initialState,
+  reducers: {
+    setStep(state, action: PayloadAction<Step>) {
+      state.step = action.payload;
+    },
+    setPatientDetails(state, action: PayloadAction<Partial<PatientDetails>>) {
+      state.patient = { ...state.patient, ...action.payload };
+    },
+    resetBooking() {
+      return initialState;
+    },
+  },
+});
+
