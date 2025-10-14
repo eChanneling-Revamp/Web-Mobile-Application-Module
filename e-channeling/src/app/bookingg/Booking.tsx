@@ -47,3 +47,6 @@ const bookingSlice = createSlice({
   },
 });
 
+/* ---------- Exports ---------- */
+export const { setStep, setPatientDetails, resetBooking } = bookingSlice.actions;
+export default bookingSlice.reducer;
