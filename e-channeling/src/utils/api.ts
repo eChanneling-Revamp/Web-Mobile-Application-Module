@@ -1,16 +1,7 @@
 import axios from "axios";
-import dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load .env from the root directory
-dotenv.config({ path: join(__dirname, "../../.env") });
 
 const api = axios.create({
-    baseURL: process.env.API_BASE_URL || "/api",
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "/api",
     headers: {
         "Content-Type": "application/json",
     },
@@ -46,6 +37,6 @@ api.interceptors.response.use(
     }
 );
 
-console.log(process.env.API_BASE_URL);
+console.log("API_BASE_URL:", process.env.NEXT_PUBLIC_API_BASE_URL);
 
 export default api;

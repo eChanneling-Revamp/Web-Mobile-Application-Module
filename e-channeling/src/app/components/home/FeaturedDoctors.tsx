@@ -1,58 +1,73 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { Star, MapPin } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { useSelector } from "react-redux";
+import { fetchTopRatedDoctors } from "@/store/doctor/doctorSlice";
 
 const FeaturedDoctors = () => {
-    const doctors = [
-        {
-            id: 1,
-            name: "Dr. Samantha Perera",
-            specialty: "Cardiologist",
-            hospital: "National Hospital, Colombo",
-            rating: 4.9,
-            reviews: 124,
-            experience: "15 years exp.",
-            availability: "Today",
-            availabilityColor: "bg-green-500",
-            image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
-        },
-        {
-            id: 2,
-            name: "Dr. Arjun Rajapakse",
-            specialty: "Dermatologist",
-            hospital: "Asiri Hospital, Kandy",
-            rating: 4.7,
-            reviews: 89,
-            experience: "10 years exp.",
-            availability: "Tomorrow",
-            availabilityColor: "bg-blue-500",
-            image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
-        },
-        {
-            id: 3,
-            name: "Dr. Fathima Nizar",
-            specialty: "Pediatrician",
-            hospital: "Lady Ridgeway Hospital",
-            rating: 4.8,
-            reviews: 156,
-            experience: "12 years exp.",
-            availability: "Today",
-            availabilityColor: "bg-green-500",
-            image: "/doctor.jpg",
-        },
-        {
-            id: 4,
-            name: "Dr. Tharaka Wijesekara",
-            specialty: "Neurologist",
-            hospital: "Nawaloka Hospital",
-            rating: 4.9,
-            reviews: 203,
-            experience: "18 years exp.",
-            availability: "Tomorrow",
-            availabilityColor: "bg-blue-500",
-            image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
-        },
-    ];
+    const dispatch = useDispatch<AppDispatch>();
+    const { doctors, loading, error } = useSelector(
+        (state: RootState) => state.doctor
+    );
+
+    useEffect(() => {
+        dispatch(fetchTopRatedDoctors());
+    }, []);
+
+    // const doctors = [
+    //     {
+    //         id: 1,
+    //         name: "Dr. Samantha Perera",
+    //         specialty: "Cardiologist",
+    //         hospital: "National Hospital, Colombo",
+    //         rating: 4.9,
+    //         reviews: 124,
+    //         experience: "15 years exp.",
+    //         availability: "Today",
+    //         availabilityColor: "bg-green-500",
+    //         image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+    //     },
+    //     {
+    //         id: 2,
+    //         name: "Dr. Arjun Rajapakse",
+    //         specialty: "Dermatologist",
+    //         hospital: "Asiri Hospital, Kandy",
+    //         rating: 4.7,
+    //         reviews: 89,
+    //         experience: "10 years exp.",
+    //         availability: "Tomorrow",
+    //         availabilityColor: "bg-blue-500",
+    //         image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+    //     },
+    //     {
+    //         id: 3,
+    //         name: "Dr. Fathima Nizar",
+    //         specialty: "Pediatrician",
+    //         hospital: "Lady Ridgeway Hospital",
+    //         rating: 4.8,
+    //         reviews: 156,
+    //         experience: "12 years exp.",
+    //         availability: "Today",
+    //         availabilityColor: "bg-green-500",
+    //         image: "/doctor.jpg",
+    //     },
+    //     {
+    //         id: 4,
+    //         name: "Dr. Tharaka Wijesekara",
+    //         specialty: "Neurologist",
+    //         hospital: "Nawaloka Hospital",
+    //         rating: 4.9,
+    //         reviews: 203,
+    //         experience: "18 years exp.",
+    //         availability: "Tomorrow",
+    //         availabilityColor: "bg-blue-500",
+    //         image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+    //     },
+    // ];
 
     const renderStars = (rating: number) => {
         const stars = [];
@@ -120,7 +135,7 @@ const FeaturedDoctors = () => {
                                 </h3>
 
                                 <p className="text-blue-600 font-medium text-sm mb-2">
-                                    {doctor.specialty}
+                                    {doctor.specialization}
                                 </p>
 
                                 <div className="flex items-start text-gray-600 text-xs sm:text-sm mb-3">
