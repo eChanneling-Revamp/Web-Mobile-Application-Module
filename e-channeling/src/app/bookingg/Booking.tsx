@@ -11,3 +11,9 @@ interface PatientDetails {
   gender: string;
   reason: string;
 }
+
+interface BookingState {
+  step: Step;
+  patient: PatientDetails;
+}
+
