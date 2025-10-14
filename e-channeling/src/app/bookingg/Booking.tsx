@@ -17,3 +17,15 @@ interface BookingState {
   patient: PatientDetails;
 }
 
+/* ---------- Initial State ---------- */
+const initialState: BookingState = {
+  step: 1,
+  patient: {
+    fullName: "",
+    phone: "",
+    email: "",
+    age: "",
+    gender: "",
+    reason: "",
+  },
+};
