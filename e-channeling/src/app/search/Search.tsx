@@ -37,6 +37,7 @@ const ADV_OPTIONS = {
     { label: "Cardiology", value: "cardiology" },
     { label: "Dermatology", value: "dermatology" },
     { label: "Neurology", value: "neurology" },
+    { label: "ENT Surgeon", value: "ENT Surgeon" },
     { label: "Pediatrics", value: "pediatrics" },
   ] as Option[],
   gender: [
@@ -56,9 +57,11 @@ const ADV_OPTIONS = {
     { label: "4500 - 5499", value: "4500_5499" },
   ] as Option[],
   doctorName: [
-    { label: "Dr Sanjeewa", value: "dr sanjeewa" },
-    { label: "Dr John", value: "dr john" },
-    { label: "Dr Peter", value: "dr peter" },
+    { label: "Dr. Samantha Perera", value: "Dr. Samantha Perera" },
+    { label: "Dr. Sanjeewa Gunasekara", value: "Dr. Sanjeewa Gunasekara" },
+    { label: "Dr. John Doe", value: "Dr. John Doe" },
+    { label: "Dr. A. B. M. Milhan", value: "Dr. A. B. M. Milhan" },
+    { label: "Dr. Peter Jayasekara", value: "Dr. Peter Jayasekara" },
   ] as Option[],
 };
 
@@ -123,7 +126,7 @@ export default function Search() {
   const greenBtn =
     "h-11 px-6 rounded-md bg-green-500 hover:bg-green-600 text-white text-sm font-semibold hover:opacity-95 active:opacity-100";
   const ghostBtn =
-    "h-11 px-4 rounded-md border text-sm bg-white hover:bg-gray-50";
+    "h-11 px-4 rounded-md border border-gray-400 text-sm bg-white hover:bg-gray-50";
   const inputBase =
     "h-11 w-full rounded-md border border-gray-200 px-3 text-[14px] outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-100 bg-white";
   const selectBase = inputBase;
@@ -134,11 +137,12 @@ export default function Search() {
     <div className="min-h-screen bg-[#F7F8FB]">
       {/* HERO (same look as Home hero) */}
       <section className="mx-auto max-w-[1400px] px-5 pt-6">
-        <div className="relative rounded-2xl overflow-hidden shadow-sm"
+        <div
+          className="relative rounded-2xl overflow-hidden shadow-sm"
           style={{
-            background:
-              "linear-gradient(135deg,#099d9b 0%,#1b74e8 100%)",
-          }}>
+            background: "linear-gradient(135deg,#099d9b 0%,#1b74e8 100%)",
+          }}
+        >
           {/* title/subtitle like Home */}
           <h1 className="text-white font-extrabold tracking-tight text-[34px] md:text-[42px] leading-tight drop-shadow-lg px-6 pt-6">
             Your Health, Our Priority
@@ -250,7 +254,9 @@ export default function Search() {
                 >
                   <option value="">Any</option>
                   {ADV_OPTIONS.hospitalType.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -266,7 +272,9 @@ export default function Search() {
                 >
                   <option value="">Any</option>
                   {ADV_OPTIONS.location.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -282,7 +290,9 @@ export default function Search() {
                 >
                   <option value="">Any</option>
                   {ADV_OPTIONS.hospitalName.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -298,7 +308,9 @@ export default function Search() {
                 >
                   <option value="">Any</option>
                   {ADV_OPTIONS.specialization.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -314,7 +326,9 @@ export default function Search() {
                 >
                   <option value="">Any</option>
                   {ADV_OPTIONS.gender.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -330,7 +344,9 @@ export default function Search() {
                 >
                   <option value="">Any</option>
                   {ADV_OPTIONS.sessionTime.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -358,7 +374,9 @@ export default function Search() {
                 >
                   <option value="">Any</option>
                   {ADV_OPTIONS.priceRange.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -374,7 +392,9 @@ export default function Search() {
                 >
                   <option value="">Any</option>
                   {ADV_OPTIONS.doctorName.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -411,7 +431,7 @@ export default function Search() {
           {results.map((doc) => (
             <div
               key={doc.id}
-              className="rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+              className="flex flex-col h-full rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
             >
               <div className="h-36 w-full bg-gray-100">
                 <img
@@ -420,7 +440,9 @@ export default function Search() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="p-4">
+
+              {/* Content grows; button is pinned to bottom */}
+              <div className="p-4 flex flex-col flex-1">
                 <div className="text-[15px] font-semibold text-[#0b1324]">
                   {doc.name}
                 </div>
@@ -434,11 +456,12 @@ export default function Search() {
                     : "—"}
                 </div>
                 {doc.fee ? (
-                  <div className="text-[12px] text-gray-600 mt-1">
+                  <div className="text-[12px] text-gray-600 mt-1 pb-4">
                     <span className="font-medium">Fee:</span> LKR {doc.fee}
                   </div>
                 ) : null}
-                <button onClick={() => goBook(doc)} className={`${greenBtn} w-full mt-4`}>
+
+                <button onClick={() => goBook(doc)} className={`${greenBtn} w-full mt-auto`}>
                   Book
                 </button>
               </div>
