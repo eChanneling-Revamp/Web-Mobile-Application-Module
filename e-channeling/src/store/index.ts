@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import doctorReducer from "@/store/doctor/doctorSlice";
+import searchReducer from "@/store/search/searchSlice";
 
 export const store = configureStore({
     reducer: {
         doctor: doctorReducer,
+        search: searchReducer,
     },
 });
 
