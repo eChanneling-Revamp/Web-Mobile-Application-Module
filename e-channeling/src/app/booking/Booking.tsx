@@ -354,41 +354,55 @@ function StepOne({
       <div>
         <h3 className="text-lg font-semibold">Select Date</h3>
         <div className="mt-3 flex flex-wrap gap-3">
-          {next7Days.map(({ day, dateNum, full }) => {
-            const active = selectedDate?.toDateString() === full.toDateString();
-            const key = full.toISOString().split("T")[0];
-            const status = availability[key] || "inactive";
+      {next7Days.map(({ day, dateNum, full }) => {
+        const active = selectedDate?.toDateString() === full.toDateString();
+        const key = full.toISOString().split("T")[0];
+        const status = availability[key] || "inactive";
 
-            let colorClass = "";
-            if (status === "available") {
-              colorClass = active
-                ? "border-green-500 bg-green-50 shadow-[0_0_10px_rgba(34,197,94,0.25)]"
-                : "border-green-400 shadow-[0_0_6px_rgba(34,197,94,0.15)]";
-            } else if (status === "full") {
-              colorClass = active
-                ? "border-red-500 bg-red-50 shadow-[0_0_10px_rgba(239,68,68,0.25)]"
-                : "border-red-400 shadow-[0_0_6px_rgba(239,68,68,0.15)]";
-            } else {
-              colorClass = "border-gray-300 bg-gray-100 text-gray-400";
+        // Disable anything that isn't available
+        const isDisabled = status !== "available";
+
+        let colorClass = "";
+        if (status === "available") {
+          colorClass = active
+            ? "border-green-500 bg-green-50 shadow-[0_0_10px_rgba(34,197,94,0.25)]"
+            : "border-green-400 shadow-[0_0_6px_rgba(34,197,94,0.15)]";
+        } else if (status === "full") {
+          // Red look but disabled
+          colorClass =
+            "border-red-400 bg-red-50/60 text-red-700 opacity-60"; // still red, but visually dimmed
+        } else {
+          // Inactive (grey) and disabled
+          colorClass = "border-gray-300 bg-gray-100 text-gray-400 opacity-60";
+        }
+
+        return (
+          <button
+            key={full.toISOString()}
+            type="button"
+            onClick={() => !isDisabled && setSelectedDate(full)}
+            disabled={isDisabled}
+            aria-disabled={isDisabled}
+            title={
+              status === "available"
+                ? "Available"
+                : status === "full"
+                ? "Fully booked"
+                : "Doctor inactive"
             }
+            className={[
+              "w-24 rounded-2xl border px-3 py-3 text-center transition-all duration-200 shadow-md",
+              colorClass,
+              isDisabled ? "cursor-not-allowed" : "hover:shadow-lg",
+              active && status === "available" ? "ring-1 ring-green-500" : ""
+            ].join(" ")}
+          >
+            <div className="text-sm text-gray-600">{day}</div>
+            <div className="text-lg font-semibold">{dateNum}</div>
+          </button>
+        );
+      })}
 
-            return (
-              <button
-                key={full.toISOString()}
-                type="button"
-                onClick={() => status !== "inactive" && setSelectedDate(full)}
-                disabled={status === "inactive"}
-                className={[
-                  "w-24 rounded-2xl border px-3 py-3 text-center transition-all duration-200 shadow-md",
-                  colorClass,
-                  "disabled:cursor-not-allowed",
-                ].join(" ")}
-              >
-                <div className="text-sm text-gray-600">{day}</div>
-                <div className="text-lg font-semibold">{dateNum}</div>
-              </button>
-            );
-          })}
         </div>
       </div>
 
