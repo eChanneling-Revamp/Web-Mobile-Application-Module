@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import api from "@/utils/api";
 
+/* ---------- Types ---------- */
 type NormalFilters = {
   doctorName: string;
   specialization: string;
   hospital: string;
-  date: string; // ISO (yyyy-mm-dd)
+  date: string; // ISO
 };
 
 type AdvancedFilters = {
@@ -15,8 +16,8 @@ type AdvancedFilters = {
   specialization: string;
   gender: string;
   sessionTime: string;
-  date: string; // ISO
-  priceRange: string;
+  date: string;
+  priceRange: string; // below_1499 | 1500_2499 | ...
   doctorName: string;
 };
 
@@ -40,12 +41,7 @@ type SearchState = {
 };
 
 const initialState: SearchState = {
-  normal: {
-    doctorName: "",
-    specialization: "",
-    hospital: "",
-    date: "",
-  },
+  normal: { doctorName: "", specialization: "", hospital: "", date: "" },
   advanced: {
     hospitalType: "",
     location: "",
@@ -64,14 +60,104 @@ const initialState: SearchState = {
   hasSearchedOnce: false,
 };
 
-/**
- * Async search thunk.
- * mode = "normal" uses only normal filters.
- * mode = "advanced" uses only advanced filters.
- * 
- * Replace the endpoint string with your real API route if different.
- * The request uses `api` from "@/utils/api" as required.
- */
+/* ---------- Helpers ---------- */
+function priceToMinMax(code?: string) {
+  switch (code) {
+    case "below_1499": return { min: 0, max: 1499 };
+    case "1500_2499": return { min: 1500, max: 2499 };
+    case "2500_3499": return { min: 2500, max: 3499 };
+    case "3500_4499": return { min: 3500, max: 4499 };
+    case "4500_5499": return { min: 4500, max: 5499 };
+    default: return undefined;
+  }
+}
+
+function normalize(v?: string) {
+  return (v || "").trim().toLowerCase();
+}
+
+/** Client-side filtering for mock data so UX matches backend behavior */
+function filterDoctorsClient(
+  list: Doctor[],
+  mode: "normal" | "advanced",
+  normal: NormalFilters,
+  advanced: AdvancedFilters
+) {
+  let out = [...list];
+
+  if (mode === "normal") {
+    const n = {
+      doctorName: normalize(normal.doctorName),
+      specialization: normalize(normal.specialization),
+      hospital: normalize(normal.hospital),
+      date: normalize(normal.date), // available if your mock models it
+    };
+
+    if (n.doctorName) out = out.filter(d => normalize(d.name).includes(n.doctorName));
+    if (n.specialization) out = out.filter(d => normalize(d.specialization) === n.specialization);
+    if (n.hospital) out = out.filter(d => d.hospitals.some(h => normalize(h) === n.hospital));
+    // date ignored in mock unless you add availability in your JSON
+    return out;
+  }
+
+  // advanced
+  const a = {
+    hospitalType: normalize(advanced.hospitalType),
+    location: normalize(advanced.location),
+    hospitalName: normalize(advanced.hospitalName),
+    specialization: normalize(advanced.specialization),
+    gender: normalize(advanced.gender),
+    sessionTime: normalize(advanced.sessionTime),
+    date: normalize(advanced.date),
+    priceRange: advanced.priceRange,
+    doctorName: normalize(advanced.doctorName),
+  };
+
+  if (a.doctorName) out = out.filter(d => normalize(d.name).includes(a.doctorName));
+  if (a.specialization) out = out.filter(d => normalize(d.specialization) === a.specialization);
+
+  // hospitalName (advanced) — same as hospital in normal
+  if (a.hospitalName) out = out.filter(d => d.hospitals.some(h => normalize(h) === a.hospitalName));
+
+  // price range
+  const rng = priceToMinMax(a.priceRange);
+  if (rng) out = out.filter(d => typeof d.fee === "number" && d.fee! >= rng.min && d.fee! <= rng.max);
+
+  // hospitalType, location, gender, sessionTime, date — apply if you add these fields to mock JSON
+  // For now we skip them to avoid filtering everything out.
+
+  return out;
+}
+
+/** Load mock JSON from /public/mock/doctors.json */
+async function loadMockDoctors(): Promise<Doctor[]> {
+  try {
+    const res = await fetch("/mock/doctors.json", { cache: "no-store" });
+    const data = await res.json();
+    // supports [ ... ] or { data: [ ... ] }
+    return (Array.isArray(data) ? data : data?.data) as Doctor[];
+  } catch {
+    // Last-resort inline sample so the UI never breaks
+    return [
+      {
+        id: "demo-1",
+        name: "Dr. Samantha Perera",
+        specialization: "cardiology",
+        hospitals: ["lanka hospital", "kandy general hospital"],
+        fee: 3500,
+      },
+      {
+        id: "demo-2",
+        name: "Dr. John Doe",
+        specialization: "dermatology",
+        hospitals: ["gampaha general hospital"],
+        fee: 2400,
+      },
+    ];
+  }
+}
+
+/* ---------- Thunk (backend-first, mock fallback) ---------- */
 export const fetchDoctors = createAsyncThunk<
   Doctor[],
   { mode: "normal" | "advanced" },
@@ -79,7 +165,9 @@ export const fetchDoctors = createAsyncThunk<
 >("search/fetchDoctors", async ({ mode }, { getState, rejectWithValue }) => {
   const { normal, advanced } = getState().search;
 
-  // Build params based on mode
+  const useMock = process.env.NEXT_PUBLIC_USE_MOCK === "1";
+
+  // Params for backend
   const params =
     mode === "normal"
       ? {
@@ -102,50 +190,30 @@ export const fetchDoctors = createAsyncThunk<
           mode,
         };
 
-  try {
-    // Example endpoint; adjust to your backend
-    const res = await api.get("/doctors/search", { params });
-
-    // Expecting: { data: Doctor[] } or Doctor[]
-    const payload = Array.isArray(res.data) ? res.data : res.data?.data;
-
-    // Fallback mock mapping (if backend not ready)
-    const list: Doctor[] =
-      payload ??
-      [
-        {
-          id: "demo-1",
-          name: "Dr. Samantha Perera",
-          specialization: "Cardiology",
-          hospitals: ["Lanka Hospital", "Kandy General Hospital"],
-          fee: 3500,
-        },
-        {
-          id: "demo-2",
-          name: "Dr. John Doe",
-          specialization: "Dermatology",
-          hospitals: ["Gampaha General Hospital"],
-          fee: 2400,
-        },
-        {
-          id: "demo-3",
-          name: "Dr. A. B. M. Milhan",
-          specialization: "ENT Surgeon",
-          hospitals: ["Jaffna General Hospital"],
-          fee: 2900,
-        },
-      ];
-
-    return list;
-  } catch (err: any) {
-    const msg =
-      err?.response?.data?.message ||
-      err?.message ||
-      "Failed to fetch doctors";
-    return rejectWithValue(msg);
+  // If forced mock, skip API entirely
+  if (useMock) {
+    const list = await loadMockDoctors();
+    return filterDoctorsClient(list, mode, normal, advanced);
   }
+
+  // Try backend first
+  try {
+    const res = await api.get("/doctors/search", { params });
+    const payload = Array.isArray(res.data) ? res.data : res.data?.data;
+    if (payload && Array.isArray(payload) && payload.length > 0) {
+      return payload as Doctor[];
+    }
+    // If backend returns empty, fall through to mock (optional)
+  } catch (err: any) {
+    // Swallow and fall back to mock
+  }
+
+  // Fallback to mock JSON
+  const list = await loadMockDoctors();
+  return filterDoctorsClient(list, mode, normal, advanced);
 });
 
+/* ---------- Slice ---------- */
 const searchSlice = createSlice({
   name: "search",
   initialState,
