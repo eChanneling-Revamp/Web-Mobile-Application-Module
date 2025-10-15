@@ -14,8 +14,8 @@ import { useRouter } from "next/navigation";
 
 /**
  * NOTES
- * - Normal search fields (from your 1st image): doctorName, specialization, hospital, date
- * - Advanced search fields (from your 2nd image): hospitalType, location, hospitalName, specialization, gender, sessionTime, date, priceRange, doctorName
+ * - Normal search fields: doctorName, specialization, hospital, date
+ * - Advanced search fields: hospitalType, location, hospitalName, specialization, gender, sessionTime, date, priceRange, doctorName
  * - Advanced is a dropdown panel toggled by a small button next to normal search.
  * - API: uses `api` from "@/utils/api" via the async thunk in the slice.
  * - Single-file component as requested (no child components).
@@ -241,12 +241,18 @@ export default function Search() {
           </button>
 
           <button
-            onClick={() => dispatch(resetAllFilters())}
+            onClick={async () => {
+                // 1) Clear all filters
+                dispatch(resetAllFilters());
+                // 2) Reload full catalog (no filters) → shows all doctors
+                await dispatch(fetchDoctors({ mode: "normal" }) as any);
+            }}
             className="h-10 px-3 rounded-md border text-sm bg-white hover:bg-gray-50"
             title="Reset all fields"
-          >
+        >
             Reset
           </button>
+
         </div>
 
         {/* ADVANCED DROPDOWN PANEL */}
