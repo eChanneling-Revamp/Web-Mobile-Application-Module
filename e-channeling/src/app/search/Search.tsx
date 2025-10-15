@@ -109,7 +109,7 @@ export default function Search() {
 
   const placeholderImg = useMemo(
     () =>
-      "https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=1200&auto=format&fit=crop",
+      "\sample-doctor.png",
     []
   );
 
