@@ -1,0 +1,42 @@
+[
+  {
+    "id": "d-001",
+    "name": "Dr. Samantha Perera",
+    "specialization": "Cardiology",
+    "hospitals": ["Lanka Hospital", "Kandy General Hospital"],
+    "fee": 3500,
+    "image": ""
+  },
+  {
+    "id": "d-002",
+    "name": "Dr. John Doe",
+    "specialization": "Dermatology",
+    "hospitals": ["Gampaha General Hospital"],
+    "fee": 2400,
+    "image": ""
+  },
+  {
+    "id": "d-003",
+    "name": "Dr. A. B. M. Milhan",
+    "specialization": "ENT Surgeon",
+    "hospitals": ["Jaffna General Hospital"],
+    "fee": 2900,
+    "image": ""
+  },
+  {
+    "id": "d-004",
+    "name": "Dr. Peter Jayasekara",
+    "specialization": "Neurology",
+    "hospitals": ["Lanka Hospital"],
+    "fee": 4600,
+    "image": ""
+  },
+  {
+    "id": "d-005",
+    "name": "Dr. Sanjeewa Gunasekara",
+    "specialization": "Pediatrics",
+    "hospitals": ["Kandy General Hospital", "Gampaha General Hospital"],
+    "fee": 1800,
+    "image": ""
+  }
+]

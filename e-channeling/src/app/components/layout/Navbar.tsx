@@ -44,7 +44,7 @@ const Navbar = () => {
                             Home
                         </Link>
                         <Link
-                            href="/find-doctors"
+                            href="/search"
                             className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
                         >
                             Find Doctors
