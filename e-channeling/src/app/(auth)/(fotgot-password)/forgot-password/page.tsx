@@ -19,7 +19,7 @@ const ForgotPasswordPage = () => {
         setTimeout(() => {
             setIsLoading(false);
             // Navigate to OTP verification page
-            router.push("/forgot-password/otp-verification");
+            router.push("/otp-verification");
         }, 1000);
     };
 
