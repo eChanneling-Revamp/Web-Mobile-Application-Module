@@ -17,7 +17,7 @@ const HeroSection = () => {
     console.log(searchState);
 
     const handleRedirect = () => {
-        router.push("/find-doctors");
+        router.push("/search");
     };
 
     return (
