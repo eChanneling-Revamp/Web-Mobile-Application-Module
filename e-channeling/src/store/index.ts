@@ -1,13 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import doctorReducer from "@/store/doctor/doctorSlice";
-import searchReducer from "@/store/search/searchSlice";
-import authReducer from "@/store/auth/authSlice";
+import bookingReducer from "./booking/bookingSlice";
+
 
 export const store = configureStore({
     reducer: {
-        doctor: doctorReducer,
-        search: searchReducer,
-        auth: authReducer,
+        // add all reducers
+        booking: bookingReducer, // ✅ key: sliceName → value: reducer
+
     },
 });
 
