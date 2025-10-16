@@ -32,7 +32,7 @@ const NewPasswordPage = () => {
         setTimeout(() => {
             setIsLoading(false);
             // Navigate to success page
-            router.push("/forgot-password/success");
+            router.push("/success");
         }, 1000);
     };
 
