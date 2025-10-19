@@ -11,7 +11,7 @@ import {
 
 const Footer = () => {
     const quickLinks = [
-        { name: "Find a Doctor", href: "/find-doctor" },
+        { name: "Find a Doctor", href: "/search" },
         { name: "Book Appointment", href: "/book-appointment" },
         { name: "Teleconsultation", href: "/teleconsultation" },
         { name: "Lab Tests", href: "/lab-tests" },
@@ -173,7 +173,8 @@ const Footer = () => {
 
                 <div className="border-t border-gray-300 mt-12 pt-8">
                     <div className="text-center text-gray-500 text-sm">
-                        © 2025 eChannelling by SLT Mobitel. All rights reserved.
+                        © 2025 eChannelling by SLT Mobitel. All rights
+                        reserved.
                     </div>
                 </div>
             </div>
