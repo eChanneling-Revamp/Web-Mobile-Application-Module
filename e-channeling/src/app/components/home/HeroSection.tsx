@@ -39,7 +39,7 @@ const HeroSection = () => {
                     Find and book appointments with top doctors near you
                 </p>
 
-                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 max-w-3xl mx-auto shadow-lg">
+                {/* <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 max-w-3xl mx-auto shadow-lg">
                     <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-4">
                         <div className="w-full">
                             <input
@@ -120,6 +120,35 @@ const HeroSection = () => {
                     >
                         Find
                     </button>
+                </div> */}
+
+                <div className="mt-10 sm:mt-12 flex justify-center">
+                    <div className="w-full max-w-xl sm:max-w-3xl rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl px-6 sm:px-10 py-6 sm:py-8">
+                        <h2 className="text-white text-2xl  md:text-3xl font-semibold tracking-tight mb-2">
+                            Find Doctors Here
+                        </h2>
+                        <p className="text-white/80 text-sm sm:text-base mb-6">
+                            Search top specialists by location and book instantly.
+                        </p>
+
+                        <button
+                            onClick={handleRedirect}
+                            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 sm:px-8 md:px-8 py-3 sm:py-3.5 md:py-3 rounded-full text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-all cursor-pointer"
+                            aria-label="Go to search page"
+                        >
+                            Search Doctors
+                            <svg
+                                className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-200 ease-out transform group-hover:translate-x-1"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.2"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>

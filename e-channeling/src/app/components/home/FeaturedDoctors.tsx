@@ -6,71 +6,69 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { useSelector } from "react-redux";
 import { fetchTopRatedDoctors } from "@/store/doctor/doctorSlice";
+import Link from "next/link";
 
 const FeaturedDoctors = () => {
-
     const dispatch = useDispatch<AppDispatch>();
-    
-    const { doctors, loading, error } = useSelector(
-        (state: RootState) => state.doctor
-    );
+
+    const { loading, error } = useSelector((state: RootState) => state.doctor);
 
     // fetch doctors
-    useEffect(() => {
-        dispatch(fetchTopRatedDoctors());
-    }, []);
+    // useEffect(() => {
+    //     dispatch(fetchTopRatedDoctors());
+    // }, []);
 
     // mock data
-    // const doctors = [
-    //     {
-    //         id: 1,
-    //         name: "Dr. Samantha Perera",
-    //         specialization: "Cardiologist",
-    //         hospital: "National Hospital, Colombo",
-    //         rating: 4.9,
-    //         reviews: 124,
-    //         experience: "15 years exp.",
-    //         availability: "Today",
-    //         availabilityColor: "bg-green-500",
-    //         image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
-    //     },
-    //     {
-    //         id: 2,
-    //         name: "Dr. Arjun Rajapakse",
-    //         specialization: "Dermatologist",
-    //         hospital: "Asiri Hospital, Kandy",
-    //         rating: 4.7,
-    //         reviews: 89,
-    //         experience: "10 years exp.",
-    //         availability: "Tomorrow",
-    //         availabilityColor: "bg-blue-500",
-    //         image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
-    //     },
-    //     {
-    //         id: 3,
-    //         name: "Dr. Fathima Nizar",
-    //         specialization: "Pediatrician",
-    //         hospital: "Lady Ridgeway Hospital, Colombo",
-    //         rating: 4.8,
-    //         reviews: 156,
-    //         experience: "12 years exp.",
-    //         availability: "Today",
-    //         availabilityColor: "bg-green-500",
-    //         image: "https://images.unsplash.com/photo-1576765607924-3f7b57d2b2a4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
-    //     },
-    //     {
-    //         id: 4,
-    //         name: "Dr. Tharaka Wijesekara",
-    //         specialization: "Neurologist",
-    //         hospital: "Nawaloka Hospital, Colombo",
-    //         rating: 4.9,
-    //         reviews: 203,
-    //         experience: "18 years exp.",
-    //         availability: "Tomorrow",
-    //         availabilityColor: "bg-blue-500",
-    //         image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
-    //     },
-    // ];
+    const doctors = [
+        {
+            id: 1,
+            name: "Dr. Samantha Perera",
+            specialization: "Cardiologist",
+            hospital: "National Hospital, Colombo",
+            rating: 4.9,
+            reviews: 124,
+            experience: "15 years exp.",
+            availability: "Today",
+            availabilityColor: "bg-green-500",
+            image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+        },
+        {
+            id: 2,
+            name: "Dr. Arjun Rajapakse",
+            specialization: "Dermatologist",
+            hospital: "Asiri Hospital, Kandy",
+            rating: 4.7,
+            reviews: 89,
+            experience: "10 years exp.",
+            availability: "Tomorrow",
+            availabilityColor: "bg-blue-500",
+            image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+        },
+        {
+            id: 3,
+            name: "Dr. Fathima Nizar",
+            specialization: "Pediatrician",
+            hospital: "Lady Ridgeway Hospital, Colombo",
+            rating: 4.8,
+            reviews: 156,
+            experience: "12 years exp.",
+            availability: "Today",
+            availabilityColor: "bg-green-500",
+            image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+        },
+        {
+            id: 4,
+            name: "Dr. Tharaka Wijesekara",
+            specialization: "Neurologist",
+            hospital: "Nawaloka Hospital, Colombo",
+            rating: 4.9,
+            reviews: 203,
+            experience: "18 years exp.",
+            availability: "Tomorrow",
+            availabilityColor: "bg-blue-500",
+            image: "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+        },
+    ];
 
     const renderStars = (rating: number) => {
         const stars = [];
@@ -105,9 +103,12 @@ const FeaturedDoctors = () => {
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
                         Featured Doctors
                     </h2>
-                    <button className="text-blue-500 hover:text-blue-600 font-medium text-sm sm:text-base self-start sm:self-auto">
+                    <Link
+                        className="text-gray-700 hover:text-blue-600 font-medium text-sm sm:text-base self-start sm:self-auto cursor-pointer"
+                        href="/search"
+                    >
                         View All
-                    </button>
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
@@ -175,7 +176,7 @@ const FeaturedDoctors = () => {
                                     key={doctor.id}
                                     className="bg-white rounded-xl transition-transform duration-300 ease-in-out shadow-lg hover:shadow-2xl hover:scale-105 overflow-hidden border border-gray-100"
                                 >
-                                    <div className="relative h-40 sm:h-48 overflow-hidden">
+                                    <div className="relative h-44 sm:h-52 overflow-hidden">
                                         <div
                                             className={`absolute top-2 sm:top-3 right-2 sm:right-3 ${doctor.availabilityColor} text-white px-2 py-1 rounded-full text-xs font-medium z-10`}
                                         >
@@ -186,7 +187,7 @@ const FeaturedDoctors = () => {
                                             src={doctor.image}
                                             alt={doctor.name}
                                             fill
-                                            className="object-cover object-center"
+                                            className="object-cover object-[center_20%]"
                                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                                         />
                                     </div>

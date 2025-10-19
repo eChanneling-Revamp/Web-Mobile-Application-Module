@@ -5,7 +5,7 @@ import { Search, Globe, User, Bell, Menu, X } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { logout } from "@/store/auth/authSlice";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,6 +13,9 @@ const Navbar = () => {
     const dispatch = useDispatch();
     const router = useRouter();
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
+    const isActive = pathname;
+    console.log("pathname", isActive);
 
     // get auth status
     const { userToken, isLoginSuccess } = useSelector(
@@ -93,25 +96,31 @@ const Navbar = () => {
                     <div className="hidden lg:flex items-center space-x-8">
                         <Link
                             href="/"
-                            className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                            className={` hover:text-blue-600 font-medium transition-colors
+                            ${isActive == "/" ? "text-blue-600 " : "text-gray-700 hover:text-blue-600"}`}
                         >
                             Home
                         </Link>
                         <Link
                             href="/search"
-                            className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                            className={` hover:text-blue-600 font-medium transition-colors
+                            ${isActive == "/search" ? "text-blue-600 " : "text-gray-700 hover:text-blue-600"}`}
                         >
                             Find Doctors
                         </Link>
-                        {/* <Link
-                            href="/my-health"
-                            className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-                        >
-                            My Health
-                        </Link> */}
+                        {isAuthenticated && (
+                            <Link
+                                href="/profile"
+                                className={` hover:text-blue-600 font-medium transition-colors
+                            ${isActive == "/profile" ? "text-blue-600 " : "text-gray-700 hover:text-blue-600"}`}
+                            >
+                                My Profile
+                            </Link>
+                        )}
                         <Link
                             href="/help"
-                            className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                            className={` hover:text-blue-600 font-medium transition-colors
+                            ${isActive == "/help" ? "text-blue-600 " : "text-gray-700 hover:text-blue-600"}`}
                         >
                             Help
                         </Link>
@@ -212,28 +221,34 @@ const Navbar = () => {
                         <div className="flex flex-col space-y-2 py-6 px-4 text-center max-h-96 overflow-y-auto">
                             <Link
                                 href="/"
-                                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-150 py-3 px-4 rounded-lg hover:bg-blue-50 active:bg-blue-100"
+                                className={` hover:text-blue-600 font-medium transition-colors py-3 px-4 rounded-lg
+                                ${isActive == "/" ? "text-blue-600 " : "text-gray-700 hover:text-blue-600"}`}
                                 onClick={handleLinkClick}
                             >
                                 Home
                             </Link>
                             <Link
-                                href="/find-doctors"
-                                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-150 py-3 px-4 rounded-lg hover:bg-blue-50 active:bg-blue-100"
+                                href="/search"
+                                className={` hover:text-blue-600 font-medium transition-colors py-3 px-4 rounded-lg
+                                ${isActive == "/search" ? "text-blue-600 " : "text-gray-700 hover:text-blue-600"}`}
                                 onClick={handleLinkClick}
                             >
                                 Find Doctors
                             </Link>
-                            {/* <Link
-                                href="/my-health"
-                                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-150 py-3 px-4 rounded-lg hover:bg-blue-50 active:bg-blue-100"
-                                onClick={handleLinkClick}
-                            >
-                                My Health
-                            </Link> */}
+                            {isAuthenticated && (
+                                <Link
+                                    href="/profile"
+                                    className={` hover:text-blue-600 font-medium transition-colors py-3 px-4 rounded-lg
+                                    ${isActive == "/profile" ? "text-blue-600 " : "text-gray-700 hover:text-blue-600"}`}
+                                    onClick={handleLinkClick}
+                                >
+                                    My Profile
+                                </Link>
+                            )}
                             <Link
                                 href="/help"
-                                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-150 py-3 px-4 rounded-lg hover:bg-blue-50 active:bg-blue-100"
+                                className={` hover:text-blue-600 font-medium transition-colors py-3 px-4 rounded-lg
+                                ${isActive == "/help" ? "text-blue-600 " : "text-gray-700 hover:text-blue-600"}`}
                                 onClick={handleLinkClick}
                             >
                                 Help
