@@ -76,7 +76,14 @@ export default function Booking() {
   }>(null);
 
   const [showAppointments, setShowAppointments] = useState(false);
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<{
+    id: string;
+    patientName: string;
+    doctorName: string;
+    hospital: string;
+    date: string;
+    time: string;
+  }[]>([]);
 
   useEffect(() => {
     const stored = localStorage.getItem("appointments");
@@ -716,6 +723,23 @@ function PaymentSection({
 }
 
 /* ---------- Confirmation Section ---------- */
+interface ConfirmationSectionProps {
+  patientName: string;
+  doctorName: string;
+  hospital: string;
+  lastAppt: {
+    id: string;
+    patientName: string;
+    doctorName: string;
+    hospital: string;
+    date: string;
+    time: string;
+  } | null;
+  onBackHome: () => void;
+  onViewAppointments: () => void;
+  onDownload: () => void;
+}
+
 function ConfirmationSection({
   patientName,
   doctorName,
@@ -724,7 +748,7 @@ function ConfirmationSection({
   onBackHome,
   onViewAppointments,
   onDownload,
-}: any) {
+}: ConfirmationSectionProps) {
   return (
     <div className="text-center">
       <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-green-100 grid place-items-center">
@@ -763,7 +787,20 @@ function ConfirmationSection({
 }
 
 /* ---------- Appointments Modal ---------- */
-function AppointmentsModal({ open, onClose, appointments }: any) {
+interface AppointmentsModalProps {
+  open: boolean;
+  onClose: () => void;
+  appointments: {
+    id: string;
+    patientName: string;
+    doctorName: string;
+    hospital: string;
+    date: string;
+    time: string;
+  }[];
+}
+
+function AppointmentsModal({ open, onClose, appointments }: AppointmentsModalProps) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 bg-black/40 grid place-items-center z-50 p-4">
@@ -776,7 +813,7 @@ function AppointmentsModal({ open, onClose, appointments }: any) {
           <p className="text-gray-600">No appointments found.</p>
         ) : (
           <ul className="space-y-3 max-h-[60vh] overflow-auto">
-            {appointments.map((a: any) => (
+            {appointments.map((a) => (
               <li key={a.id} className="border rounded-xl p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">{a.doctorName}</p>

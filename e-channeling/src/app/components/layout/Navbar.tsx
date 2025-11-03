@@ -1,11 +1,13 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Search, Globe, User, Bell, Menu, X } from "lucide-react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store";
+import {  Globe, User, Bell, Menu, X } from "lucide-react";
+// import { useSelector } from "react-redux";
+import {  useDispatch } from "react-redux";
+// import { RootState } from "@/store";
 import { logout } from "@/store/auth/authSlice";
 import { usePathname, useRouter } from "next/navigation";
+
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,9 +20,9 @@ const Navbar = () => {
     console.log("pathname", isActive);
 
     // get auth status
-    const { userToken, isLoginSuccess } = useSelector(
-        (state: RootState) => state.auth
-    );
+    // const { userToken, isLoginSuccess } = useSelector(
+    //     (state: RootState) => state.auth
+    // );
     // const isAuthenticated =
     //     isLoginSuccess && userToken && Object.keys(userToken).length > 0;
 

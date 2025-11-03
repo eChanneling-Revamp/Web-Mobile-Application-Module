@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useDispatch } from "react-redux";
@@ -10,7 +11,7 @@ import type { AppDispatch } from "@/store";
 import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
-    const { isLoginLoading, isLoginError, isLoginSuccess, role } = useSelector(
+    const { isLoginLoading, isLoginError, role } = useSelector(
         (state: RootState) => state.auth
     );
     const dispatch = useDispatch<AppDispatch>();
@@ -77,10 +78,12 @@ export default function SignInPage() {
         <div className="min-h-screen bg-gradient-to-b from-cyan-100 to-gray-50 flex flex-col items-center justify-center p-4">
             {/* Logo */}
             <div className="mb-8">
-                <img
+                <Image
                     src="/logo.jpg"
                     alt="E-channeling Logo"
-                    className="w-20 h-20 object-contain"
+                    width={80}
+                    height={80}
+                    className="object-contain"
                 />
             </div>
 
@@ -93,7 +96,7 @@ export default function SignInPage() {
 
                     <p className="text-gray-600 text-center mb-8 text-sm">
                         * Please enter your registered mobile number in below
-                        field and we'll send SMS contains OTP to sign in.
+                        field and we&apos;ll send SMS contains OTP to sign in.
                     </p>
 
                     <div className="space-y-6">
@@ -203,7 +206,7 @@ export default function SignInPage() {
                         {/* Sign Up Link */}
                         <div className="text-center pt-4">
                             <p className="text-gray-700">
-                                I'm a new user,{" "}
+                                I&apos;m a new user,{" "}
                                 <button
                                     onClick={() =>
                                         console.log("Sign up clicked")

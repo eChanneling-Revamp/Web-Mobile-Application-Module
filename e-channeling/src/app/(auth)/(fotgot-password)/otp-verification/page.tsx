@@ -121,7 +121,7 @@ const OTPVerificationPage = () => {
                         {/* Resend OTP */}
                         <div className="text-center">
                             <p className="text-gray-600 text-sm mb-2">
-                                Didn't recieve an OTP ?
+                                Didn&apos;t recieve an OTP ?
                             </p>
                             <button
                                 type="button"

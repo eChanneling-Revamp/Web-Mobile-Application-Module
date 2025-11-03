@@ -8,7 +8,6 @@ import {
   verifyOtp,
   signup,
   setSignupData,
-  resetSignup
 } from '@/store/auth/authSlice';
 
 import Image from 'next/image';
@@ -18,7 +17,6 @@ const SignUpPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const {
     isOtpLoading,
-    isOtpError,
     isSignupLoading,
     signupData,
   } = useSelector((state: RootState) => state.auth);
@@ -232,7 +230,7 @@ const SignUpPage = () => {
                     OTP Expires in {Math.floor(otpTimer / 60)}:{(otpTimer % 60).toString().padStart(2, '0')}
                   </p>
                   <p className="text-sm">
-                    Didn't receive an OTP?{' '}
+                    Didn&apos;t receive an OTP?{' '}
                     <button
                       type="button"
                       onClick={() => otpTimer === 0 && setOtpTimer(120)}
@@ -519,7 +517,7 @@ const SignUpPage = () => {
               </div>
             </div>
             <p className="text-sm text-gray-600 mt-8">
-              Click here to agree {' '}
+              Click here to agree{' '}
               <Link href="/terms" className="text-[#4B5BDA] hover:underline">
                 eChannelling Terms and Conditions
               </Link>
@@ -553,7 +551,7 @@ const SignUpPage = () => {
       {/* Main card */}
       <div className="w-full max-w-screen-sm bg-white rounded-2xl shadow-lg p-8">
         <h1 className="text-center text-2xl font-bold mb-4">Sign Up</h1>
-        <p className="text-center text-gray-600 mb-8">Hello there! Let's create your account.</p>
+        <p className="text-center text-gray-600 mb-8">Hello there! Let&apos;s create your account.</p>
 
         {/* Progress steps */}
         <div className="flex justify-center items-center space-x-2 mb-8">

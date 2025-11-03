@@ -37,9 +37,10 @@ export const fetchTopRatedDoctors = createAsyncThunk<
     try {
         const response = await api.get("/topRatedDoctors");
         return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } } };
         return rejectWithValue(
-            error.response?.data?.message ||
+            err.response?.data?.message ||
                 "Failed to fetch top rated Doctors!"
         );
     }

@@ -476,7 +476,7 @@ export default function HelpPage() {
                                     Medical Emergency?
                                 </h3>
                                 <p className="text-red-700 text-sm leading-6">
-                                    If you're experiencing a medical emergency,
+                                    If you&apos;re experiencing a medical emergency,
                                     please call <strong>1990</strong> (Ambulance
                                     Service) or visit the nearest hospital
                                     emergency room immediately.

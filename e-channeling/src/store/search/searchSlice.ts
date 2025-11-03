@@ -162,7 +162,7 @@ export const fetchDoctors = createAsyncThunk<
   Doctor[],
   { mode: "normal" | "advanced" },
   { state: { search: SearchState } }
->("search/fetchDoctors", async ({ mode }, { getState, rejectWithValue }) => {
+>("search/fetchDoctors", async ({ mode }, { getState }) => {
   const { normal, advanced } = getState().search;
 
   const useMock = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -204,7 +204,7 @@ export const fetchDoctors = createAsyncThunk<
       return payload as Doctor[];
     }
     // If backend returns empty, fall through to mock (optional)
-  } catch (err: any) {
+  } catch {
     // Swallow and fall back to mock
   }
 

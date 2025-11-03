@@ -1,20 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 
 const HeroSection = () => {
     const router = useRouter();
-
-    // search state
-    const [searchState, setSearchState] = useState({
-        keyword: "",
-        filters: {
-            specialty: "",
-            location: "",
-        },
-    });
-
-    console.log(searchState);
 
     const handleRedirect = () => {
         router.push("/search");

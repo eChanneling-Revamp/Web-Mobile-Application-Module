@@ -33,7 +33,7 @@ interface LoginData {
 
 // data types of state
 interface userState {
-    userToken: any[];
+    userToken: Record<string, unknown>;
     role: string | null;
     userId: string | null;
     isLoginLoading: boolean;
@@ -80,9 +80,10 @@ export const requestOtp = createAsyncThunk<
     try {
         const response = await api.post("/auth/request-otp", { phoneNumber });
         return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } } };
         return rejectWithValue(
-            error.response?.data?.message ||
+            err.response?.data?.message ||
             "An error occurred while sending OTP."
         );
     }
@@ -97,9 +98,10 @@ export const verifyOtp = createAsyncThunk<
     try {
         const response = await api.post("/auth/verify-otp", data);
         return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } } };
         return rejectWithValue(
-            error.response?.data?.message ||
+            err.response?.data?.message ||
             "Invalid OTP code."
         );
     }
@@ -114,9 +116,10 @@ export const signup = createAsyncThunk<
     try {
         const response = await api.post("/auth/signup", signupData);
         return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } } };
         return rejectWithValue(
-            error.response?.data?.message ||
+            err.response?.data?.message ||
             "An error occurred during signup."
         );
     }
@@ -131,9 +134,10 @@ export const login = createAsyncThunk<
     try {
         const response = await api.post("/login", { loginData });
         return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } } };
         return rejectWithValue(
-            error.response?.data?.message ||
+            err.response?.data?.message ||
             "An unexpected error occurred during login."
         );
     }
@@ -150,7 +154,7 @@ const authSlice = createSlice({
             state.isOtpError = null;
         },
         logout: (state) => {
-            state.userToken = [];
+            state.userToken = {};
             state.userId = null;
             state.role = null;
             state.isLoginSuccess = false;

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { RootState, AppDispatch } from "@/store";
 import {
     setNormalField,
     setAdvancedField,
@@ -68,8 +69,8 @@ const ADV_OPTIONS = {
     ] as Option[],
 };
 
-export default function Search() {
-    const dispatch = useDispatch();
+export default function SearchPage() {
+    const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
 
     const {
@@ -103,20 +104,26 @@ export default function Search() {
 
     // initial load → show all
     useEffect(() => {
-        if (!hasSearchedOnce) dispatch(fetchDoctors({ mode: "normal" }) as any);
+        if (!hasSearchedOnce) dispatch(fetchDoctors({ mode: "normal" }));
     }, [dispatch, hasSearchedOnce]);
 
     const onNormalSearch = useCallback(() => {
-        dispatch(fetchDoctors({ mode: "normal" }) as any);
+        dispatch(fetchDoctors({ mode: "normal" }));
     }, [dispatch]);
 
     const onAdvancedSearch = useCallback(() => {
-        dispatch(fetchDoctors({ mode: "advanced" }) as any);
+        dispatch(fetchDoctors({ mode: "advanced" }));
     }, [dispatch]);
 
-    const placeholderImg = useMemo(() => "\sample-doctor.png", []);
+    const placeholderImg = useMemo(() => "/sample-doctor.png", []);
 
-    const goBook = (doc: any) => {
+    interface Doctor {
+        name?: string;
+        hospitals?: string | string[];
+        fee?: number | string;
+    }
+
+    const goBook = (doc: Doctor) => {
         const hospital = Array.isArray(doc?.hospitals) ? doc.hospitals[0] : "";
         router.push(
             `/booking?doctorName=${encodeURIComponent(doc?.name || "")}&hospital=${encodeURIComponent(
@@ -259,7 +266,7 @@ export default function Search() {
                                         await dispatch(
                                             fetchDoctors({
                                                 mode: "normal",
-                                            }) as any
+                                            })
                                         );
                                     }}
                                     className={ghostBtn}
@@ -526,11 +533,13 @@ export default function Search() {
                             key={doc.id}
                             className="flex flex-col h-full rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                         >
-                            <div className="h-55 w-full bg-gray-100">
-                                <img
+                            <div className="h-[220px] w-full bg-gray-100 relative">
+                                <Image
                                     src={doc.image || placeholderImg}
-                                    alt={doc.name}
-                                    className="h-full w-full object-cover"
+                                    alt={doc.name || "Doctor"}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                                 />
                             </div>
 

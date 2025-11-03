@@ -1,15 +1,15 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import { Star, MapPin } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "@/store";
+// import { useDispatch } from "react-redux";
+import {  RootState } from "@/store";
 import { useSelector } from "react-redux";
-import { fetchTopRatedDoctors } from "@/store/doctor/doctorSlice";
+// import { fetchTopRatedDoctors } from "@/store/doctor/doctorSlice";
 import Link from "next/link";
 
 const FeaturedDoctors = () => {
-    const dispatch = useDispatch<AppDispatch>();
+    // const dispatch = useDispatch<AppDispatch>();
 
     const { loading, error } = useSelector((state: RootState) => state.doctor);
 
