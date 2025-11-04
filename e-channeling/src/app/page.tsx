@@ -5,7 +5,7 @@ import FeaturedDoctors from "./components/home/FeaturedDoctors";
 
 export default function Home() {
     return (
-        <main className="min-h-screen px-5 sm:px-15 pt-10">
+        <main className="min-h-screen px-5 sm:px-15 pt-8">
             {/* Landing Page */}
             <HeroSection />
             <FeaturedServices />

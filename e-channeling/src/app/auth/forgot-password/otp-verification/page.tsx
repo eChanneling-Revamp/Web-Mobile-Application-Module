@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -54,7 +55,7 @@ const OTPVerificationPage = () => {
         setTimeout(() => {
             setIsLoading(false);
             // Navigate to new password page
-            router.push("/forgot-password/new-password");
+            router.push("/auth/forgot-password/new-password");
         }, 1000);
     };
 
@@ -121,7 +122,7 @@ const OTPVerificationPage = () => {
                         {/* Resend OTP */}
                         <div className="text-center">
                             <p className="text-gray-600 text-sm mb-2">
-                                Didn't recieve an OTP ?
+                                Didn&apos;t recieve an OTP ?
                             </p>
                             <button
                                 type="button"

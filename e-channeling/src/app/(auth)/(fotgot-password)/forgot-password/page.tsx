@@ -19,7 +19,7 @@ const ForgotPasswordPage = () => {
         setTimeout(() => {
             setIsLoading(false);
             // Navigate to OTP verification page
-            router.push("/forgot-password/otp-verification");
+            router.push("/otp-verification");
         }, 1000);
     };
 
@@ -39,7 +39,7 @@ const ForgotPasswordPage = () => {
                         </h1>
                         <p className="text-gray-600 text-sm leading-relaxed">
                             * Please enter your registered email address and
-                            we'll
+                            we&apos;ll
                             <br />
                             send an email or SMS contain OTP to reset password.
                         </p>
