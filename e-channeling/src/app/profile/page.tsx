@@ -104,56 +104,93 @@ const UserProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar 
-        user={user} 
-        activeSection={activeSection} 
-        onSectionChange={setActiveSection} 
-      />
-
-      {/* Main Content */}
-      <div className="flex-1 p-8">
-        <div className="max-w-4xl">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-800">Appointments</h1>
-            <p className="text-gray-500">Manage your medical appointments</p>
+    <div className="min-h-screen bg-gray-50 py-4 md:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+          {/* Mobile: Sidebar dropdown */}
+          <div className="lg:hidden">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex-shrink-0"></div>
+                  <div>
+                    <select 
+                      value={activeSection}
+                      onChange={(e) => setActiveSection(e.target.value)}
+                      className="text-sm font-medium text-gray-900 bg-transparent border-none outline-none cursor-pointer"
+                    >
+                      <option value="Appointments">Appointments</option>
+                      <option value="Health Records">Health Records</option>
+                      <option value="Payments & Refunds">Payments & Refunds</option>
+                      <option value="Membership">Membership</option>
+                      <option value="Notifications">Notifications</option>
+                      <option value="Settings">Settings</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Appointment Tabs */}
-          <AppointmentTabs 
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            counts={appointmentCounts}
-          />
-
-          {/* Appointments List */}
-          <div className="space-y-6">
-            {filteredAppointments.map((appointment) => (
-              <AppointmentCard
-                key={appointment.id}
-                appointment={appointment}
-                onViewDetails={handleViewDetails}
-                onJoinConsultation={handleJoinConsultation}
-                onCancel={handleCancel}
-                onReschedule={handleReschedule}
-              />
-            ))}
+          {/* Desktop: Sidebar */}
+          <div className="hidden lg:block">
+            <Sidebar 
+              user={user} 
+              activeSection={activeSection} 
+              onSectionChange={setActiveSection} 
+            />
           </div>
 
-          {/* Empty State */}
-          {filteredAppointments.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No {activeTab} appointments found.</p>
+          {/* Main Content */}
+          <div className="flex-1 min-w-0">
+            <div className="mb-4 md:mb-6">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Appointments</h1>
+              <p className="text-gray-600 mt-1 text-sm md:text-base">Manage your medical appointments</p>
             </div>
-          )}
 
-          {/* Status Indicators */}
-          <div className="mt-8 flex items-center space-x-6 text-sm text-gray-600">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-              Confirmed
-            </div>
+            <AppointmentTabs 
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              counts={appointmentCounts}
+            />
+
+            {filteredAppointments.length > 0 ? (
+              <div className="space-y-3 md:space-y-4">
+                {filteredAppointments.map((appointment) => (
+                  <AppointmentCard
+                    key={appointment.id}
+                    appointment={appointment}
+                    onViewDetails={handleViewDetails}
+                    onJoinConsultation={handleJoinConsultation}
+                    onCancel={handleCancel}
+                    onReschedule={handleReschedule}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm p-8 md:p-12">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <svg 
+                    className="w-16 h-16 md:w-20 md:h-20 text-gray-300 mb-4" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
+                    No {activeTab} appointments
+                  </h3>
+                  <p className="text-gray-500 text-sm">
+                    You don&apos;t have any {activeTab} appointments at the moment.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
