@@ -6,13 +6,19 @@ import { Search, Globe, User, Bell, Menu, X } from "lucide-react";
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
     };
 
+    const toggleProfileDropdown = () => {
+        setIsProfileDropdownOpen(!isProfileDropdownOpen);
+    };
+
     const handleLinkClick = () => {
         setIsMobileMenuOpen(false);
+        setIsProfileDropdownOpen(false);
     };
 
     return (
@@ -49,12 +55,6 @@ const Navbar = () => {
                         >
                             Find Doctors
                         </Link>
-                        {/* <Link
-                            href="/my-health"
-                            className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-                        >
-                            My Health
-                        </Link> */}
                         <Link
                             href="/help"
                             className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
@@ -86,6 +86,30 @@ const Navbar = () => {
                                 3
                             </span>
                         </button>
+
+                        {/* Profile Icon with Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={toggleProfileDropdown}
+                                className="p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                aria-label="Profile"
+                            >
+                                <User className="w-5 h-5" />
+                            </button>
+
+                            {/* Profile Dropdown - Only My Profile */}
+                            {isProfileDropdownOpen && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                                    <Link
+                                        href="/profile"
+                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                        onClick={handleLinkClick}
+                                    >
+                                        My Profile
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
 
                         <Link
                             href="/login"
@@ -137,13 +161,6 @@ const Navbar = () => {
                             >
                                 Find Doctors
                             </Link>
-                            {/* <Link
-                                href="/my-health"
-                                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-150 py-3 px-4 rounded-lg hover:bg-blue-50 active:bg-blue-100"
-                                onClick={handleLinkClick}
-                            >
-                                My Health
-                            </Link> */}
                             <Link
                                 href="/help"
                                 className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-150 py-3 px-4 rounded-lg hover:bg-blue-50 active:bg-blue-100"
@@ -151,6 +168,19 @@ const Navbar = () => {
                             >
                                 Help
                             </Link>
+                            
+                            {/* Profile Link in Mobile Menu */}
+                            <div className="border-t border-gray-200 pt-4 mt-2">
+                               // In your Navbar component, find this part:
+<Link
+  href="/profile"
+  className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+  onClick={handleLinkClick}
+>
+  My Profile
+</Link>
+                            </div>
+
                             <div className="flex items-center justify-center space-x-2 py-3 px-4 text-sm text-gray-600 rounded-lg hover:bg-blue-50 transition-colors duration-150">
                                 <Globe className="w-4 h-4" />
                                 <span>English</span>
