@@ -26,7 +26,7 @@ const Navbar = () => {
     // const isAuthenticated =
     //     isLoginSuccess && userToken && Object.keys(userToken).length > 0;
 
-    const isAuthenticated = true;
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
 
     // mobile nav bar
     const toggleMobileMenu = () => {
@@ -42,6 +42,7 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
+        setIsAuthenticated(false)
         localStorage.removeItem("token");
         dispatch(logout());
         setIsProfileDropdownOpen(false);

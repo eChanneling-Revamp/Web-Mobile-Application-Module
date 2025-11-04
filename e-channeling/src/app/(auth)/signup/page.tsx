@@ -540,9 +540,9 @@ const SignUpPage = () => {
       {/* Logo */}
       <div className="w-full max-w-screen-sm mb-8">
         <Image
-          src="/e-channelling-logo.png"
+          src="/logo.jpg"
           alt="eChannelling"
-          width={200}
+          width={80}
           height={50}
           className="mx-auto"
         />

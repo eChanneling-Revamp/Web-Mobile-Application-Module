@@ -207,14 +207,12 @@ export default function SignInPage() {
                         <div className="text-center pt-4">
                             <p className="text-gray-700">
                                 I&apos;m a new user,{" "}
-                                <button
-                                    onClick={() =>
-                                        console.log("Sign up clicked")
-                                    }
+                                <Link
+                                    href={"/signup"}
                                     className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
                                 >
                                     Sign Up
-                                </button>
+                                </Link>
                             </p>
                         </div>
                     </div>
