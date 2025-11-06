@@ -2,22 +2,27 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {  Globe, User, Bell, Menu, X } from "lucide-react";
-// import { useSelector } from "react-redux";
-import {  useDispatch } from "react-redux";
-// import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
 import { logout } from "@/store/auth/authSlice";
 import { usePathname, useRouter } from "next/navigation";
+import NotificationPanel from "../notifications/NotificationPanel";
 
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const dispatch = useDispatch();
+    
+    // Get notifications from Redux store
+    const { notifications } = useSelector((state: RootState) => state.notifications);
+    const unreadCount = notifications?.filter(notification => !notification.isRead).length || 0;
     const router = useRouter();
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const notificationRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
     const isActive = pathname;
-    console.log("pathname", isActive);
 
     // get auth status
     // const { userToken, isLoginSuccess } = useSelector(
@@ -39,6 +44,12 @@ const Navbar = () => {
 
     const toggleProfileDropdown = () => {
         setIsProfileDropdownOpen(!isProfileDropdownOpen);
+        setIsNotificationOpen(false);
+    };
+
+    const toggleNotification = () => {
+        setIsNotificationOpen(!isNotificationOpen);
+        setIsProfileDropdownOpen(false);
     };
 
     const handleLogout = () => {
@@ -149,28 +160,40 @@ const Navbar = () => {
                                     <Globe className="w-5 h-5 mr-1" />
                                     <span className="font-medium">English</span>
                                 </div>
-                                <button
-                                    className="relative p-2 text-gray-600 transition-colors rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 "
-                                    aria-label="Notifications"
-                                >
-                                    <Bell className="w-5 h-5 hover:text-black" />
-                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4.5 h-4.5 flex items-center justify-center border-2 border-white shadow text-[10px] text-center">
-                                        3
-                                    </span>
-                                </button>
 
-                                <div
-                                    className="relative flex"
-                                    ref={dropdownRef}
-                                >
+                                {/* Notification Bell */}
+                                <div className="relative" ref={notificationRef}>
+                                    <button
+                                        onClick={toggleNotification}
+                                        className="relative p-2 text-gray-600 transition-colors rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 hover:bg-gray-100"
+                                        aria-label="Notifications"
+                                    >
+                                        <Bell className="w-5 h-5 hover:text-black" />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4.5 h-4.5 flex items-center justify-center border-2 border-white shadow text-[10px]">
+                                                {unreadCount > 9 ? "9+" : unreadCount}
+                                            </span>
+                                        )}
+                                    </button>
+                                    <NotificationPanel
+                                        isOpen={isNotificationOpen}
+                                        onClose={() => setIsNotificationOpen(false)}
+                                    />
+                                </div>
+
+                                <div className="relative flex" ref={dropdownRef}>
                                     <div
                                         onClick={toggleProfileDropdown}
-                                        className={`border rounded-full p-2 border-gray-400/80 cursor-pointer transition-colors hover:bg-gray-200 ${isProfileDropdownOpen ? "bg-gray-200" : ""}`}
+                                        className={`border rounded-full p-2 border-gray-400/80 cursor-pointer transition-colors hover:bg-gray-200 ${
+                                            isProfileDropdownOpen
+                                                ? "bg-gray-200"
+                                                : ""
+                                        }`}
                                         aria-haspopup="menu"
                                         aria-expanded={isProfileDropdownOpen}
                                         aria-label="Open profile menu"
                                     >
-                                        <User className="w-5.5 h-5 text-gray-700 hover:text-black " />
+                                        <User className="w-5.5 h-5 text-gray-700 hover:text-black" />
                                     </div>
 
                                     {isProfileDropdownOpen && (
