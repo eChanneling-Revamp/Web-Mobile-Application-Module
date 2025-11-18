@@ -144,15 +144,15 @@ const SignUpPage = () => {
         return (
           <form onSubmit={handlePhoneSubmit} className="space-y-6">
             <div>
-              <h2 className="text-lg font-medium mb-4">Set Nationality</h2>
+              <h2 className="text-lg font-medium mb-4 text-center">Set Nationality</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block mb-1">Nationality *</label>
+                  <label className="block mb-1 text-sm">Nationality *</label>
                   <select
                     name="nationality"
                     value={formData.nationality}
                     onChange={handleInputChange}
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                    className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                     required
                   >
                     <option value="Sri Lankan">Sri Lankan</option>
@@ -160,16 +160,16 @@ const SignUpPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block mb-1">Phone Number *</label>
+                  <label className="block mb-1 text-sm">Phone Number *</label>
                   <div className="flex">
-                    <span className="p-3 border rounded-l-lg bg-gray-50">+94</span>
+                    <span className="px-3 py-3 border-2 border-r-0 rounded-l-full bg-gray-50">+94</span>
                     <input
                       type="tel"
                       name="phoneNumber"
                       value={formData.phoneNumber}
                       onChange={handleInputChange}
                       placeholder="Ex: 711234567"
-                      className="flex-1 p-3 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                      className="flex-1 px-4 py-3 border-2 rounded-r-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                       required
                     />
                   </div>
@@ -177,12 +177,12 @@ const SignUpPage = () => {
               </div>
             </div>
             <div className="flex justify-end space-x-4">
-              <button type="button" className="px-6 py-2 border rounded-lg">
+              <button type="button" className="px-6 py-2 border rounded-full">
                 Close
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-[#4B5BDA] text-white rounded-lg"
+                className="px-6 py-2 w-[140px] bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
               >
                 Next
               </button>
@@ -194,7 +194,7 @@ const SignUpPage = () => {
         return (
           <form onSubmit={handleOtpSubmit} className="space-y-6">
             <div>
-              <h2 className="text-lg font-medium mb-4">Verify Mobile Number</h2>
+              <h2 className="text-lg font-medium mb-4 text-center">Verify Mobile Number</h2>
               <div className="space-y-4">
                 <div className="text-center mb-4">
                   <p className="font-medium">OTP Verification</p>
@@ -221,7 +221,7 @@ const SignUpPage = () => {
                           }
                         }
                       }}
-                      className="w-12 h-12 text-center border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                      className="w-12 h-12 text-center border-2 rounded-lg focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                     />
                   ))}
                 </div>
@@ -234,7 +234,7 @@ const SignUpPage = () => {
                     <button
                       type="button"
                       onClick={() => otpTimer === 0 && setOtpTimer(120)}
-                      className="text-[#4B5BDA] hover:underline"
+                      className="text-blue-600 hover:text-blue-700 hover:underline"
                       disabled={otpTimer > 0}
                     >
                       Resend OTP
@@ -247,13 +247,13 @@ const SignUpPage = () => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="px-6 py-2 border rounded-lg"
+                className="px-6 py-2 border rounded-full"
               >
                 Previous
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-[#4B5BDA] text-white rounded-lg"
+                className="px-6 py-2 w-[140px] bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
                 disabled={isOtpLoading || otp.length !== 6}
               >
                 Next
@@ -262,88 +262,104 @@ const SignUpPage = () => {
           </form>
         );
 
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-lg font-medium mb-4">Select Package</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {packages.map((pkg) => (
-                <div
-                  key={pkg.name}
-                  className={`p-6 border rounded-xl cursor-pointer transition-all ${
-                    formData.package === pkg.name ? 'border-[#4B5BDA] bg-[#F8FAFF]' : 'hover:border-gray-300'
-                  }`}
-                  onClick={() => handlePackageSelect(pkg.name)}
-                >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-4 ${
-                    pkg.name === 'Free Member' ? 'bg-[#E8F4FE]' : 'bg-[#F1FFE9]'
-                  }`}>
-                    {pkg.name === 'Free Member' ? (
-                      <span className="text-[#4B5BDA] text-xl">★</span>
-                    ) : (
-                      <span className="text-[#75B53B] text-xl">👑</span>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-medium">{pkg.name}</h3>
-                      <p className="text-2xl font-bold">{pkg.price}</p>
-                    </div>
-                    {formData.package === pkg.name && (
-                      <span className="text-xs bg-[#4B5BDA] text-white px-3 py-1 rounded-full">
-                        Selected
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">{pkg.duration}</p>
-                  <ul className="space-y-2">
-                    {pkg.features.map((feature, index) => (
-                      <li key={index} className="flex items-start space-x-2 text-sm">
-                        <svg className="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+case 3:
+  return (
+    <div className="space-y-8">
+      <h2 className="text-lg font-bold text-center">Select Package</h2>
+
+      {/* Two equal cards side-by-side on md+, stacked on small screens */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {packages.map((pkg) => (
+          <div
+            key={pkg.name}
+            onClick={() => handlePackageSelect(pkg.name)}
+            className={`relative cursor-pointer transition-all rounded-xl border bg-white p-6 min-h-[300px] flex flex-col justify-between ${
+              formData.package === pkg.name
+                ? 'border-[#4B5BDA] shadow-md'
+                : 'border-gray-300 hover:shadow-sm'
+            }`}
+          >
+            {/* top row with icon */}
+            <div className="flex items-start justify-between">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                pkg.name === 'Free Member' ? 'bg-[#E8F4FE]' : 'bg-[#F1FFE9]'
+              }`}>
+                {pkg.name === 'Free Member' ? (
+                  <span className="text-[#4B5BDA] text-xl">★</span>
+                ) : (
+                  <span className="text-[#75B53B] text-xl">👑</span>
+                )}
+              </div>
+
+              {/* Selected pill positioned top-right */}
+              {formData.package === pkg.name && (
+                <span className="absolute top-3 right-3 text-xs bg-[#4B5BDA] text-white px-3 py-1 rounded-full">
+                  Selected
+                </span>
+              )}
+            </div>
+
+            {/* center: title + price */}
+            <div className="flex-1 flex flex-col justify-center items-start">
+              <h3 className="font-medium">{pkg.name}</h3>
+              <p className="text-2xl font-extrabold mt-2">{pkg.price}</p>
+              <p className="text-sm text-gray-500 mt-2">{pkg.duration}</p>
+            </div>
+
+            {/* bottom: features */}
+            <ul className="space-y-2 text-sm text-gray-700 mt-4">
+              {pkg.features.map((feature, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <svg className="w-4 h-4 text-green-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="leading-tight">{feature}</span>
+                </li>
               ))}
-            </div>
-            <div className="text-center text-sm">
-              <Link href="/membership-details" className="text-[#4B5BDA] hover:underline">
-                To view more info regarding eChannelling membership and benefits Visit Membership Details
-              </Link>
-            </div>
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="px-6 py-2 border rounded-lg"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => formData.package && setStep(4)}
-                className="px-6 py-2 bg-[#4B5BDA] text-white rounded-lg"
-                disabled={!formData.package}
-              >
-                Next
-              </button>
-            </div>
+            </ul>
           </div>
-        );
+        ))}
+      </div>
+
+      <div className="text-center text-sm">
+        <Link href="/membership-details" className="text-blue-600 hover:text-blue-700 underline">
+          To view more info regarding eChannelling membership and benefits visit Membership Details
+        </Link>
+      </div>
+
+      <div className="flex justify-end space-x-4 pt-2">
+        <button
+          type="button"
+          onClick={() => setStep(2)}
+          className="px-6 py-2 border rounded-full transition-all hover:shadow-md active:scale-95"
+        >
+          Previous
+        </button>
+
+        <button
+          type="button"
+          onClick={() => formData.package && setStep(4)}
+          className="px-6 py-2 w-[140px] bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
+          disabled={!formData.package}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+
 
       case 4:
+        // added extra spacing so inputs don't feel cramped
         return (
-          <form onSubmit={handleFinalSubmit} className="space-y-6">
-            <div className="space-y-4">
+          <form onSubmit={handleFinalSubmit} className="space-y-8">
+            <div className="space-y-6">
               <div>
                 <select
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                  className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                   required
                 >
                   <option value="Mr">Mr.</option>
@@ -352,48 +368,47 @@ const SignUpPage = () => {
                   <option value="Dr">Dr.</option>
                 </select>
               </div>
-              <div>
+
+              <div className="grid grid-cols-1 gap-4">
                 <input
                   type="text"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
                   placeholder="First Name"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                  className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                   required
                 />
-              </div>
-              <div>
                 <input
                   type="text"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
                   placeholder="Last Name"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                  className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                   required
                 />
-              </div>
-              <div>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Email"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                  className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                   required
                 />
               </div>
-              <div className="bg-[#F8FAFF] p-3 rounded-lg">
+
+              <div className="bg-gray-50 p-3 rounded-full">
                 <input
                   type="tel"
                   value={formData.phoneNumber}
                   disabled
-                  className="w-full bg-transparent"
+                  className="w-full bg-transparent outline-none placeholder:text-gray-500"
                 />
               </div>
-              <div className="flex space-x-4">
+
+              <div className="flex items-center gap-6">
                 <label className="flex items-center space-x-2">
                   <input
                     type="radio"
@@ -401,7 +416,7 @@ const SignUpPage = () => {
                     value="NIC"
                     checked={formData.idType === 'NIC'}
                     onChange={handleInputChange}
-                    className="text-[#4B5BDA] focus:ring-[#4B5BDA]"
+                    className="text-indigo-500 focus:ring-indigo-400"
                   />
                   <span>NIC</span>
                 </label>
@@ -412,11 +427,12 @@ const SignUpPage = () => {
                     value="Passport"
                     checked={formData.idType === 'Passport'}
                     onChange={handleInputChange}
-                    className="text-[#4B5BDA] focus:ring-[#4B5BDA]"
+                    className="text-indigo-500 focus:ring-indigo-400"
                   />
                   <span>Passport</span>
                 </label>
               </div>
+
               <div>
                 <input
                   type="text"
@@ -424,10 +440,11 @@ const SignUpPage = () => {
                   value={formData.idNumber}
                   onChange={handleInputChange}
                   placeholder="NIC Number"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                  className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                   required
                 />
               </div>
+
               <div className="relative">
                 <input
                   type="password"
@@ -435,7 +452,7 @@ const SignUpPage = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   placeholder="Password"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA] pr-10"
+                  className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 pr-12 border-gray-300 focus:border-indigo-400"
                   required
                   minLength={8}
                 />
@@ -449,6 +466,7 @@ const SignUpPage = () => {
                   </svg>
                 </button>
               </div>
+
               <div>
                 <input
                   type="password"
@@ -456,23 +474,25 @@ const SignUpPage = () => {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   placeholder="Confirm Password"
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4B5BDA]"
+                  className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                   required
                 />
               </div>
             </div>
+
             {isSignupError && <p className="text-red-500 text-center">{isSignupError}</p>}
+
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
                 onClick={() => setStep(3)}
-                className="px-6 py-2 border rounded-lg"
+                className="px-6 py-2 border rounded-full"
               >
                 Previous
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-[#4B5BDA] text-white rounded-lg"
+                className="px-6 py-2 w-[140px] bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
                 disabled={isSignupLoading}
               >
                 Next
@@ -481,49 +501,48 @@ const SignUpPage = () => {
           </form>
         );
 
-      case 5:
-        return (
-          <div className="text-center space-y-6">
-            <h2 className="text-xl font-bold">Summary</h2>
-            <div className="flex items-center space-x-8">
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-full bg-[#F8FAFF] flex items-center justify-center">
-                  <span className="text-2xl">★</span>
-                </div>
-                <div className="mt-2">
-                  <h3 className="font-medium">Free Member</h3>
-                  <p className="text-xl font-bold">0 LKR</p>
-                  <p className="text-sm text-gray-600">Life time</p>
-                </div>
-              </div>
-              <div className="flex-grow text-left">
-                <h3 className="text-[#75B53B] font-medium mb-4">
-                  {formData.title} {formData.firstName} {formData.lastName}
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-gray-600">NIC Number</p>
-                    <p className="font-medium">{formData.idNumber}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Mobile Number</p>
-                    <p className="font-medium">{formData.phoneNumber}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Email</p>
-                    <p className="font-medium">{formData.email}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mt-8">
-              Click here to agree{' '}
-              <Link href="/terms" className="text-[#4B5BDA] hover:underline">
-                eChannelling Terms and Conditions
-              </Link>
-            </p>
-          </div>
-        );
+case 5:
+  return (
+    <div className="text-center space-y-8">
+      <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+        <svg
+          className="w-8 h-8 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+      </div>
+
+      <h2 className="text-xl font-bold leading-relaxed">
+        Congratulations! You have successfully registered as a Free Member!
+      </h2>
+
+      <div className="flex justify-center space-x-4 pt-2">
+        <button
+          onClick={() => setStep(4)}
+          className="px-6 py-2 border rounded-full transition-all hover:shadow-md active:scale-95"
+        >
+          Previous
+        </button>
+
+        <Link href="/login">
+          <button
+            className="px-6 py-2 w-[140px] bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
+          >
+            Done
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+
 
       default:
         return null;
@@ -531,85 +550,54 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#E8F4FE] flex flex-col items-center justify-center p-4">
-      {/* Background circles */}
-      <div className="absolute left-0 bottom-0 w-64 h-64 rounded-full bg-[#75B53B] opacity-20" />
-      <div className="absolute right-0 top-0 w-40 h-40 rounded-full bg-[#75B53B] opacity-20" />
-      <div className="absolute left-20 top-20 w-16 h-16 rounded-full bg-[#4B5BDA] opacity-20" />
-      
+  <div className="min-h-screen bg-gradient-to-b from-cyan-100 to-gray-50 flex flex-col items-center justify-center p-4">
+
       {/* Logo */}
-      <div className="w-full max-w-screen-sm mb-8">
+      <div className="mb-8">
         <Image
           src="/logo.jpg"
           alt="eChannelling"
           width={80}
-          height={50}
-          className="mx-auto"
+          height={80}
+          className="object-contain"
         />
       </div>
 
-      {/* Main card */}
-      <div className="w-full max-w-screen-sm bg-white rounded-2xl shadow-lg p-8">
-        <h1 className="text-center text-2xl font-bold mb-4">Sign Up</h1>
-        <p className="text-center text-gray-600 mb-8">Hello there! Let&apos;s create your account.</p>
+      {/* Main card - same size tokens as sign-in (max-w-md) */}
+<div
+  className={`bg-white rounded-3xl shadow-2xl p-10 w-full max-w-lg relative overflow-hidden space-y-6 mb-20 ${
+    step === 5 ? 'min-h-[500px] justify-center' : 'min-h-[680px] flex flex-col justify-between'
+  }`}
+>
 
-        {/* Progress steps */}
-        <div className="flex justify-center items-center space-x-2 mb-8">
-          {[1, 2, 3, 4, 5].map((stepNumber) => (
-            <div key={stepNumber} className="flex items-center">
-              <div
-                className={`rounded-full h-8 w-8 flex items-center justify-center ${
-                  stepNumber === step
-                    ? 'bg-[#4B5BDA] text-white'
-                    : stepNumber < step
-                    ? 'bg-[#4B5BDA] text-white'
-                    : 'border-2 border-gray-200 text-gray-400'
-                }`}
-              >
-                {stepNumber < step ? '✓' : stepNumber}
-              </div>
-              {stepNumber < 5 && (
+        <div className="relative z-10 ">
+          <h1 className="text-2xl font-bold text-center mb-4 ">Sign Up</h1>
+          <p className="text-gray-600 text-center mb-6 text-sm">Hello there! Let&apos;s create your account.</p>
+
+          {/* Progress steps - circle size preserved (h-8 w-8) */}
+          <div className="flex justify-center items-center space-x-2 mb-6">
+            {[1, 2, 3, 4, 5].map((stepNumber) => (
+              <div key={stepNumber} className="flex items-center">
                 <div
-                  className={`w-8 h-0.5 ${
-                    stepNumber < step ? 'bg-[#4B5BDA]' : 'bg-gray-200'
+                  className={`rounded-full h-8 w-8 flex items-center justify-center ${
+                    stepNumber <= step ? 'bg-blue-600 text-white' : 'border-2 border-gray-200 text-gray-400'
                   }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+                >
+                  {stepNumber < step ? '✓' : stepNumber}
+                </div>
+                {stepNumber < 5 && (
+                  <div className={`w-8 h-0.5 ${stepNumber < step ? 'bg-blue-600' : 'bg-gray-200'}`} />
+                )}
+              </div>
+            ))}
+          </div>
 
-        {/* Content */}
-        <div className="space-y-6">
-          {renderStep()}
-        </div>
-      </div>
-
-      {step === 5 && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-center mb-4">Congratulations! You have successfully registered as a Free Member!</h2>
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={() => setStep(4)}
-                className="px-6 py-2 border rounded-md"
-              >
-                Previous
-              </button>
-              <Link href="/login">
-                <button className="px-6 py-2 bg-[#4B5BDA] text-white rounded-md">
-                  Done
-                </button>
-              </Link>
-            </div>
+          {/* Content or success card replacement */}
+          <div className="space-y-6">
+            {renderStep()}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
