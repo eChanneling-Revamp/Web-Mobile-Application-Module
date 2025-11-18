@@ -87,7 +87,7 @@ const OTPVerificationPage = () => {
               {otp.map((digit, i) => (
                 <input
                   key={i}
-                  ref={(el) => (inputRefs.current[i] = el)}
+                  ref={(el) => { inputRefs.current[i] = el; }}
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
@@ -101,7 +101,7 @@ const OTPVerificationPage = () => {
             </div>
 
             <div className="text-center">
-              <p className="text-gray-600 text-sm mb-2">Didn't receive an OTP?</p>
+              <p className="text-gray-600 text-sm mb-2">Didn&apos;t receive an OTP?</p>
               <button
                 type="button"
                 onClick={handleResendOTP}
