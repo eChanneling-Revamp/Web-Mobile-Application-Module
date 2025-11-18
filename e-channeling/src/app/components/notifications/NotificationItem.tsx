@@ -20,8 +20,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     switch (type) {
       case "appointment_reminder":
         return <Calendar className={iconClass} />;
-      case "new_message":
-        return <MessageSquare className={iconClass} />;
       case "appointment_confirmed":
         return <CheckCircle className={iconClass} />;
       case "payment_reminder":
@@ -35,8 +33,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     switch (type) {
       case "appointment_reminder":
         return "bg-blue-100 text-blue-600";
-      case "new_message":
-        return "bg-green-100 text-green-600";
       case "appointment_confirmed":
         return "bg-emerald-100 text-emerald-600";
       case "payment_reminder":

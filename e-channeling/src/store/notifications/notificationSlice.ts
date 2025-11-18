@@ -14,15 +14,6 @@ const initialState: NotificationState = {
     },
     {
       id: "2",
-      type: "new_message",
-      title: "New Message",
-      description: "Dr. Arjun Rajapakse sent you a message",
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-      isRead: false,
-      link: "/profile/messages",
-    },
-    {
-      id: "3",
       type: "appointment_confirmed",
       title: "Appointment Confirmed",
       description: "Your appointment has been confirmed for 6/20/2023",
@@ -31,7 +22,7 @@ const initialState: NotificationState = {
       link: "/profile/appointments",
     },
     {
-      id: "4",
+      id: "3",
       type: "payment_reminder",
       title: "Payment Reminder",
       description: "Your payment of Rs. 3,000 was successful",

@@ -1,6 +1,5 @@
 export type NotificationType = 
   | "appointment_reminder" 
-  | "new_message" 
   | "appointment_confirmed" 
   | "payment_reminder"
   | "appointment_cancelled"

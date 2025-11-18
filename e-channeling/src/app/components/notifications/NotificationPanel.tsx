@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { markAsRead, markAllAsRead } from "@/store/notifications/notificationSlice";
 import NotificationItem from "./NotificationItem";
-import { useRouter } from "next/navigation";
 
 interface NotificationPanelProps {
   isOpen: boolean;
@@ -17,7 +16,6 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
   onClose,
 }) => {
   const dispatch = useDispatch();
-  const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
   const { notifications } = useSelector((state: RootState) => state.notifications);
 
@@ -30,13 +28,10 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
 
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      // Prevent body scroll on mobile when panel is open
-      document.body.style.overflow = 'hidden';
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = 'unset';
     };
   }, [isOpen, onClose]);
 
@@ -46,11 +41,6 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
 
   const handleMarkAllAsRead = () => {
     dispatch(markAllAsRead());
-  };
-
-  const handleViewAll = () => {
-    router.push("/profile/notifications");
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -97,12 +87,6 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
           >
             Mark all as read
           </button>
-          <button
-            onClick={handleViewAll}
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-          >
-            View all
-          </button>
         </div>
 
         {/* Notification List */}
@@ -139,18 +123,6 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
             ))
           )}
         </div>
-
-        {/* Footer */}
-        {notifications.length > 0 && (
-          <div className="border-t border-gray-200">
-            <button
-              onClick={handleViewAll}
-              className="w-full px-4 py-3 text-sm text-blue-600 hover:bg-gray-50 font-medium transition-colors"
-            >
-              See all notifications
-            </button>
-          </div>
-        )}
       </div>
     </>  
   );
