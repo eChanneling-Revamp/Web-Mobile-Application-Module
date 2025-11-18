@@ -93,8 +93,10 @@ export default function SignInPage() {
                         src="/signin-image.png"
                         alt="E-channeling Decorative"
                         width={400}
-                        height={620}
+                        height={420}
                         className="object-contain w-56 md:w-96 h-auto"
+                        placeholder="blur"
+                        blurDataURL="/signin-image-blur.png"
                     />
                 </div>
                 <div className="w-full md:w-1/2">
