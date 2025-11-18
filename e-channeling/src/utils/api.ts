@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api",
+    baseURL:
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api",
     headers: {
         "Content-Type": "application/json",
     },
@@ -13,7 +14,7 @@ api.interceptors.request.use(
         if (typeof window !== "undefined") {
             const token = localStorage.getItem("token");
             if (token) {
-                config.headers.Authorization =`Bearer ${token}`;
+                config.headers.Authorization = `Bearer ${token}`;
             }
         }
         return config;
@@ -29,8 +30,11 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             if (typeof window !== "undefined") {
-                localStorage.removeItem("token");
-                window.location.href = "/login";
+                const currentPath = window.location.pathname;
+                if (!currentPath.includes("/login")) {
+                    localStorage.removeItem("token");
+                    window.location.href = "/login";
+                }
             }
         }
         return Promise.reject(error);

@@ -24,14 +24,14 @@ const Navbar = () => {
     const pathname = usePathname();
     const isActive = pathname;
 
-    // get auth status
-    // const { userToken, isLoginSuccess } = useSelector(
-    //     (state: RootState) => state.auth
-    // );
-    // const isAuthenticated =
-    //     isLoginSuccess && userToken && Object.keys(userToken).length > 0;
+    //get auth status
+    const { userToken, isLoginSuccess } = useSelector(
+        (state: RootState) => state.auth
+    );
+    const isAuthenticated =
+        isLoginSuccess && userToken && Object.keys(userToken).length > 0;
 
-    const [isAuthenticated, setIsAuthenticated] = useState(true);
+    //const [isAuthenticated, setIsAuthenticated] = useState();
 
     // mobile nav bar
     const toggleMobileMenu = () => {
@@ -53,8 +53,8 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        setIsAuthenticated(false)
-        localStorage.removeItem("token");
+        //setIsAuthenticated(false)
+        //if (typeof window !== "undefined") localStorage.removeItem("token");
         dispatch(logout());
         setIsProfileDropdownOpen(false);
         router.push("/");

@@ -18,3 +18,8 @@ html {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+
+@theme {
+    --color-matte-green: #008486;
+}

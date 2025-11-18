@@ -11,14 +11,14 @@ import type { AppDispatch } from "@/store";
 import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
-    const { isLoginLoading, isLoginError, role } = useSelector(
+    const { isLoginLoading, isLoginError, isLoginSuccess } = useSelector(
         (state: RootState) => state.auth
     );
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
 
     const [formData, setFormData] = useState({
-        identifier: "",
+        email: "",
         password: "",
         rememberMe: false,
     });
@@ -28,11 +28,10 @@ export default function SignInPage() {
     const validateSignIn = () => {
         setError("");
 
-        if (!formData.identifier.trim()) {
-            setError("Please enter your Member ID / Email / NIC");
+        if (!formData.email.trim()) {
+            setError("Please enter your Email!");
             return;
         }
-
         if (!formData.password) {
             setError("Please enter your password");
             return;
@@ -43,7 +42,8 @@ export default function SignInPage() {
     };
 
     // handle login
-    const handleSubmit = () => {
+    const handleSubmit = (e?: React.FormEvent) => {
+        e?.preventDefault();
         dispatch(clearErrors());
 
         // validate input
@@ -52,31 +52,30 @@ export default function SignInPage() {
 
         dispatch(
             login({
-                username: formData.identifier,
+                email: formData.email,
                 password: formData.password,
             })
         );
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
+            e.preventDefault();
             handleSubmit();
         }
     };
 
+    console.log(isLoginSuccess);
     // after log according to the user redirect relevant url
     useEffect(() => {
-        if (!role) return;
-        if (role === "ADMIN") {
-            router.push("/");
-        } else if (role === "INTERN") {
+        if (isLoginSuccess) {
             router.push("/");
         }
-    }, [role, router]);
+    }, [isLoginSuccess, router]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-cyan-100 to-gray-50 flex flex-col items-center justify-center p-4">
-            {/* Logo */}
+        <div className="min-h-screen bg-gradient-to-b from-blue-300 to-gray-50 flex flex-col items-center justify-center p-4">
+            {/* Logo
             <div className="mb-8">
                 <Image
                     src="/logo.jpg"
@@ -85,37 +84,45 @@ export default function SignInPage() {
                     height={80}
                     className="object-contain"
                 />
-            </div>
+            </div> */}
 
             {/* Sign In Card */}
-            <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
-                <div className="relative z-10">
-                    <h1 className="text-3xl font-bold text-center mb-6">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md md:max-w-4xl relative overflow-hidden flex flex-col md:flex-row items-center justify-center gap-6 md:gap-20">
+                <div className="flex-shrink-0">
+                    <Image
+                        src="/signin-image.png"
+                        alt="E-channeling Decorative"
+                        width={400}
+                        height={620}
+                        className="object-contain w-56 md:w-96 h-auto"
+                    />
+                </div>
+                <div className="w-full md:w-1/2">
+                    <h1 className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6">
                         SIGN IN
                     </h1>
 
-                    <p className="text-gray-600 text-center mb-8 text-sm">
-                        * Please enter your registered mobile number in below
-                        field and we&apos;ll send SMS contains OTP to sign in.
+                    <p className="text-gray-600 text-center mb-6 md:mb-8 text-sm">
+                        * Please enter your registered email in below field.
                     </p>
 
-                    <div className="space-y-6">
-                        {/* Member ID / Email / NIC Input */}
+                    <div className="space-y-4 md:space-y-6">
                         <div>
                             <input
                                 type="text"
-                                value={formData.identifier}
+                                value={formData.email}
                                 onChange={(e) => {
                                     setFormData((prev) => ({
                                         ...prev,
-                                        identifier: e.target.value,
+                                        email: e.target.value,
                                     }));
                                     setError("");
+                                    dispatch(clearErrors());
                                 }}
-                                onKeyPress={handleKeyPress}
-                                placeholder="Member ID / Email / NIC"
+                                onKeyDown={handleKeyDown}
+                                placeholder=" Email"
                                 className={`w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 ${
-                                    error && !formData.identifier
+                                    error && !formData.email
                                         ? "border-red-400 focus:border-red-400"
                                         : "border-gray-300 focus:border-indigo-400"
                                 }`}
@@ -133,9 +140,10 @@ export default function SignInPage() {
                                         password: e.target.value,
                                     }));
                                     setError("");
+                                    dispatch(clearErrors());
                                 }}
-                                onKeyPress={handleKeyPress}
-                                placeholder="Password"
+                                onKeyDown={handleKeyDown}
+                                placeholder=" Password"
                                 className={`w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 pr-12 ${
                                     error && !formData.password
                                         ? "border-red-400 focus:border-red-400"
@@ -186,9 +194,10 @@ export default function SignInPage() {
 
                         {/* Submit Button */}
                         <button
+                            type="button"
                             onClick={handleSubmit}
                             disabled={isLoginLoading}
-                            className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
+                            className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
                         >
                             {isLoginLoading ? "Signing In..." : "Sign In"}
                         </button>
@@ -204,12 +213,12 @@ export default function SignInPage() {
                         </div>
 
                         {/* Sign Up Link */}
-                        <div className="text-center pt-4">
-                            <p className="text-gray-700">
+                        <div className="text-center pt-2 md:pt-4">
+                            <p className="text-gray-700 text-sm md:text-base">
                                 I&apos;m a new user,{" "}
                                 <Link
                                     href={"/signup"}
-                                    className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                                    className="text-blue-600 hover:text-blue-700 font-semibold transition-colors cursor-pointer"
                                 >
                                     Sign Up
                                 </Link>
