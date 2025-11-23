@@ -4,7 +4,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-// if need add user verified or not    
+// if need add user verified or not
 interface SignupData {
     phoneNumber: string;
     package: string;
@@ -204,6 +204,12 @@ const authSlice = createSlice({
             state.signupData = {};
             state.isOtpVerified = false;
             state.isSignupSuccess = false;
+            state.isRequestOtpSuccess = false;
+            state.isRequestOtpError = null;
+            state.isVerifyOtpError = null;
+        },
+        setRequestOtpSuccessFalse: (state) => {
+            state.isRequestOtpSuccess = false;
         },
     },
     extraReducers: (builder) =>
@@ -303,6 +309,6 @@ const authSlice = createSlice({
             }),
 });
 
-export const { clearErrors, logout, setSignupData, resetSignup } =
+export const { clearErrors, logout, setSignupData, resetSignup ,setRequestOtpSuccessFalse } =
     authSlice.actions;
 export default authSlice.reducer;

@@ -17,6 +17,9 @@ const SignUpPage = () => {
     );
 
     useEffect(() => {
+        if (!isRequestOtpSuccess) {
+            setStep(1);
+        }
         if (isRequestOtpSuccess) {
             setStep(2);
         }
@@ -81,7 +84,7 @@ const SignUpPage = () => {
                                     </div>
                                     {stepNumber < 5 && (
                                         <div
-                                            className={`w-8 h-0.5 ${stepNumber < step ? "bg-blue-600" : "bg-gray-200"}`}
+                                            className={`w-5 sm:w-8 h-0.5 ${stepNumber < step ? "bg-blue-600" : "bg-gray-200"}`}
                                         />
                                     )}
                                 </div>

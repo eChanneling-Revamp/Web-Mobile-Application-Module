@@ -3,10 +3,12 @@ import doctorReducer from "@/store/doctor/doctorSlice";
 import authReducer from "@/store/auth/authSlice";
 import bookingReducer from "@/store/booking/bookingSlice";
 import searchReducer from "@/store/search/searchSlice";
+import profileReducer from "./profile/profileSlice";
 import notificationReducer from "@/store/notifications/notificationSlice";
 
 export const store = configureStore({
     reducer: {
+        profile: profileReducer,
         doctor: doctorReducer,
         auth: authReducer,
         booking: bookingReducer,

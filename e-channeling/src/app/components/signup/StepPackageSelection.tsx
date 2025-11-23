@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/store";
-import { setSignupData } from "@/store/auth/authSlice";
+import { resetSignup, setSignupData } from "@/store/auth/authSlice";
 import Link from "next/link";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +11,6 @@ interface StepPackageSelectionProps {
 export const StepPackageSelection = ({
     setStep,
 }: StepPackageSelectionProps) => {
-
     const { signupData } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch<AppDispatch>();
 
@@ -53,7 +52,14 @@ export const StepPackageSelection = ({
             setStep(4);
         }
     };
-    
+
+    const handleCancel = () => {
+        dispatch(resetSignup());
+        if (setStep) {
+            setStep(1);
+        }
+    };
+
     return (
         <div className="space-y-8 ">
             <h2 className="text-lg font-bold text-center">Select Package</h2>
@@ -139,12 +145,12 @@ export const StepPackageSelection = ({
             </div>
 
             <div className="flex justify-end space-x-4 pt-2">
-                <Link
-                    href={"/login"}
+                <button
+                    onClick={handleCancel}
                     className="px-6 py-2 border border-gray-500 rounded-full hover:bg-gray-800 hover:text-white transition ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
                 >
-                    Close
-                </Link>
+                    Cancel
+                </button>
 
                 <button
                     type="button"

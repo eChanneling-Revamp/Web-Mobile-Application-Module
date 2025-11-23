@@ -1,5 +1,10 @@
 import { AppDispatch, RootState } from "@/store";
-import { clearErrors, verifyOtp } from "@/store/auth/authSlice";
+import {
+    clearErrors,
+    requestOtp,
+    setRequestOtpSuccessFalse,
+    verifyOtp,
+} from "@/store/auth/authSlice";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,8 +17,12 @@ export const StepOTPVerification = () => {
     const OTP_LENGTH = 6;
     const dispatch = useDispatch<AppDispatch>();
 
-    const { isVerifyOtpLoading, isVerifyOtpError, signupData } =
-        useSelector((state: RootState) => state.auth);
+    const {
+        isRequestOtpLoading,
+        isVerifyOtpLoading,
+        isVerifyOtpError,
+        signupData,
+    } = useSelector((state: RootState) => state.auth);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!otp) dispatch(clearErrors());
@@ -54,6 +63,22 @@ export const StepOTPVerification = () => {
         dispatch(verifyOtp({ phone_number: phoneFromState, otp: otp }));
     };
 
+    const handleBack = () => {
+        dispatch(setRequestOtpSuccessFalse());
+    };
+
+    const phoneFromState = signupData?.phoneNumber as string;
+
+    const reSendOtpRequest = () => {
+        dispatch(clearErrors());
+        if (otpTimer !== 0) return;
+
+        setOtp("");
+        setOtpTimer(120);
+
+        dispatch(requestOtp({ phone_number: phoneFromState }));
+    };
+
     return (
         <form onSubmit={handleOtpSubmit} className="space-y-6">
             <div>
@@ -66,7 +91,8 @@ export const StepOTPVerification = () => {
                             OTP Verification
                         </p>
                         <p className="text-sm text-gray-600 mt-2">
-                            We have shared the OTP with the given mobile number
+                            We have send OTP to your mobile number{" "}
+                            {phoneFromState}
                         </p>
                     </div>
 
@@ -137,11 +163,14 @@ export const StepOTPVerification = () => {
                             Didn&apos;t receive an OTP?{" "}
                             <button
                                 type="button"
-                                //onClick={() => otpTimer === 0 && setOtpTimer(120)}
-                                className="text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
-                                //disabled={otpTimer > 0}
+                                onClick={reSendOtpRequest}
+                                className="text-blue-600 hover:text-blue-700 hover:underline cursor-pointer disabled:text-gray-400 disabled:cursor-not-allowed disabled:no-underline transition-colors"
+                                disabled={otpTimer > 0}
+                                aria-disabled={otpTimer > 0}
                             >
-                                Resend OTP
+                                {isRequestOtpLoading
+                                    ? "Sending..."
+                                    : "Resend OTP"}
                             </button>
                         </p>
                     </div>
@@ -150,14 +179,14 @@ export const StepOTPVerification = () => {
             <div className="flex justify-end space-x-4">
                 <button
                     type="button"
-                    //onClick={() => setStep(1)}
+                    onClick={handleBack}
                     className="px-6 py-2 border border-gray-500 rounded-full hover:bg-gray-800 hover:text-white transition ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
                 >
                     Previous
                 </button>
                 <button
                     type="submit"
-                    disabled={isVerifyOtpLoading}
+                    disabled={isVerifyOtpLoading || otp.length < 6}
                     aria-busy={isVerifyOtpLoading}
                     className="px-4 py-2 w-36 bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition ease-in-out duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-300"
                 >
