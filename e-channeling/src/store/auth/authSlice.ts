@@ -4,8 +4,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
+// if need add user verified or not    
 interface SignupData {
-    nationality: string;
     phoneNumber: string;
     package: string;
     title: string;
@@ -18,7 +18,7 @@ interface SignupData {
 }
 
 interface OtpVerificationData {
-    phoneNumber: string;
+    phone_number: string;
     otp: string;
 }
 
@@ -58,8 +58,11 @@ interface AuthState {
     isSignupLoading: boolean;
     isSignupError: string | null;
     isSignupSuccess: boolean;
-    isOtpLoading: boolean;
-    isOtpError: string | null;
+    isRequestOtpLoading: boolean;
+    isRequestOtpError: string | null;
+    isRequestOtpSuccess: boolean;
+    isVerifyOtpLoading: boolean;
+    isVerifyOtpError: string | null;
     isOtpVerified: boolean;
     signupData: Partial<SignupData>;
 }
@@ -76,21 +79,29 @@ function safeDecodeJwt(token?: string | null) {
     }
 }
 
-const decodedPayload = safeDecodeJwt(token)
+const decodedPayload = safeDecodeJwt(token);
 
 // intial state
 const initialState: AuthState = {
     userToken: token ? token : null,
-    role: decodedPayload?.role ?? null ,
-    userId: decodedPayload?.sub ?? null ,
+    role: decodedPayload?.role ?? null,
+    userId: decodedPayload?.sub ?? null,
     isLoginLoading: false,
     isLoginError: null,
-    isLoginSuccess: !!decodedPayload && (!decodedPayload.exp || decodedPayload.exp * 1000 > Date.now()),
+    isLoginSuccess:
+        !!decodedPayload &&
+        (!decodedPayload.exp || decodedPayload.exp * 1000 > Date.now()),
+
     isSignupLoading: false,
     isSignupError: null,
     isSignupSuccess: false,
-    isOtpLoading: false,
-    isOtpError: null,
+
+    isRequestOtpLoading: false,
+    isRequestOtpError: null,
+    isRequestOtpSuccess: false,
+
+    isVerifyOtpLoading: false,
+    isVerifyOtpError: null,
     isOtpVerified: false,
     signupData: {},
 };
@@ -98,11 +109,11 @@ const initialState: AuthState = {
 // Request OTP
 export const requestOtp = createAsyncThunk<
     { message: string },
-    { phoneNumber: string },
+    { phone_number: string },
     { rejectValue: string }
->("auth/requestOtp", async ({ phoneNumber }, { rejectWithValue }) => {
+>("auth/requestOtp", async (phoneNumber, { rejectWithValue }) => {
     try {
-        const response = await api.post("/auth/request-otp", { phoneNumber });
+        const response = await api.post("/auth/send-otp", phoneNumber);
         return response.data;
     } catch (error: unknown) {
         const err = error as { response?: { data?: { message?: string } } };
@@ -173,7 +184,8 @@ const authSlice = createSlice({
         clearErrors: (state) => {
             state.isLoginError = null;
             state.isSignupError = null;
-            state.isOtpError = null;
+            state.isRequestOtpError = null;
+            state.isVerifyOtpError = null;
         },
         logout: (state) => {
             state.userToken = null;
@@ -210,11 +222,12 @@ const authSlice = createSlice({
                     // get the token only
                     const token = action.payload?.token;
                     if (!token) {
-                        state.isLoginError = "Login succeeded but token missing.";
+                        state.isLoginError =
+                            "Login succeeded but token missing.";
                         state.isLoginSuccess = false;
                         return;
                     }
-                    state.isLoginSuccess = true;                  
+                    state.isLoginSuccess = true;
                     state.userToken = token;
                     const payload = safeDecodeJwt(token);
                     // get role and user id from the token payload
@@ -234,30 +247,35 @@ const authSlice = createSlice({
             })
             // OTP request reducers
             .addCase(requestOtp.pending, (state) => {
-                state.isOtpLoading = true;
-                state.isOtpError = null;
+                state.isRequestOtpLoading = true;
+                state.isRequestOtpError = null;
             })
             .addCase(requestOtp.fulfilled, (state) => {
-                state.isOtpLoading = false;
-                state.isOtpError = null;
+                state.isRequestOtpLoading = false;
+                state.isRequestOtpError = null;
+                state.isRequestOtpSuccess = true;
             })
             .addCase(requestOtp.rejected, (state, action) => {
-                state.isOtpLoading = false;
-                state.isOtpError = action.payload || "Failed to send OTP";
+                state.isRequestOtpLoading = false;
+                state.isRequestOtpError =
+                    action.payload || "Failed to send OTP";
+                state.isRequestOtpSuccess = true;
             })
             // OTP verification reducers
             .addCase(verifyOtp.pending, (state) => {
-                state.isOtpLoading = true;
-                state.isOtpError = null;
+                state.isVerifyOtpLoading = true;
+                state.isVerifyOtpError = null;
             })
             .addCase(verifyOtp.fulfilled, (state) => {
-                state.isOtpLoading = false;
-                state.isOtpError = null;
+                state.isVerifyOtpLoading = false;
+                state.isVerifyOtpError = null;
                 state.isOtpVerified = true;
             })
             .addCase(verifyOtp.rejected, (state, action) => {
-                state.isOtpLoading = false;
-                state.isOtpError = action.payload || "OTP verification failed";
+                state.isVerifyOtpLoading = false;
+                state.isVerifyOtpError =
+                    action.payload || "OTP verification failed";
+                state.isOtpVerified = true;
             })
             // Signup reducers
             .addCase(signup.pending, (state) => {

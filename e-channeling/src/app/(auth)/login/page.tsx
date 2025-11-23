@@ -10,7 +10,7 @@ import { clearErrors, login } from "@/store/auth/authSlice";
 import type { AppDispatch } from "@/store";
 import { useRouter } from "next/navigation";
 
-export default function SignInPage() {
+const SignInPage = () => {
     const { isLoginLoading, isLoginError, isLoginSuccess } = useSelector(
         (state: RootState) => state.auth
     );
@@ -87,7 +87,7 @@ export default function SignInPage() {
             </div> */}
 
             {/* Sign In Card */}
-            <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md md:max-w-4xl relative overflow-hidden flex flex-col md:flex-row items-center justify-center gap-6 md:gap-20">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md md:max-w-4xl relative overflow-hidden flex flex-col md:flex-row items-center justify-center gap-6 md:gap-20 transform -translate-y-6 md:translate-y-0">
                 <div className="flex-shrink-0">
                     <Image
                         src="/signin-image.png"
@@ -96,7 +96,7 @@ export default function SignInPage() {
                         height={0}
                         className="object-contain w-56 md:w-96 h-auto"
                         placeholder="blur"
-                        blurDataURL="/signin-image-blur.png"
+                        blurDataURL="/signin-image.png"
                     />
                 </div>
                 <div className="w-full md:w-1/2">
@@ -199,7 +199,7 @@ export default function SignInPage() {
                             type="button"
                             onClick={handleSubmit}
                             disabled={isLoginLoading}
-                            className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
+                            className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold py-3 rounded-full transition ease-in-out duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
                         >
                             {isLoginLoading ? "Signing In..." : "Sign In"}
                         </button>
@@ -234,4 +234,6 @@ export default function SignInPage() {
             <div className="h-8"></div>
         </div>
     );
-}
+};
+
+export default SignInPage;
