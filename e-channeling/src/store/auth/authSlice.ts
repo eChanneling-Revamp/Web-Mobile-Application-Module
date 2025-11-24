@@ -5,16 +5,24 @@ const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
 // if need add user verified or not
-interface SignupData {
-    phoneNumber: string;
+export interface SignupData {
+    phone_number: string;
+    country_code: string;
     package: string;
     title: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     email: string;
-    idType: "NIC" | "Passport";
-    idNumber: string;
+    id_type: "nic" | "passport";
     password: string;
+    confirm_password: string;
+    user_type: "individual" | "corporate";
+    nic_number: string;
+    passport_number: string;
+    nationality: string;
+    company_name: string;
+    employee_id: string;
+    accepted_terms: boolean;
 }
 
 interface OtpVerificationData {
@@ -148,7 +156,7 @@ export const signup = createAsyncThunk<
     { rejectValue: string }
 >("auth/signup", async (signupData, { rejectWithValue }) => {
     try {
-        const response = await api.post("/auth/signup", signupData);
+        const response = await api.post("/auth/register", signupData);
         return response.data;
     } catch (error: unknown) {
         const err = error as { response?: { data?: { message?: string } } };
@@ -205,8 +213,6 @@ const authSlice = createSlice({
             state.isOtpVerified = false;
             state.isSignupSuccess = false;
             state.isRequestOtpSuccess = false;
-            state.isRequestOtpError = null;
-            state.isVerifyOtpError = null;
         },
         setRequestOtpSuccessFalse: (state) => {
             state.isRequestOtpSuccess = false;
@@ -265,7 +271,7 @@ const authSlice = createSlice({
                 state.isRequestOtpLoading = false;
                 state.isRequestOtpError =
                     action.payload || "Failed to send OTP";
-                state.isRequestOtpSuccess = true;
+                //state.isRequestOtpSuccess = true;
             })
             // OTP verification reducers
             .addCase(verifyOtp.pending, (state) => {
@@ -281,7 +287,7 @@ const authSlice = createSlice({
                 state.isVerifyOtpLoading = false;
                 state.isVerifyOtpError =
                     action.payload || "OTP verification failed";
-                state.isOtpVerified = true;
+                //state.isOtpVerified = true;
             })
             // Signup reducers
             .addCase(signup.pending, (state) => {
@@ -291,24 +297,35 @@ const authSlice = createSlice({
             .addCase(signup.fulfilled, (state, action) => {
                 state.isSignupLoading = false;
                 state.isSignupError = null;
+                // get the token only
+                const token = action.payload?.token;
+                if (!token) {
+                    state.isSignupError = "Signup succeeded but token missing.";
+                    state.isSignupSuccess = false;
+                    return;
+                }
                 state.isSignupSuccess = true;
-                const token = action.payload.token;
-                state.userToken = JSON.parse(atob(token.split(".")[1]));
-                state.role =
-                    (JSON.parse(atob(token.split(".")[1])) as { role?: string })
-                        .role ?? null;
-                state.userId =
-                    (JSON.parse(atob(token.split(".")[1])) as { sub?: string })
-                        .sub ?? null;
-                localStorage.setItem("token", token);
+                state.userToken = token;
+                const payload = safeDecodeJwt(token);
+                // get role and user id from the token payload
+                state.role = payload?.role ?? null;
+                state.userId = payload.sub ?? null;
+                if (typeof window !== "undefined") {
+                    localStorage.setItem("token", token);
+                }
             })
             .addCase(signup.rejected, (state, action) => {
                 state.isSignupLoading = false;
                 state.isSignupError = action.payload || "Signup failed";
-                state.isSignupSuccess = true; //remove latter
+                //state.isSignupSuccess = true; //remove latter
             }),
 });
 
-export const { clearErrors, logout, setSignupData, resetSignup ,setRequestOtpSuccessFalse } =
-    authSlice.actions;
+export const {
+    clearErrors,
+    logout,
+    setSignupData,
+    resetSignup,
+    setRequestOtpSuccessFalse,
+} = authSlice.actions;
 export default authSlice.reducer;

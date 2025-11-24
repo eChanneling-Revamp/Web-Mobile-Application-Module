@@ -144,10 +144,10 @@ export const StepPackageSelection = ({
                 </Link>
             </div>
 
-            <div className="flex justify-end space-x-4 pt-2">
+            <div className="flex justify-between space-x-4 pt-2">
                 <button
                     onClick={handleCancel}
-                    className="px-6 py-2 border border-gray-500 rounded-full hover:bg-gray-800 hover:text-white transition ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    className="sm:w-auto px-7 w-32 py-2 border-2 border-gray-300 text-gray-700 font-medium rounded-full transition-all  hover:bg-gray-800 hover:text-white hover:border-gray-400 hover:shadow-md active:scale-95 cursor-pointer"
                 >
                     Cancel
                 </button>
@@ -155,7 +155,7 @@ export const StepPackageSelection = ({
                 <button
                     type="button"
                     onClick={handleNext}
-                    className="px-6 py-2 w-[140px] bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg active:scale-95"
+                    className="px-4 py-2 w-32 bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition ease-in-out duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     disabled={!formData.package}
                 >
                     Next

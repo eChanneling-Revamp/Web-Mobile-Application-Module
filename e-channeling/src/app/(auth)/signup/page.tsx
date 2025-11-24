@@ -2,62 +2,51 @@
 import { StepNationality } from "@/app/components/signup/StepNationality";
 import { StepOTPVerification } from "@/app/components/signup/StepOTPVerification";
 import { StepPackageSelection } from "@/app/components/signup/StepPackageSelection";
-// import { StepPersonalDetails } from "@/app/components/signup/StepPersonalDetails";
-// import { StepSuccess } from "@/app/components/signup/StepSuccess";
-import { RootState } from "@/store";
+import { StepPersonalDetails } from "@/app/components/signup/StepPersonalDetails";
+import { StepFinal } from "@/app/components/signup/StepFinal";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useCallback } from "react";
 
 const SignUpPage = () => {
-    const [step, setStep] = useState(1);
+    const [step, setStepState] = useState(1);
 
-    const { isRequestOtpSuccess, isOtpVerified } = useSelector(
-        (state: RootState) => state.auth
-    );
-
-    useEffect(() => {
-        if (!isRequestOtpSuccess) {
-            setStep(1);
-        }
-        if (isRequestOtpSuccess) {
-            setStep(2);
-        }
-        if (isOtpVerified) {
-            setStep(3);
-        }
-    }, [isRequestOtpSuccess, isOtpVerified]);
+    const setStep = useCallback((newStep: number) => {
+        setStepState(newStep);
+    }, []);
 
     const renderStep = () => {
         switch (step) {
             case 1:
-                return <StepNationality />;
+                return <StepNationality setStep={setStep} />;
             case 2:
-                return <StepOTPVerification />;
+                return <StepOTPVerification setStep={setStep} />;
             case 3:
                 return <StepPackageSelection setStep={setStep} />;
+            case 4:
+                return <StepPersonalDetails setStep={setStep} />;
+            case 5:
+                return <StepFinal setStep={setStep} />;
             default:
                 return null;
         }
     };
 
-    console.log("main");
-
     return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-300 to-gray-50 flex flex-col items-center justify-center p-4">
-            <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md md:max-w-4xl relative overflow-hidden flex flex-col md:flex-row items-center justify-center gap-6 md:gap-17 transform -translate-y-6 md:translate-y-0 ">
+        <div className="min-h-screen bg-gradient-to-b from-blue-300 to-gray-50 flex flex-col items-center justify-center py-10 px-7">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 w-full max-w-md md:max-w-5xl relative overflow-hidden flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 transform -translate-y-6 md:translate-y-0 ">
                 <div className="flex-shrink-0 ">
                     <Image
                         src="/signin-image.png"
                         alt="E-channeling Decorative"
                         width={350}
-                        height={0}
-                        className="object-contain w-56 md:w-86 h-auto"
+                        height={350}
+                        className="object-contain w-40 sm:w-55 md:w-65 lg:w-90 transition-all duration-300 ease-in-out"
                         placeholder="blur"
                         blurDataURL="/signin-image.png"
+                        sizes="(max-width: 640px) 5rem, (max-width: 768px) 7rem, (max-width: 1024px) 14rem, 20rem"
                     />
                 </div>
-                <div className="w-full md:w-1/2 ">
+                <div className="w-full mr-0 md:mr-5">
                     <div className="">
                         <h1 className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6">
                             SIGN UP
@@ -92,7 +81,7 @@ const SignUpPage = () => {
                         </div>
                     </div>
 
-                    <div className="mt-8 ">{renderStep()}</div>
+                    <div className="mt-8">{renderStep()}</div>
                 </div>
             </div>
         </div>

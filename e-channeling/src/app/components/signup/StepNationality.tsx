@@ -2,29 +2,33 @@ import { AppDispatch, RootState } from "@/store";
 import { clearErrors, requestOtp, setSignupData } from "@/store/auth/authSlice";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export const StepNationality = () => {
+interface StepPackageSelectionProps {
+    setStep?: (step: number) => void;
+}
+
+export const StepNationality = ({ setStep }: StepPackageSelectionProps) => {
     const [nationality, setNationality] = useState("Sri Lankan");
-    const [phoneNumber, setPhoneNumber] = useState({
+    const [contactInfo, setContactInfo] = useState({
         phone_number: "",
+        email: "",
+        country_code: "",
     });
     const [error, setError] = useState("");
-    const { isRequestOtpLoading, isRequestOtpError } = useSelector(
-        (state: RootState) => state.auth
-    );
+    const { isRequestOtpLoading, isRequestOtpError, isRequestOtpSuccess } =
+        useSelector((state: RootState) => state.auth);
 
-    const validateNumber = () => {
+    const validateContactInfo = () => {
         setError("");
-        const num = phoneNumber.phone_number.trim();
-
-        if (!num) {
-            setError("Please enter your Number!");
-            return false;
-        }
 
         if (nationality === "Sri Lankan") {
+            const num = contactInfo.phone_number.trim();
+            if (!num) {
+                setError("Please enter your Number!");
+                return false;
+            }
             if (!/^\d{9}$/.test(num)) {
                 setError(
                     "Sri Lankan phone number must be exactly 9 digits and contain only numbers"
@@ -32,22 +36,25 @@ export const StepNationality = () => {
                 return false;
             }
         } else {
-            if (!/^\d{11}$/.test(num)) {
-                setError(
-                    "phone number must be exactly 11 digits and contain only numbers"
-                );
+            const email = contactInfo.email.trim();
+            if (!email) {
+                setError("Please enter your Email!");
+                return false;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+            if (!emailRegex.test(email)) {
+                setError("Please enter a valid email address");
                 return false;
             }
         }
+
         return true;
     };
 
     const formatNumber = () => {
         let number;
         if (nationality === "Sri Lankan") {
-            number = `+94${phoneNumber.phone_number}`;
-        } else {
-            number = `${phoneNumber.phone_number}`;
+            number = `+94${contactInfo.phone_number}`;
         }
         return number;
     };
@@ -56,13 +63,34 @@ export const StepNationality = () => {
 
     const sendOtpRequest = (e?: FormEvent) => {
         e?.preventDefault();
-        if (!validateNumber()) return;
+        if (!validateContactInfo()) return;
         dispatch(clearErrors());
-        console.log("sending OTP to", formatNumber());
+
         const num = formatNumber();
-        dispatch(setSignupData({ phoneNumber: num }));
-        dispatch(requestOtp({ phone_number: num }));
+        //console.log("sending OTP to", num);
+
+        dispatch(
+            setSignupData({
+                phone_number: num || "",
+                email: contactInfo.email || "",
+                country_code: contactInfo.country_code || "",
+            })
+        );
+
+        // complete this after verify how the backend verify OTP
+        dispatch(requestOtp({ phone_number: num || "" }));
     };
+
+    useEffect(() => {
+        if (isRequestOtpSuccess) {
+            if (setStep) {
+                setStep(2);
+            }
+        }
+    }, [isRequestOtpSuccess, setStep]);
+
+    // console.log(contactInfo);
+    // console.log("Sign up data ",signupData)
 
     return (
         <form onSubmit={sendOtpRequest} className="space-y-6">
@@ -84,6 +112,12 @@ export const StepNationality = () => {
                             onChange={(e) => {
                                 setNationality(e.target.value);
                                 setError("");
+                                setContactInfo({
+                                    phone_number: "",
+                                    email: "",
+                                    country_code: "",
+                                });
+                                dispatch(clearErrors());
                             }}
                             className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                             required
@@ -92,13 +126,14 @@ export const StepNationality = () => {
                             <option value="Other">Other</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block mb-2 text-sm sm:text-[16px]">
-                            Phone Number *
-                        </label>
-                        <div className="flex">
-                            {nationality === "Sri Lankan" ? (
-                                <>
+
+                    <div className="">
+                        {nationality === "Sri Lankan" ? (
+                            <div>
+                                <label className="block mb-2 text-sm sm:text-[16px]">
+                                    Phone Number *
+                                </label>
+                                <div className="flex">
                                     <span className="px-3 py-3 border-2 border-r-0 rounded-l-full border-gray-500 bg-gray-50">
                                         +94
                                     </span>
@@ -106,11 +141,12 @@ export const StepNationality = () => {
                                         type="tel"
                                         name="phone_number"
                                         inputMode="numeric"
-                                        value={phoneNumber.phone_number}
+                                        value={contactInfo.phone_number}
                                         onChange={(e) => {
-                                            setPhoneNumber((prev) => ({
+                                            setContactInfo((prev) => ({
                                                 ...prev,
                                                 phone_number: e.target.value,
+                                                country_code: "+94",
                                             }));
                                             setError("");
                                             dispatch(clearErrors());
@@ -119,47 +155,52 @@ export const StepNationality = () => {
                                         className="flex-1 px-4 py-3 border-2  rounded-r-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                                         required
                                     />
-                                </>
-                            ) : (
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="">
+                                <label className="block mb-2 text-sm sm:text-[16px]">
+                                    Email *
+                                </label>
                                 <input
-                                    type="tel"
-                                    name="phone_number"
-                                    inputMode="numeric"
-                                    value={phoneNumber.phone_number}
+                                    type="text"
+                                    name="email"
+                                    value={contactInfo.email}
                                     onChange={(e) => {
-                                        setPhoneNumber((prev) => ({
+                                        setContactInfo((prev) => ({
                                             ...prev,
-                                            phone_number: e.target.value,
+                                            email: e.target.value,
+                                            country_code: "other",
                                         }));
                                         setError("");
                                         dispatch(clearErrors());
                                     }}
-                                    placeholder="Ex: +44********* ( number with county code )"
-                                    className="flex-1 px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
+                                    placeholder="Enter your email to send OTP"
+                                    className="flex-1 px-4 py-3 border-2 w-full rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                                     required
                                 />
-                            )}
-                        </div>
-
-                        {error && (
-                            <div className="text-red-500 text-sm mt-4 text-center">
-                                {error}
-                            </div>
-                        )}
-
-                        {isRequestOtpError && (
-                            <div className="text-red-500 text-sm mt-4 text-center">
-                                {isRequestOtpError}
                             </div>
                         )}
                     </div>
+
+                    {error && (
+                        <div className="text-red-500 text-sm mt-4 text-center">
+                            {error}
+                        </div>
+                    )}
+
+                    {isRequestOtpError && (
+                        <div className="text-red-500 text-sm mt-4 text-center">
+                            {isRequestOtpError}
+                        </div>
+                    )}
                 </div>
             </div>
-            <div className="flex justify-end space-x-4 mt-10">
+            <div className="flex justify-between space-x-4 mt-10">
                 <Link
                     href={"/login"}
                     type="button"
-                    className="px-6 py-2 border border-gray-500 rounded-full hover:bg-gray-800 hover:text-white transition ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    className=" px-7 w-32 py-2 text-center border-2 border-gray-300 text-gray-700 font-medium rounded-full transition-all  hover:bg-gray-800 hover:text-white hover:border-gray-400 hover:shadow-md active:scale-95 cursor-pointer"
                 >
                     Close
                 </Link>

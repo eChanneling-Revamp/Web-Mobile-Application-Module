@@ -3,15 +3,20 @@ import {
     clearErrors,
     requestOtp,
     setRequestOtpSuccessFalse,
+    setSignupData,
     verifyOtp,
 } from "@/store/auth/authSlice";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export const StepOTPVerification = () => {
+interface StepPackageSelectionProps {
+    setStep?: (step: number) => void;
+}
+
+export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
     const [otp, setOtp] = useState("");
-    const [otpTimer, setOtpTimer] = useState(120);
+    const [otpTimer, setOtpTimer] = useState(60);
     const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const OTP_LENGTH = 6;
@@ -21,6 +26,7 @@ export const StepOTPVerification = () => {
         isRequestOtpLoading,
         isVerifyOtpLoading,
         isVerifyOtpError,
+        isOtpVerified,
         signupData,
     } = useSelector((state: RootState) => state.auth);
 
@@ -46,10 +52,6 @@ export const StepOTPVerification = () => {
     };
 
     useEffect(() => {
-        console.log("OTP =", otp);
-    }, [otp]);
-
-    useEffect(() => {
         const interval = setInterval(() => {
             setOtpTimer((prev) => (prev > 0 ? prev - 1 : 0));
         }, 1000);
@@ -57,27 +59,44 @@ export const StepOTPVerification = () => {
         return () => clearInterval(interval);
     }, []);
 
+    useEffect(() => {
+        if (isOtpVerified) {
+            if (setStep) {
+                setStep(3);
+            }
+        }
+    }, [isOtpVerified, setStep]);
+
     const handleOtpSubmit = (e?: React.FormEvent) => {
         e?.preventDefault();
-        const phoneFromState = signupData?.phoneNumber as string;
+        const phoneFromState = signupData?.phone_number as string;
         dispatch(verifyOtp({ phone_number: phoneFromState, otp: otp }));
     };
 
     const handleBack = () => {
         dispatch(setRequestOtpSuccessFalse());
+        dispatch(setSignupData({}));
+        if (setStep) {
+            setStep(1);
+        }
     };
 
-    const phoneFromState = signupData?.phoneNumber as string;
+    const phoneFromState = signupData?.phone_number as string;
 
     const reSendOtpRequest = () => {
         dispatch(clearErrors());
         if (otpTimer !== 0) return;
 
         setOtp("");
-        setOtpTimer(120);
+        setOtpTimer(60);
 
         dispatch(requestOtp({ phone_number: phoneFromState }));
     };
+
+    // useEffect(() => {
+    //     console.log("OTP =", otp);
+    //     console.log(signupData);
+    // }, [otp]);
 
     return (
         <form onSubmit={handleOtpSubmit} className="space-y-6">
@@ -176,11 +195,11 @@ export const StepOTPVerification = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-between space-x-4">
                 <button
                     type="button"
                     onClick={handleBack}
-                    className="px-6 py-2 border border-gray-500 rounded-full hover:bg-gray-800 hover:text-white transition ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    className=" px-7 w-32 py-2  border-2 border-gray-300 text-gray-700 font-medium rounded-full transition-all  hover:bg-gray-800 hover:text-white hover:border-gray-400 hover:shadow-md active:scale-95 cursor-pointer"
                 >
                     Previous
                 </button>
@@ -188,7 +207,7 @@ export const StepOTPVerification = () => {
                     type="submit"
                     disabled={isVerifyOtpLoading || otp.length < 6}
                     aria-busy={isVerifyOtpLoading}
-                    className="px-4 py-2 w-36 bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition ease-in-out duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    className="px-7 py-2 w-36 bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-semibold rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition ease-in-out duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-300"
                 >
                     {isVerifyOtpLoading ? (
                         <span className="flex items-center justify-center gap-2">
