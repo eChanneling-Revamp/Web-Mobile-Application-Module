@@ -9,7 +9,7 @@ interface StepPackageSelectionProps {
 
 export const SuccessStep = ({ setStep }: StepPackageSelectionProps) => {
     const router = useRouter();
-    const [countdown, setCountdown] = useState(10);
+    const [countdown, setCountdown] = useState(6);
     const [shouldRedirect, setShouldRedirect] = useState(false);
 
     // Countdown timer
