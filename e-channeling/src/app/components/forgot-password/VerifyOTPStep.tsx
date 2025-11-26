@@ -14,7 +14,7 @@ interface StepPackageSelectionProps {
     setStep?: (step: number) => void;
 }
 
-export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
+export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
     const [otp, setOtp] = useState("");
     const [otpTimer, setOtpTimer] = useState(60);
     const [isFocused, setIsFocused] = useState(false);
@@ -59,18 +59,22 @@ export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        if (isOtpVerified) {
-            if (setStep) {
-                setStep(3);
-            }
-        }
-    }, [isOtpVerified, setStep]);
+    // useEffect(() => {
+    //     if (isOtpVerified) {
+    //         if (setStep) {
+    //             setStep(3);
+    //         }
+    //     }
+    // }, [isOtpVerified, setStep]);
 
     const handleOtpSubmit = (e?: React.FormEvent) => {
         e?.preventDefault();
-        const phoneFromState = signupData?.phone_number as string;
-        dispatch(verifyOtp({ phone_number: phoneFromState, otp: otp }));
+        // const phoneFromState = signupData?.phone_number as string;
+        // dispatch(verifyOtp({ phone_number: phoneFromState, otp: otp }));
+
+        if (setStep) {
+            setStep(3);
+        }
     };
 
     const handleBack = () => {
@@ -101,9 +105,6 @@ export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
     return (
         <form onSubmit={handleOtpSubmit} className="space-y-6">
             <div>
-                <h2 className="text-lg font-medium mb-4 text-center">
-                    Verify Mobile Number
-                </h2>
                 <div className="space-y-4">
                     <div className="text-center mb-4">
                         <p className="text-[16px] text-gray-600 mt-2">
