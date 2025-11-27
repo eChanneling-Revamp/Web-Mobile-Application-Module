@@ -10,9 +10,9 @@ interface StepPackageSelectionProps {
 }
 
 export const SendIdentifierStep = ({ setStep }: StepPackageSelectionProps) => {
-    const {isRequestOtpLoading ,isVerifyOtpLoading} = useSelector((state: RootState) => state.auth)
+    const {isVerifyOtpLoading} = useSelector((state: RootState) => state.auth)
 
-    const handleClose = () => {};
+    //const handleClose = () => {};
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

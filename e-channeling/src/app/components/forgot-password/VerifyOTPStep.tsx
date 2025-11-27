@@ -4,7 +4,7 @@ import {
     requestOtp,
     setRequestOtpSuccessFalse,
     setSignupData,
-    verifyOtp,
+    
 } from "@/store/auth/authSlice";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -26,7 +26,7 @@ export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
         isRequestOtpLoading,
         isVerifyOtpLoading,
         isVerifyOtpError,
-        isOtpVerified,
+        
         signupData,
     } = useSelector((state: RootState) => state.auth);
 

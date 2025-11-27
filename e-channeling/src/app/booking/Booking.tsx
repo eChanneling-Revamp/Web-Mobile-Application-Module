@@ -4,11 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import {
-    setStep,
-    setPatientDetails,
-    resetBooking,
-} from "@/store/booking/bookingSlice";
+import { setPatientDetails, resetBooking } from "@/store/booking/bookingSlice";
 import jsPDF from "jspdf";
 
 type VisitType = "in_person" | "video";
@@ -17,9 +13,7 @@ type UIStep = 1 | 2 | 3 | 4 | 5;
 
 export default function Booking() {
     const dispatch = useDispatch();
-    const { step: reduxStep, patient } = useSelector(
-        (s: RootState) => s.booking
-    );
+    const patient = useSelector((s: RootState) => s.booking.patient);
     const authState = useSelector((s: RootState) => s.auth);
 
     // Use local step state for UI-level 5-step flow
@@ -726,8 +720,8 @@ function StepTwo({
                     <div className="text-5xl mb-4">👤</div>
                     <p className="text-xl font-semibold mb-2">For You</p>
                     <p className="text-sm text-gray-600">
-                        Book this appointment for yourself. We'll auto-fill your
-                        details.
+                        Book this appointment for yourself. We&apos;ll auto-fill
+                        your details.
                     </p>
                 </button>
 
@@ -747,7 +741,7 @@ function StepTwo({
                         For Someone Else
                     </p>
                     <p className="text-sm text-gray-600">
-                        Book on behalf of a family member or friend. You'll
+                        Book on behalf of a family member or friend. You&apos;ll
                         enter their details manually.
                     </p>
                 </button>
@@ -780,7 +774,6 @@ function PatientSection({
     patient,
     onChange,
     patientSelection,
-    authState,
     onPrev,
     onNext,
 }: {
@@ -794,7 +787,7 @@ function PatientSection({
     };
     onChange: (patch: Partial<typeof patient>) => void;
     patientSelection: PatientSelectionType | null;
-    authState: any;
+    authState: RootState["auth"];
     onPrev: () => void;
     onNext: (e: React.FormEvent) => void;
 }) {

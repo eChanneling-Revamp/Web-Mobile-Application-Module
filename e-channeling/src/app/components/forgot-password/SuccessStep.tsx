@@ -27,6 +27,8 @@ export const SuccessStep = ({ setStep }: StepPackageSelectionProps) => {
         return () => clearInterval(countdownInterval);
     }, []);
 
+    console.log(setStep)
+
     // Handle redirect separately
     useEffect(() => {
         if (shouldRedirect) {
