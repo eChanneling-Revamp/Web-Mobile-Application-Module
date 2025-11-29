@@ -199,10 +199,10 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
     // console.log("signupData ", signupData);
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-2 py-6">
-            <form onSubmit={handleSubmit} noValidate className="space-y-6">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-2 py-1">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 <div className="space-y-2">
-                    <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                    <h2 className="text-xl sm:text-[22px] font-semibold text-gray-800">
                         Personal information
                     </h2>
                     <p className="text-sm text-gray-500">
@@ -241,14 +241,15 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
 
                 {formData.user_type === "corporate" && (
                     <div className="text-sm text-blue-500">
-                        Please choose the &apos;Corporate&apos; option only if you are an
-                        employee or member of one of the listed companies
+                        Please choose the &apos;Corporate&apos; option only if
+                        you are an employee or member of one of the listed
+                        companies
                     </div>
                 )}
 
                 {/* Corporate Fields */}
                 {formData.user_type === "corporate" && (
-                    <div className="flex flex-col lg:flex-row gap-4">
+                    <div className="flex flex-col md:flex-row gap-4">
                         <div className="space-y-1">
                             <label
                                 htmlFor="company_name"
@@ -313,7 +314,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                     </div>
                 )}
 
-                <div className="flex flex-col sm:flex-row gap-4 ">
+                <div className="flex flex-col md:flex-row gap-4 ">
                     <div className="space-y-1 ">
                         <label
                             htmlFor="title"
@@ -346,7 +347,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                         )}
                     </div>
 
-                    <div className="space-y-1">
+                    <div className="space-y-1  w-full">
                         <label
                             htmlFor="first_name"
                             className="text-sm text-gray-700"
@@ -373,117 +374,125 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             </p>
                         )}
                     </div>
-                </div>
 
-                <div className="space-y-1">
-                    <label
-                        htmlFor="last_name"
-                        className="text-sm text-gray-700"
-                    >
-                        Last name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="last_name"
-                        name="last_name"
-                        value={formData.last_name}
-                        onChange={handleInputChange}
-                        placeholder="Enter your last name"
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                            errors.last_name
-                                ? "border-red-500"
-                                : "border-gray-300"
-                        }`}
-                        required
-                    />
-                    {errors.last_name && (
-                        <p className="text-xs text-red-500">
-                            {errors.last_name}
-                        </p>
-                    )}
-                </div>
-
-                <div className="space-y-1">
-                    <label htmlFor="email" className="text-sm text-gray-700">
-                        Email{" "}
-                        {isEmailFromPreviousStep && (
-                            <span className="text-gray-500 text-xs">
-                                (verified)
-                            </span>
-                        )}
-                    </label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="Enter your email"
-                        disabled={isEmailFromPreviousStep}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                            errors.email ? "border-red-500" : "border-gray-300"
-                        } ${
-                            isEmailFromPreviousStep
-                                ? "bg-gray-100 cursor-not-allowed text-gray-700"
-                                : ""
-                        }`}
-                        required
-                    />
-                    {errors.email && (
-                        <p className="text-xs text-red-500">{errors.email}</p>
-                    )}
-                </div>
-
-                <div className="space-y-1">
-                    <label htmlFor="phone" className="text-sm text-gray-700">
-                        Number <span className="text-red-500">*</span>{" "}
-                        {isPhoneFromPreviousStep && (
-                            <span className="text-gray-500 text-xs">
-                                (verified)
-                            </span>
-                        )}
-                    </label>
-                    <div className="flex gap-2">
-                        <select
-                            name="country_code"
-                            value={formData.country_code}
-                            onChange={handleInputChange}
-                            disabled={isPhoneFromPreviousStep}
-                            className={`w-24 px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                                isPhoneFromPreviousStep
-                                    ? "bg-gray-100 cursor-not-allowed"
-                                    : ""
-                            }`}
+                    <div className="space-y-1 w-full">
+                        <label
+                            htmlFor="last_name"
+                            className="text-sm text-gray-700"
                         >
-                            {COUNTRY_CODES.map((item) => (
-                                <option key={item.code} value={item.code}>
-                                    {item.code}
-                                </option>
-                            ))}
-                        </select>
+                            Last name <span className="text-red-500">*</span>
+                        </label>
                         <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone_number}
+                            type="text"
+                            id="last_name"
+                            name="last_name"
+                            value={formData.last_name}
                             onChange={handleInputChange}
-                            placeholder="EX: 715575983"
-                            disabled={isPhoneFromPreviousStep}
-                            className={`flex-1 max-w-[200px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                                errors.phone
+                            placeholder="Enter your last name"
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                errors.last_name
                                     ? "border-red-500"
                                     : "border-gray-300"
+                            }`}
+                            required
+                        />
+                        {errors.last_name && (
+                            <p className="text-xs text-red-500">
+                                {errors.last_name}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                <div className="space-y-1 flex flex-col md:flex-row  gap-10 ">
+
+                    <div className="w-full space-y-1 ">
+                        <label htmlFor="email" className="text-sm text-gray-700">
+                            Email{" "}
+                            {isEmailFromPreviousStep && (
+                                <span className="text-gray-500 text-xs">
+                                    (verified)
+                                </span>
+                            )}
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            placeholder="Enter your email"
+                            disabled={isEmailFromPreviousStep}
+                            className={`w-full min-w-[280px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                errors.email ? "border-red-500" : "border-gray-300"
                             } ${
-                                isPhoneFromPreviousStep
+                                isEmailFromPreviousStep
                                     ? "bg-gray-100 cursor-not-allowed text-gray-700"
                                     : ""
                             }`}
                             required
                         />
+                        {errors.email && (
+                            <p className="text-xs text-red-500">{errors.email}</p>
+                        )}
                     </div>
-                    {errors.phone && (
-                        <p className="text-xs text-red-500">{errors.phone}</p>
-                    )}
+
+                    <div className="w-full space-y-1 ">
+                        <label
+                            htmlFor="phone_number"
+                            className="text-sm text-gray-700"
+                        >
+                            Number <span className="text-red-500">*</span>{" "}
+                            {isPhoneFromPreviousStep && (
+                                <span className="text-gray-500 text-xs">
+                                    (verified)
+                                </span>
+                            )}
+                        </label>
+                        <div className="flex gap-2">
+                            <select
+                                name="country_code"
+                                value={formData.country_code}
+                                onChange={handleInputChange}
+                                disabled={isPhoneFromPreviousStep}
+                                className={`w-20 px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                    isPhoneFromPreviousStep
+                                        ? "bg-gray-100 cursor-not-allowed"
+                                        : ""
+                                }`}
+                            >
+                                {COUNTRY_CODES.map((item) => (
+                                    <option key={item.code} value={item.code}>
+                                        {item.code}
+                                    </option>
+                                ))}
+                            </select>
+                            <input
+                                type="tel"
+                                id="phone_number"
+                                name="phone_number"
+                                value={formData.phone_number}
+                                onChange={handleInputChange}
+                                placeholder="EX: 715575983"
+                                disabled={isPhoneFromPreviousStep}
+                                className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                    errors.phone
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                } ${
+                                    isPhoneFromPreviousStep
+                                        ? "bg-gray-100 cursor-not-allowed text-gray-700"
+                                        : ""
+                                }`}
+                                required
+                            />
+                        </div>
+                        {errors.phone && (
+                            <p className="text-xs text-red-500">
+                                {errors.phone}
+                            </p>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-6">
@@ -516,7 +525,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                 </div>
 
                 {formData.id_type === "nic" ? (
-                    <div className="space-y-1">
+                    <div className="flex flex-col">
                         <label
                             htmlFor="nic_number"
                             className="text-sm text-gray-700"
@@ -530,7 +539,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             value={formData.nic_number}
                             onChange={handleInputChange}
                             placeholder="Enter your NIC"
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            className={`max-w-[400px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                 errors.nic_number
                                     ? "border-red-500"
                                     : "border-gray-300"
@@ -544,7 +553,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                         )}
                     </div>
                 ) : (
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col md:flex-row gap-4">
                         <div className="space-y-1">
                             <label
                                 htmlFor="nationality"
@@ -557,7 +566,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 name="nationality"
                                 value={formData.nationality}
                                 onChange={handleInputChange}
-                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.nationality
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -595,7 +604,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 value={formData.passport_number}
                                 onChange={handleInputChange}
                                 placeholder="Enter your passport number"
-                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.passport_number
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -611,7 +620,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10">
                     <div className="space-y-1">
                         <label
                             htmlFor="password"
