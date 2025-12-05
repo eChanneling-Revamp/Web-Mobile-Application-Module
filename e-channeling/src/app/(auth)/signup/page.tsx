@@ -1,5 +1,5 @@
 "use client";
-import { StepNationality } from "@/app/components/signup/StepNationality";
+import { StepVerify } from "@/app/components/signup/StepVerify";
 import { StepOTPVerification } from "@/app/components/signup/StepOTPVerification";
 import { StepPackageSelection } from "@/app/components/signup/StepPackageSelection";
 import { StepPersonalDetails } from "@/app/components/signup/StepPersonalDetails";
@@ -17,7 +17,7 @@ const SignUpPage = () => {
     const renderStep = () => {
         switch (step) {
             case 1:
-                return <StepNationality setStep={setStep} />;
+                return <StepVerify setStep={setStep} />;
             case 2:
                 return <StepOTPVerification setStep={setStep} />;
             case 3:
