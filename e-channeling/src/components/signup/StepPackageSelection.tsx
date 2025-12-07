@@ -60,6 +60,8 @@ export const StepPackageSelection = ({
         }
     };
 
+    console.log("signupData ", signupData)
+
     return (
         <div className="space-y-8 ">
             <h2 className="text-lg font-bold text-center">Select Package</h2>

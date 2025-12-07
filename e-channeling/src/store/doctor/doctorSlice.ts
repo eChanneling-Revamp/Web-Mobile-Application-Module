@@ -1,4 +1,4 @@
-import api from "@/utils/api";
+import api from "@/lib/utils/api";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // doctor type
@@ -40,8 +40,7 @@ export const fetchTopRatedDoctors = createAsyncThunk<
     } catch (error: unknown) {
         const err = error as { response?: { data?: { message?: string } } };
         return rejectWithValue(
-            err.response?.data?.message ||
-                "Failed to fetch top rated Doctors!"
+            err.response?.data?.message || "Failed to fetch top rated Doctors!"
         );
     }
 });

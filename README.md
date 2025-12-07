@@ -6,7 +6,6 @@ A modern web application for booking medical appointments with doctors across Sr
 
 **Live Site**: [https://echannelling.vercel.app/](https://echannelling.vercel.app/)
 
-
 ## Tech Stack
 
 -   Next.js 15.5.4
@@ -19,11 +18,17 @@ A modern web application for booking medical appointments with doctors across Sr
 -   React Icons 5.5.0
 -   Lucide React 0.544.0
 -   jsPDF 3.0.3
+-   Nodemailer 7.0.11
+-   Twilio 5.10.7
+-   crypto-js 4.2.0
 
 ## Prerequisites
 
 -   Node.js (version 18+)
--   npm
+-   npm or yarn
+-   Redis instance (Upstash recommended)
+-   SMTP server access (for email OTP)
+-   Twilio account (for SMS OTP)
 
 ## Installation
 
@@ -31,7 +36,39 @@ A modern web application for booking medical appointments with doctors across Sr
 git clone <repository-url>
 cd e-channeling
 npm install
+```
 
+## 📋 Environment Variables
+
+Create a `.env` file in the root of your project and add the following:
+
+```env
+# ===========================
+# Redis Configuration (Upstash)
+# ===========================
+UPSTASH_REDIS_REST_URL=https://your-redis-instance.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-redis-rest-token
+
+# ===========================
+# Email Configuration (SMTP)
+# ===========================
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+MAIL_USER=your-email@gmail.com
+
+# ===========================
+# Twilio Configuration (SMS)
+# ===========================
+TWILIO_SID=your-twilio-account-sid
+TWILIO_AUTH_TOKEN=your-twilio-auth-token
+TWILIO_PHONE=+1234567890
+
+# ===========================
+# API Configuration
+# ===========================
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api
 ```
 
 ## Getting Started
@@ -51,13 +88,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 -   `npx tsx src/utils/api.ts` - Run single ts file
 
 ## Routes
+
 -   `/` - Home page
 -   `/login` - Login page (/Email/Phone number+ Password)
 -   `/signup` - Registration page (Multi-step with OTP verification)
 -   `/forgot-password` - Password recovery initiation
--   `/otp-verification` - OTP verification (for forgot-password)
--   `/new-password` - Set new password (for forgot-password)
--   `/success` - Success confirmation (for forgot-password)
 -   `/search` - Find Doctors
 -   `/profile` - User profile (Protected - requires login)
 -   `/booking` - Appointment booking (Protected - requires login)

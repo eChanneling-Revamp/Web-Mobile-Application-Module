@@ -1,23 +1,26 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import {  Globe, User, Bell, Menu, X } from "lucide-react";
+import { Globe, User, Bell, Menu, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { logout } from "@/store/auth/authSlice";
 import { usePathname, useRouter } from "next/navigation";
 import NotificationPanel from "../notifications/NotificationPanel";
 
-
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const dispatch = useDispatch();
-    
+
     // Get notifications from Redux store
-    const { notifications } = useSelector((state: RootState) => state.notifications);
-    const unreadCount = notifications?.filter(notification => !notification.isRead).length || 0;
+    const { notifications } = useSelector(
+        (state: RootState) => state.notifications
+    );
+    const unreadCount =
+        notifications?.filter((notification) => !notification.isRead).length ||
+        0;
     const router = useRouter();
     const dropdownRef = useRef<HTMLDivElement>(null);
     const notificationRef = useRef<HTMLDivElement>(null);
@@ -171,17 +174,24 @@ const Navbar = () => {
                                         <Bell className="w-5 h-5 hover:text-black" />
                                         {unreadCount > 0 && (
                                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4.5 h-4.5 flex items-center justify-center border-2 border-white shadow text-[10px]">
-                                                {unreadCount > 9 ? "9+" : unreadCount}
+                                                {unreadCount > 9
+                                                    ? "9+"
+                                                    : unreadCount}
                                             </span>
                                         )}
                                     </button>
                                     <NotificationPanel
                                         isOpen={isNotificationOpen}
-                                        onClose={() => setIsNotificationOpen(false)}
+                                        onClose={() =>
+                                            setIsNotificationOpen(false)
+                                        }
                                     />
                                 </div>
 
-                                <div className="relative flex" ref={dropdownRef}>
+                                <div
+                                    className="relative flex"
+                                    ref={dropdownRef}
+                                >
                                     <div
                                         onClick={toggleProfileDropdown}
                                         className={`border rounded-full p-2 border-gray-400/80 cursor-pointer transition-colors hover:bg-gray-200 ${

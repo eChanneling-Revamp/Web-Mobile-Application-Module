@@ -1,8 +1,8 @@
 "use client";
-import { ResetPasswordStep } from "@/app/components/forgot-password/ResetPasswordStep";
-import { SendIdentifierStep } from "@/app/components/forgot-password/SendIdentifierStep";
-import { SuccessStep } from "@/app/components/forgot-password/SuccessStep";
-import { VerifyStep } from "@/app/components/forgot-password/VerifyOTPStep";
+import { ResetPasswordStep } from "@/components/forgot-password/ResetPasswordStep";
+import { SendIdentifierStep } from "@/components/forgot-password/SendIdentifierStep";
+import { SuccessStep } from "@/components/forgot-password/SuccessStep";
+import { VerifyStep } from "@/components/forgot-password/VerifyOTPStep";
 
 import Image from "next/image";
 import { useCallback, useState } from "react";

@@ -1,9 +1,9 @@
 "use client";
-import { StepVerify } from "@/app/components/signup/StepVerify";
-import { StepOTPVerification } from "@/app/components/signup/StepOTPVerification";
-import { StepPackageSelection } from "@/app/components/signup/StepPackageSelection";
-import { StepPersonalDetails } from "@/app/components/signup/StepPersonalDetails";
-import { StepFinal } from "@/app/components/signup/StepFinal";
+import { StepVerify } from "@/components/signup/StepVerify";
+import { StepOTPVerification } from "@/components/signup/StepOTPVerification";
+import { StepPackageSelection } from "@/components/signup/StepPackageSelection";
+import { StepPersonalDetails } from "@/components/signup/StepPersonalDetails";
+import { StepFinal } from "@/components/signup/StepFinal";
 import Image from "next/image";
 import { useState, useCallback } from "react";
 

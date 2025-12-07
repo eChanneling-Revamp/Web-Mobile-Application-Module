@@ -1,5 +1,6 @@
-import api from "@/utils/api";
+import api from "@/lib/utils/api";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -23,11 +24,6 @@ export interface SignupData {
     company_name: string;
     employee_id: string;
     accepted_terms: boolean;
-}
-
-interface OtpVerificationData {
-    phone_number: string;
-    otp: string;
 }
 
 // the user not store in the local storage yet
@@ -75,6 +71,16 @@ interface AuthState {
     signupData: Partial<SignupData>;
 }
 
+interface RequestOtpPayload {
+    email?: string;
+    phone?: string;
+}
+
+interface OtpVerificationData {
+    identifier: string;
+    otp: string;
+}
+
 function safeDecodeJwt(token?: string | null) {
     if (!token || typeof token !== "string") return null;
     const parts = token.split(".");
@@ -117,11 +123,12 @@ const initialState: AuthState = {
 // Request OTP
 export const requestOtp = createAsyncThunk<
     { message: string },
-    { phone_number: string },
+    RequestOtpPayload,
     { rejectValue: string }
->("auth/requestOtp", async (phoneNumber, { rejectWithValue }) => {
+>("auth/requestOtp", async (payload, { rejectWithValue }) => {
     try {
-        const response = await api.post("/auth/send-otp", phoneNumber);
+        console.log("redy to send data ", payload);
+        const response = await axios.post("/api/auth/send-otp", payload);
         return response.data;
     } catch (error: unknown) {
         const err = error as { response?: { data?: { message?: string } } };
@@ -137,9 +144,10 @@ export const verifyOtp = createAsyncThunk<
     { message: string },
     OtpVerificationData,
     { rejectValue: string }
->("auth/verifyOtp", async (data, { rejectWithValue }) => {
+>("auth/verifyOtp", async (payload, { rejectWithValue }) => {
     try {
-        const response = await api.post("/auth/verify-otp", data);
+        console.log("redy to send data ", payload);
+        const response = await axios.post("api/auth/verify-otp", payload);
         return response.data;
     } catch (error: unknown) {
         const err = error as { response?: { data?: { message?: string } } };

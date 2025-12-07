@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from 'react';
-import Sidebar from '@/app/components/profile/Sidebar';
-import AppointmentTabs from '@/app/components/profile/AppointmentTabs';
-import AppointmentCard from '@/app/components/profile/AppointmentCard';
-import { Appointment, User } from '@/app/components/profile/types';
+import Sidebar from '@/components/profile/Sidebar';
+import AppointmentTabs from '@/components/profile/AppointmentTabs';
+import AppointmentCard from '@/components/profile/AppointmentCard';
+import { Appointment , User } from '@/components/profile/types';
 
 const UserProfilePage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>("Appointments");

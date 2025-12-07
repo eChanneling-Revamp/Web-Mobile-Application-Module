@@ -1,5 +1,10 @@
 import { AppDispatch, RootState } from "@/store";
-import { clearErrors, requestOtp, setSignupData } from "@/store/auth/authSlice";
+import {
+    clearErrors,
+    requestOtp,
+    resetSignup,
+    setSignupData,
+} from "@/store/auth/authSlice";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
@@ -42,9 +47,9 @@ export const StepVerify = ({ setStep }: StepPackageSelectionProps) => {
                     setError("Please enter your Number!");
                     return false;
                 }
-                if (!/^\d{9}$/.test(num)) {
+                if (!/^\d{9,10}$/.test(num)) {
                     setError(
-                        "Sri Lankan phone number must be exactly 9 digits and contain only numbers"
+                        "Sri Lankan phone number must be 9 or 10 digits and contain only numbers"
                     );
                     return false;
                 }
@@ -65,10 +70,16 @@ export const StepVerify = ({ setStep }: StepPackageSelectionProps) => {
         return true;
     };
 
+    // format the number standard way
     const formatNumber = () => {
         let number;
         if (nationality === "Sri Lankan") {
-            number = `+94${contactInfo.phone_number}`;
+            const phone = contactInfo.phone_number;
+            if (phone.length == 10) {
+                number = `+94${phone.slice(1)}`;
+            } else {
+                number = `+94${phone}`;
+            }
         }
         return number;
     };
@@ -80,25 +91,38 @@ export const StepVerify = ({ setStep }: StepPackageSelectionProps) => {
         if (!validateContactInfo()) return;
         dispatch(clearErrors());
 
-        const num = formatNumber();
-        //console.log("sending OTP to", num);
-
-        dispatch(
-            setSignupData({
-                phone_number: num || "",
-                email: contactInfo.email || "",
-                country_code: contactInfo.country_code || "",
-            })
-        );
+        const formatedNumber = formatNumber();
+        //console.log("sending OTP to", formatedNumber);
 
         if (nationality === "Sri Lankan") {
             if (useEmail) {
-                //
+                const identifierValue = contactInfo.email || "";
+                dispatch(
+                    setSignupData({
+                        email: identifierValue,
+                        country_code: contactInfo.country_code,
+                    })
+                );
+                dispatch(requestOtp({ email: identifierValue }));
             } else {
-                dispatch(requestOtp({ phone_number: num || "" }));
+                const identifierValue = formatedNumber || "";
+                dispatch(
+                    setSignupData({
+                        phone_number: identifierValue,
+                        country_code: contactInfo.country_code,
+                    })
+                );
+                dispatch(requestOtp({ phone: identifierValue }));
             }
         } else {
-            dispatch(requestOtp({ phone_number: num || "" }));
+            const identifierValue = contactInfo.email || "";
+            dispatch(
+                setSignupData({
+                    email: identifierValue,
+                    country_code: contactInfo.country_code,
+                })
+            );
+            dispatch(requestOtp({ email: identifierValue }));
         }
     };
 
@@ -117,10 +141,11 @@ export const StepVerify = ({ setStep }: StepPackageSelectionProps) => {
         e.preventDefault();
         setError("");
         dispatch(clearErrors());
+        dispatch(resetSignup());
         setUseEmail(!useEmail);
     };
 
-    console.log(contactInfo);
+    //console.log(contactInfo);
 
     return (
         <form onSubmit={sendOtpRequest} noValidate className="space-y-6">
@@ -147,6 +172,7 @@ export const StepVerify = ({ setStep }: StepPackageSelectionProps) => {
                                     country_code: "",
                                 });
                                 dispatch(clearErrors());
+                                dispatch(resetSignup());
                             }}
                             className="w-full px-4 py-3 border-2 rounded-full focus:outline-none transition-colors placeholder:text-gray-500 border-gray-300 focus:border-indigo-400"
                             required

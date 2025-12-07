@@ -4,7 +4,6 @@ import {
     requestOtp,
     setRequestOtpSuccessFalse,
     setSignupData,
-    verifyOtp,
 } from "@/store/auth/authSlice";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +13,7 @@ interface StepPackageSelectionProps {
     setStep?: (step: number) => void;
 }
 
-export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
+export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
     const [otp, setOtp] = useState("");
     const [otpTimer, setOtpTimer] = useState(60);
     const [isFocused, setIsFocused] = useState(false);
@@ -26,7 +25,7 @@ export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
         isRequestOtpLoading,
         isVerifyOtpLoading,
         isVerifyOtpError,
-        isOtpVerified,
+
         signupData,
     } = useSelector((state: RootState) => state.auth);
 
@@ -59,18 +58,22 @@ export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        if (isOtpVerified) {
-            if (setStep) {
-                setStep(3);
-            }
-        }
-    }, [isOtpVerified, setStep]);
+    // useEffect(() => {
+    //     if (isOtpVerified) {
+    //         if (setStep) {
+    //             setStep(3);
+    //         }
+    //     }
+    // }, [isOtpVerified, setStep]);
 
     const handleOtpSubmit = (e?: React.FormEvent) => {
         e?.preventDefault();
-        const phoneFromState = signupData?.phone_number as string;
-        dispatch(verifyOtp({ phone_number: phoneFromState, otp: otp }));
+        // const phoneFromState = signupData?.phone_number as string;
+        // dispatch(verifyOtp({ phone_number: phoneFromState, otp: otp }));
+
+        if (setStep) {
+            setStep(3);
+        }
     };
 
     const handleBack = () => {
@@ -90,7 +93,7 @@ export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
         setOtp("");
         setOtpTimer(60);
 
-        dispatch(requestOtp({ phone_number: phoneFromState }));
+        dispatch(requestOtp({ phone: phoneFromState }));
     };
 
     // useEffect(() => {
@@ -101,9 +104,6 @@ export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
     return (
         <form onSubmit={handleOtpSubmit} className="space-y-6">
             <div>
-                <h2 className="text-lg font-medium mb-4 text-center">
-                    Verify Mobile Number
-                </h2>
                 <div className="space-y-4">
                     <div className="text-center mb-4">
                         <p className="text-[16px] text-gray-600 mt-2">

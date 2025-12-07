@@ -4,7 +4,7 @@ import {
     requestOtp,
     setRequestOtpSuccessFalse,
     setSignupData,
-    
+    verifyOtp,
 } from "@/store/auth/authSlice";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -14,9 +14,9 @@ interface StepPackageSelectionProps {
     setStep?: (step: number) => void;
 }
 
-export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
+export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
     const [otp, setOtp] = useState("");
-    const [otpTimer, setOtpTimer] = useState(60);
+    const [otpTimer, setOtpTimer] = useState(180);
     const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const OTP_LENGTH = 6;
@@ -26,9 +26,12 @@ export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
         isRequestOtpLoading,
         isVerifyOtpLoading,
         isVerifyOtpError,
-        
+        isOtpVerified,
         signupData,
     } = useSelector((state: RootState) => state.auth);
+
+    const phoneFromState = signupData?.phone_number as string;
+    const emailFromState = signupData?.email as string;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!otp) dispatch(clearErrors());
@@ -59,21 +62,24 @@ export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
         return () => clearInterval(interval);
     }, []);
 
-    // useEffect(() => {
-    //     if (isOtpVerified) {
-    //         if (setStep) {
-    //             setStep(3);
-    //         }
-    //     }
-    // }, [isOtpVerified, setStep]);
+    useEffect(() => {
+        if (isOtpVerified) {
+            if (setStep) {
+                setStep(3);
+            }
+        }
+    }, [isOtpVerified, setStep]);
 
-    const handleOtpSubmit = (e?: React.FormEvent) => {
+    const handleOtpSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
-        // const phoneFromState = signupData?.phone_number as string;
-        // dispatch(verifyOtp({ phone_number: phoneFromState, otp: otp }));
 
-        if (setStep) {
-            setStep(3);
+        if (phoneFromState) {
+            console.log("phoneFromState ", phoneFromState);
+            await dispatch(verifyOtp({ identifier: phoneFromState, otp: otp }));
+        }
+        if (emailFromState) {
+            console.log("emailFromState ", emailFromState);
+            await dispatch(verifyOtp({ identifier: emailFromState, otp: otp }));
         }
     };
 
@@ -85,8 +91,6 @@ export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
         }
     };
 
-    const phoneFromState = signupData?.phone_number as string;
-
     const reSendOtpRequest = () => {
         dispatch(clearErrors());
         if (otpTimer !== 0) return;
@@ -94,7 +98,12 @@ export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
         setOtp("");
         setOtpTimer(60);
 
-        dispatch(requestOtp({ phone_number: phoneFromState }));
+        if (phoneFromState) {
+            dispatch(requestOtp({ phone: phoneFromState }));
+        }
+        if (emailFromState) {
+            dispatch(requestOtp({ email: emailFromState }));
+        }
     };
 
     // useEffect(() => {
@@ -105,6 +114,9 @@ export const VerifyStep = ({ setStep }: StepPackageSelectionProps) => {
     return (
         <form onSubmit={handleOtpSubmit} className="space-y-6">
             <div>
+                <h2 className="text-lg font-medium mb-4 text-center">
+                    Verify Mobile Number
+                </h2>
                 <div className="space-y-4">
                     <div className="text-center mb-4">
                         <p className="text-[16px] text-gray-600 mt-2">

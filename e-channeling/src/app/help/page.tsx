@@ -19,7 +19,7 @@ import {
     Video,
 } from "lucide-react";
 import Link from "next/link";
-import FAQ from "@/app/components/help/FAQ";
+import FAQ from "@/components/help/FAQ";
 import Image from "next/image";
 
 export default function HelpPage() {
