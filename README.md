@@ -8,7 +8,7 @@ A modern web application for booking medical appointments with doctors across Sr
 
 ## Tech Stack
 
--   Next.js 15.5.4
+-   Next.js 16.0.7
 -   React 19.1.0
 -   TypeScript 5.9.3
 -   Tailwind CSS 4.1.14
