@@ -12,6 +12,7 @@ const SignUpPage = () => {
 
     const setStep = useCallback((newStep: number) => {
         setStepState(newStep);
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }, []);
 
     const renderStep = () => {
@@ -30,10 +31,11 @@ const SignUpPage = () => {
                 return null;
         }
     };
+    
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-300 to-gray-50 flex flex-col items-center justify-center py-10 px-7">
-            <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 w-full max-w-md md:max-w-5xl relative overflow-hidden flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 transform -translate-y-6 md:translate-y-0 ">
+        <div className="min-h-screen bg-gradient-to-b from-blue-300 to-gray-50 flex flex-col items-center  py-10 px-7">
+            <div className="bg-white rounded-3xl shadow-2xl p-6  w-full max-w-md md:max-w-5xl relative overflow-hidden flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 transform -translate-y-6 md:translate-y-0 ">
                 {step !== 4 && (
                     <div className="flex-shrink-0 ">
                         <Image
@@ -42,8 +44,6 @@ const SignUpPage = () => {
                             width={350}
                             height={350}
                             className="object-contain w-40 sm:w-55 md:w-65 lg:w-90 transition-all duration-300 ease-in-out"
-                            placeholder="blur"
-                            blurDataURL="/signin-image.png"
                             sizes="(max-width: 640px) 5rem, (max-width: 768px) 7rem, (max-width: 1024px) 14rem, 20rem"
                         />
                     </div>
@@ -52,11 +52,11 @@ const SignUpPage = () => {
                     <div className="">
                         {step != 4 ? (
                             <>
-                                <h1 className="text-2xl md:text-3xl font-bold text-center mb-4 md:mb-6">
+                                <h1 className="text-2xl md:text-[28px] font-bold text-center mb-4 ">
                                     SIGN UP
                                 </h1>
 
-                                <p className="text-gray-600 text-center mb-6 md:mb-8 text-sm">
+                                <p className="text-gray-600 text-center mb-6  text-sm">
                                     Hello there! Let&apos;s create your account.
                                 </p>
 
@@ -88,11 +88,11 @@ const SignUpPage = () => {
                             </>
                         ) : (
                             <>
-                                <h1 className="text-2xl md:text-[28px] font-bold text-center mb-4">
+                                <h1 className="text-2xl  font-bold text-center mb-3">
                                     SIGN UP
                                 </h1>
 
-                                <p className="text-gray-600 text-center mb-6  text-sm">
+                                <p className="text-gray-600 text-center mb-4  text-sm">
                                     Hello there! Let&apos;s create your account.
                                 </p>
 
@@ -103,7 +103,7 @@ const SignUpPage = () => {
                                             className="flex items-center"
                                         >
                                             <div
-                                                className={`rounded-full h-8 w-8 flex items-center justify-center ${
+                                                className={`rounded-full h-6 w-6 flex items-center justify-center ${
                                                     stepNumber <= step
                                                         ? "bg-blue-600 text-white"
                                                         : "border-2 border-gray-200 text-gray-400"
@@ -125,7 +125,9 @@ const SignUpPage = () => {
                         )}
                     </div>
 
-                    <div className="mt-8">{renderStep()}</div>
+                    <div className={`${step === 4 ? "mt-2" : "mt-6"}`}>
+                        {renderStep()}
+                    </div>
                 </div>
             </div>
         </div>

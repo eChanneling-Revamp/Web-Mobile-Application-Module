@@ -199,13 +199,13 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
     // console.log("signupData ", signupData);
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-2 py-1">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-2 ">
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 <div className="space-y-2">
-                    <h2 className="text-xl sm:text-[22px] font-semibold text-gray-800">
+                    <h2 className="text-[18px] sm:text-[20px] font-semibold text-gray-800">
                         Personal information
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-[13px] text-gray-500">
                         Please fill the below form fields
                     </p>
                 </div>
@@ -262,7 +262,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 name="company_name"
                                 value={formData.company_name}
                                 onChange={handleInputChange}
-                                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.company_name
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -298,7 +298,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 value={formData.employee_id}
                                 onChange={handleInputChange}
                                 placeholder="Enter your employee number"
-                                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.employee_id
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -327,7 +327,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             name="title"
                             value={formData.title}
                             onChange={handleInputChange}
-                            className={`w-full min-w-[80px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            className={`w-full min-w-[80px] px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                 errors.title
                                     ? "border-red-500"
                                     : "border-gray-300"
@@ -361,7 +361,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             value={formData.first_name}
                             onChange={handleInputChange}
                             placeholder="Enter your first name"
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                 errors.first_name
                                     ? "border-red-500"
                                     : "border-gray-300"
@@ -389,7 +389,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             value={formData.last_name}
                             onChange={handleInputChange}
                             placeholder="Enter your last name"
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                 errors.last_name
                                     ? "border-red-500"
                                     : "border-gray-300"
@@ -423,7 +423,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             onChange={handleInputChange}
                             placeholder="Enter your email"
                             disabled={isEmailFromPreviousStep}
-                            className={`w-full min-w-[280px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            className={`w-full min-w-[280px] px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                 errors.email ? "border-red-500" : "border-gray-300"
                             } ${
                                 isEmailFromPreviousStep
@@ -455,7 +455,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 value={formData.country_code}
                                 onChange={handleInputChange}
                                 disabled={isPhoneFromPreviousStep}
-                                className={`w-20 px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-20 px-2 py-[7px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     isPhoneFromPreviousStep
                                         ? "bg-gray-100 cursor-not-allowed"
                                         : ""
@@ -475,7 +475,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 onChange={handleInputChange}
                                 placeholder="EX: 715575983"
                                 disabled={isPhoneFromPreviousStep}
-                                className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`flex-1 px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.phone
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -539,7 +539,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             value={formData.nic_number}
                             onChange={handleInputChange}
                             placeholder="Enter your NIC"
-                            className={`max-w-[400px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            className={`max-w-[400px] px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                 errors.nic_number
                                     ? "border-red-500"
                                     : "border-gray-300"
@@ -566,7 +566,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 name="nationality"
                                 value={formData.nationality}
                                 onChange={handleInputChange}
-                                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.nationality
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -604,7 +604,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 value={formData.passport_number}
                                 onChange={handleInputChange}
                                 placeholder="Enter your passport number"
-                                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.passport_number
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -636,7 +636,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 placeholder="Enter your password"
-                                className={`w-full px-4 py-2 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-full px-4 py-[7px] pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.password
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -710,7 +710,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 value={formData.confirm_password}
                                 onChange={handleInputChange}
                                 placeholder="Enter your password"
-                                className={`w-full px-4 py-2 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                className={`w-full px-4 py-[7px] pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.confirm_password
                                         ? "border-red-500"
                                         : "border-gray-300"

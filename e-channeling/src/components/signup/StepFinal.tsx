@@ -87,8 +87,8 @@ export const StepFinal = ({ setStep }: StepPackageSelectionProps) => {
     // console.log("signupData", signupData);
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-1 py-6 sm:py-8 ">
-            <div className="mb-6 sm:mb-8">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-1 py-1  ">
+            <div className="mb-4">
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
                     Summary
                 </h1>
@@ -97,29 +97,29 @@ export const StepFinal = ({ setStep }: StepPackageSelectionProps) => {
                 </p>
             </div>
 
-            <div className="mb-6 sm:mb-8">
+            <div className="mb-6">
                 {signupData?.package === "FREE Member" ? (
-                    <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-1.5 bg-blue-50 rounded-full border border-blue-200">
-                        <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                    <div className="inline-flex items-center gap-2 sm:gap-3 px-3  py-1.5  bg-blue-50 rounded-full border border-blue-200">
+                        <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
                             <FaStar className="text-white" />
                         </div>
-                        <span className="text-base sm:text-[16px] font-semibold text-blue-700">
+                        <span className="text-base sm:text-[15px] font-semibold text-blue-700">
                             {signupData.package}
                         </span>
                     </div>
                 ) : (
-                    <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-1.5 bg-green-50 rounded-full border border-green-200">
-                        <div className="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                    <div className="inline-flex items-center gap-2 sm:gap-3 px-3  py-1.5  bg-green-50 rounded-full border border-green-200">
+                        <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
                             <FaStar className="text-white" />
                         </div>
-                        <span className="text-base sm:text-[16px] font-semibold text-green-700">
+                        <span className="text-base sm:text-[15px] font-semibold text-green-700">
                             {signupData.package}
                         </span>
                     </div>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4  mb-6 sm:mb-8">
                 <div className="space-y-1">
                     <p className="text-xs sm:text-sm text-gray-500 font-medium">
                         User Type

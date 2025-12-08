@@ -63,23 +63,23 @@ export const StepPackageSelection = ({
     console.log("signupData ", signupData)
 
     return (
-        <div className="space-y-8 ">
+        <div className="space-y-6 ">
             <h2 className="text-lg font-bold text-center">Select Package</h2>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-4">
                 {packages.map((pkg) => (
                     <div
                         key={pkg.name}
                         onClick={() => handlePackageSelect(pkg.name)}
-                        className={`relative cursor-pointer transition-all rounded-xl border p-6 min-h-[200px] md:min-h-[300px] flex flex-col justify-between hover:bg-blue-100 ${
+                        className={`relative cursor-pointer transition-all rounded-xl border p-4  flex flex-col justify-between hover:bg-blue-100 ${
                             formData.package === pkg.name
                                 ? "border-[#4B5BDA] shadow-md bg-blue-100"
                                 : "border-gray-300 hover:shadow-sm bg-gray-50"
                         }`}
                     >
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-between ">
                             <div
-                                className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                                className={`w-10 h-10 rounded-full flex items-center justify-center ${
                                     pkg.name === "Free Member"
                                         ? "bg-[#E8F4FE]"
                                         : "bg-[#F1FFE9]"
@@ -97,7 +97,7 @@ export const StepPackageSelection = ({
                             </div>
                         </div>
 
-                        <div className="flex-1 flex flex-col justify-center items-start">
+                        <div className="flex-1 flex flex-col py-4 ">
                             <h3 className="font-medium">{pkg.name}</h3>
                             <p className="text-2xl font-extrabold mt-2">
                                 {pkg.price}
@@ -136,7 +136,7 @@ export const StepPackageSelection = ({
                 ))}
             </div>
 
-            <div className="text-center text-sm">
+            <div className="text-center text-[12px]">
                 <Link
                     href="/membership-details"
                     className="text-blue-600 hover:text-blue-700 underline"
