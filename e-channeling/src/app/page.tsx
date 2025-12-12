@@ -1,7 +1,7 @@
-import HeroSection from "./components/home/HeroSection";
-import FeaturedServices from "./components/home/FeaturedServices";
-import MembershipSection from "./components/home/MembershipSection";
-import FeaturedDoctors from "./components/home/FeaturedDoctors";
+import HeroSection from "../components/home/HeroSection";
+import FeaturedServices from "../components/home/FeaturedServices";
+import MembershipSection from "../components/home/MembershipSection";
+import FeaturedDoctors from "../components/home/FeaturedDoctors";
 
 export default function Home() {
     return (

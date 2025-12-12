@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import ReduxProvider from "@/providers/ReduxProvider";
 
 const geistSans = Geist({
@@ -27,9 +27,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" data-scroll-behavior="smooth">
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+                suppressHydrationWarning
             >
                 <ReduxProvider>
                     <Navbar />
