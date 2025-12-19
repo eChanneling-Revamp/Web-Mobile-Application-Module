@@ -118,18 +118,21 @@ export default function SearchPage() {
     const placeholderImg = useMemo(() => "/sample-doctor.png", []);
 
     interface Doctor {
+        id?: string;
         name?: string;
+        specialization?: string;
         hospitals?: string | string[];
         fee?: number | string;
+        image?: string;
     }
 
     const goBook = (doc: Doctor) => {
-        const hospital = Array.isArray(doc?.hospitals) ? doc.hospitals[0] : "";
-        router.push(
-            `/booking?doctorName=${encodeURIComponent(doc?.name || "")}&hospital=${encodeURIComponent(
-                hospital || ""
-            )}&fee=${encodeURIComponent(doc?.fee ?? "")}`
-        );
+        const params = new URLSearchParams();
+        params.append("doctorId", doc?.id || "");
+        params.append("doctorName", doc?.name || "");
+        params.append("specialization", doc?.specialization || "");
+        params.append("fee", (doc?.fee || "").toString());
+        router.push(`/booking?${params.toString()}`);
     };
 
     /* ------- UI Tokens to match Home screenshots ------- */
