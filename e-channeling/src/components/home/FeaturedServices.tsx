@@ -5,22 +5,22 @@ const FeaturedServices = () => {
     const services = [
         {
             id: 1,
-            title: "Teleconsultation",
-            description: "Talk to doctors online via video consultation",
+            title: "Doctor Channeling",
+            description: "Book doctor appointments easily by selecting your preferred hospital and time.",
             icon: <Video className="w-8 h-8 text-green-500" />,
             
         },
         {
             id: 2,
-            title: "Lab Tests",
-            description: "Book lab tests and health checkups",
+            title: "Member Registration",
+            description: "Create an account to access faster bookings and exclusive member benefits.",
             icon: <TestTube className="w-8 h-8 text-blue-500" />,
             
         },
         {
             id: 3,
-            title: "Medicines",
-            description: "Order medicines and get them delivered",
+            title: "Medical Checkups & Reservations",
+            description: "Schedule medical checkups and reserve healthcare services with ease.",
             icon: <Pill className="w-8 h-8 text-green-500" />,
             
         },
