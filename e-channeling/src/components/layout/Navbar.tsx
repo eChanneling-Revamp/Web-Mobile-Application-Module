@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Globe, User, Bell, Menu, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { logout } from "@/store/auth/authSlice";
+import { logout, rehydrateAuth } from "@/store/auth/authSlice";
 import { usePathname, useRouter } from "next/navigation";
 import NotificationPanel from "../notifications/NotificationPanel";
 
@@ -33,6 +33,11 @@ const Navbar = () => {
     );
     const isAuthenticated =
         isLoginSuccess && userToken && Object.keys(userToken).length > 0;
+
+    // Rehydrate auth state from localStorage on mount (client-side only)
+    useEffect(() => {
+        dispatch(rehydrateAuth());
+    }, [dispatch]);
 
     //const [isAuthenticated, setIsAuthenticated] = useState();
 

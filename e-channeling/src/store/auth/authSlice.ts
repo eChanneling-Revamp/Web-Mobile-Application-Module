@@ -2,9 +2,6 @@ import api from "@/lib/utils/api";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
 // if need add user verified or not
 export interface SignupData {
     phone_number: string;
@@ -97,18 +94,14 @@ function safeDecodeJwt(token?: string | null) {
     }
 }
 
-const decodedPayload = safeDecodeJwt(token);
-
-// intial state
+// intial state - Always start with null to avoid hydration mismatch
 const initialState: AuthState = {
-    userToken: token ? token : null,
-    role: decodedPayload?.role ?? null,
-    userId: decodedPayload?.sub ?? null,
+    userToken: null,
+    role: null,
+    userId: null,
     isLoginLoading: false,
     isLoginError: null,
-    isLoginSuccess:
-        !!decodedPayload &&
-        (!decodedPayload.exp || decodedPayload.exp * 1000 > Date.now()),
+    isLoginSuccess: false,
 
     isSignupLoading: false,
     isSignupError: null,
@@ -187,9 +180,9 @@ export const login = createAsyncThunk<
         const response = await api.post("/auth/login", loginData);
         return response.data;
     } catch (error: unknown) {
-        const err = error as { response?: { data?: { message?: string } } };
+        const err = error as { response?: { data?: { error?: string } } };
         return rejectWithValue(
-            err.response?.data?.message ||
+            err.response?.data?.error ||
                 "An unexpected error occurred during login."
         );
     }
@@ -200,6 +193,28 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
+        // Rehydrate auth state from localStorage (client-side only)
+        rehydrateAuth: (state) => {
+            if (typeof window !== "undefined") {
+                const token = localStorage.getItem("token");
+                if (token) {
+                    const payload = safeDecodeJwt(token);
+                    // Check if token is valid and not expired
+                    if (
+                        payload &&
+                        (!payload.exp || payload.exp * 1000 > Date.now())
+                    ) {
+                        state.userToken = token;
+                        state.role = payload.role ?? null;
+                        state.userId = payload.sub ?? null;
+                        state.isLoginSuccess = true;
+                    } else {
+                        // Token is invalid or expired, remove it
+                        localStorage.removeItem("token");
+                    }
+                }
+            }
+        },
         clearErrors: (state) => {
             state.isLoginError = null;
             state.isSignupError = null;
@@ -331,6 +346,7 @@ const authSlice = createSlice({
 });
 
 export const {
+    rehydrateAuth,
     clearErrors,
     logout,
     setSignupData,
