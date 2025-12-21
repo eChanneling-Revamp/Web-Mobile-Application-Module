@@ -16,7 +16,7 @@ export const StepPackageSelection = ({
 
     const packages = [
         {
-            name: "Free Member",
+            name: "FREE_MEMBER",
             price: "0 LKR",
             duration: "Life time",
             features: [
@@ -25,7 +25,7 @@ export const StepPackageSelection = ({
             ],
         },
         {
-            name: "Premium Member",
+            name: "PREMIUM_MEMBER",
             price: "2000 LKR",
             duration: "1 Year",
             features: ["30% on ECH Service fee", "15% on ECH Service fee"],
@@ -60,7 +60,7 @@ export const StepPackageSelection = ({
         }
     };
 
-    console.log("signupData ", signupData)
+    console.log("signupData ", signupData);
 
     return (
         <div className="space-y-6 ">
@@ -80,12 +80,12 @@ export const StepPackageSelection = ({
                         <div className="flex items-start justify-between ">
                             <div
                                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                    pkg.name === "Free Member"
+                                    pkg.name === "FREE_MEMBER"
                                         ? "bg-[#E8F4FE]"
                                         : "bg-[#F1FFE9]"
                                 }`}
                             >
-                                {pkg.name === "Free Member" ? (
+                                {pkg.name === "FREE_MEMBER" ? (
                                     <span className="text-[#4B5BDA] text-xl">
                                         ★
                                     </span>

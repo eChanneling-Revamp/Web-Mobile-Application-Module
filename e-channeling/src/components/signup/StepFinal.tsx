@@ -74,15 +74,15 @@ export const StepFinal = ({ setStep }: StepPackageSelectionProps) => {
             console.error("Incomplete signup data:", signupData);
             return;
         }
-        // TypeScript now knows signupData is complete SignupData
         dispatch(signup(signupData));
     };
 
     useEffect(() => {
         if (isSignupSuccess) {
-            router.push("/");
+            dispatch(resetSignup());
+            window.location.href = "/";
         }
-    }, [isSignupSuccess, router]);
+    }, [isSignupSuccess, dispatch]);
 
     // console.log("signupData", signupData);
 

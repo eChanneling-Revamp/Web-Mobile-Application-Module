@@ -64,6 +64,12 @@ export const StepOTPVerification = ({ setStep }: StepPackageSelectionProps) => {
 
     useEffect(() => {
         if (isOtpVerified) {
+            if (phoneFromState) {
+                dispatch(setSignupData({ is_number_verified: true }));
+            }
+            if (emailFromState) {
+                dispatch(setSignupData({ is_email_verified: true }));
+            }
             if (setStep) {
                 setStep(3);
             }

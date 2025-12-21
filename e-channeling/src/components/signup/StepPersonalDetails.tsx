@@ -21,6 +21,8 @@ interface FormData {
     confirm_password: string;
     company_name: string;
     employee_id: string;
+    age: number;
+    gender: string;
 }
 
 interface ValidationErrors {
@@ -32,14 +34,7 @@ interface StepPackageSelectionProps {
 }
 
 // example companies
-const COMPANIES = [
-    "Company A",
-    "Company B",
-    "Company C",
-    "Sri Lanka Telecom",
-    "Dialog Axiata",
-    "Other",
-];
+const COMPANIES = ["Roseth", "Nawaloka", "Ruhuna", "Durdans", "Asiri"];
 
 const TITLES = ["Mr", "Mrs", "Miss", "Ms", "Dr", "Prof"];
 
@@ -55,10 +50,21 @@ const COUNTRY_CODES = [
 export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
     const { signupData } = useSelector((state: RootState) => state.auth);
 
-    const isPhoneFromPreviousStep = !!(signupData && signupData.phone_number
-        ? signupData.phone_number.trim().slice(3)
-        : "");
-    const isEmailFromPreviousStep = !!signupData?.email;
+    // let isPhoneFromPreviousStep = false;
+    // let isEmailFromPreviousStep = false;
+
+    // if (signupData.is_number_verified) {
+    //     isPhoneFromPreviousStep = !!(signupData && signupData.phone_number
+    //         ? signupData.phone_number.trim().slice(3)
+    //         : "");
+    // }
+
+    // if (signupData.is_email_verified) {
+    //     isEmailFromPreviousStep = !!signupData?.email;
+    // }
+
+    const isEmailVerified = signupData.is_email_verified;
+    const isPhoneVerified = signupData.is_number_verified;
 
     const [formData, setFormData] = useState<FormData>({
         phone_number: signupData?.phone_number || "",
@@ -77,6 +83,8 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
         confirm_password: signupData?.confirm_password || "",
         company_name: signupData?.company_name || "",
         employee_id: signupData?.employee_id || "",
+        age: signupData?.age || 0,
+        gender: signupData?.gender || "male",
     });
 
     const [showPassword, setShowPassword] = useState(false);
@@ -155,6 +163,14 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
             if (formData.id_type === "passport" && !formData.nationality) {
                 newErrors.nationality = "Nationality is required";
             }
+        }
+
+        if (!formData.gender) {
+            newErrors.gender = "Gender is required";
+        }
+
+        if (!formData.age || formData.age <= 0) {
+            newErrors.age = "Please enter a valid age";
         }
 
         if (!formData.password) {
@@ -405,11 +421,13 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                 </div>
 
                 <div className="space-y-1 flex flex-col md:flex-row  gap-10 ">
-
                     <div className="w-full space-y-1 ">
-                        <label htmlFor="email" className="text-sm text-gray-700">
+                        <label
+                            htmlFor="email"
+                            className="text-sm text-gray-700"
+                        >
                             Email{" "}
-                            {isEmailFromPreviousStep && (
+                            {isEmailVerified && (
                                 <span className="text-gray-500 text-xs">
                                     (verified)
                                 </span>
@@ -422,18 +440,22 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             value={formData.email}
                             onChange={handleInputChange}
                             placeholder="Enter your email"
-                            disabled={isEmailFromPreviousStep}
+                            disabled={isEmailVerified}
                             className={`w-full min-w-[280px] px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                                errors.email ? "border-red-500" : "border-gray-300"
+                                errors.email
+                                    ? "border-red-500"
+                                    : "border-gray-300"
                             } ${
-                                isEmailFromPreviousStep
+                                isEmailVerified
                                     ? "bg-gray-100 cursor-not-allowed text-gray-700"
                                     : ""
                             }`}
                             required
                         />
                         {errors.email && (
-                            <p className="text-xs text-red-500">{errors.email}</p>
+                            <p className="text-xs text-red-500">
+                                {errors.email}
+                            </p>
                         )}
                     </div>
 
@@ -443,7 +465,7 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                             className="text-sm text-gray-700"
                         >
                             Number <span className="text-red-500">*</span>{" "}
-                            {isPhoneFromPreviousStep && (
+                            {isPhoneVerified && (
                                 <span className="text-gray-500 text-xs">
                                     (verified)
                                 </span>
@@ -454,9 +476,9 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 name="country_code"
                                 value={formData.country_code}
                                 onChange={handleInputChange}
-                                disabled={isPhoneFromPreviousStep}
+                                disabled={isPhoneVerified}
                                 className={`w-20 px-2 py-[7px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                                    isPhoneFromPreviousStep
+                                    isPhoneVerified
                                         ? "bg-gray-100 cursor-not-allowed"
                                         : ""
                                 }`}
@@ -474,13 +496,13 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                                 value={formData.phone_number}
                                 onChange={handleInputChange}
                                 placeholder="EX: 715575983"
-                                disabled={isPhoneFromPreviousStep}
+                                disabled={isPhoneVerified}
                                 className={`flex-1 px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                                     errors.phone
                                         ? "border-red-500"
                                         : "border-gray-300"
                                 } ${
-                                    isPhoneFromPreviousStep
+                                    isPhoneVerified
                                         ? "bg-gray-100 cursor-not-allowed text-gray-700"
                                         : ""
                                 }`}
@@ -495,130 +517,203 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-6">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="id_type"
-                            value="nic"
-                            checked={formData.id_type === "nic"}
-                            onChange={() => handleIdTypeChange("nic")}
-                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
-                        />
-                        <span className="text-sm sm:text-base text-gray-700">
-                            NIC number
-                        </span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="id_type"
-                            value="passport"
-                            checked={formData.id_type === "passport"}
-                            onChange={() => handleIdTypeChange("passport")}
-                            className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
-                        />
-                        <span className="text-sm sm:text-base text-gray-700">
-                            Passport
-                        </span>
-                    </label>
-                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                        <div className="flex items-center gap-6 mb-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="id_type"
+                                    value="nic"
+                                    checked={formData.id_type === "nic"}
+                                    onChange={() => handleIdTypeChange("nic")}
+                                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                                />
+                                <span className="text-sm sm:text-base text-gray-700">
+                                    NIC number
+                                </span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="id_type"
+                                    value="passport"
+                                    checked={formData.id_type === "passport"}
+                                    onChange={() =>
+                                        handleIdTypeChange("passport")
+                                    }
+                                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                                />
+                                <span className="text-sm sm:text-base text-gray-700">
+                                    Passport
+                                </span>
+                            </label>
+                        </div>
 
-                {formData.id_type === "nic" ? (
-                    <div className="flex flex-col">
-                        <label
-                            htmlFor="nic_number"
-                            className="text-sm text-gray-700"
-                        >
-                            NIC Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="nic_number"
-                            name="nic_number"
-                            value={formData.nic_number}
-                            onChange={handleInputChange}
-                            placeholder="Enter your NIC"
-                            className={`max-w-[400px] px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                                errors.nic_number
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                            }`}
-                            required
-                        />
-                        {errors.nic_number && (
-                            <p className="text-xs text-red-500">
-                                {errors.nic_number}
-                            </p>
+                        {formData.id_type === "nic" ? (
+                            <div className="flex flex-col ">
+                                <label
+                                    htmlFor="nic_number"
+                                    className="text-sm text-gray-700 mb-1"
+                                >
+                                    NIC Number{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="nic_number"
+                                    name="nic_number"
+                                    value={formData.nic_number}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your NIC"
+                                    className={`max-w-[400px] px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                        errors.nic_number
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                    }`}
+                                    required
+                                />
+                                {errors.nic_number && (
+                                    <p className="text-xs text-red-500">
+                                        {errors.nic_number}
+                                    </p>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col md:flex-row gap-4 ">
+                                <div className="">
+                                    <label
+                                        htmlFor="nationality"
+                                        className="text-sm text-gray-700"
+                                    >
+                                        Nationality{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        id="nationality"
+                                        name="nationality"
+                                        value={formData.nationality}
+                                        onChange={handleInputChange}
+                                        className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                            errors.nationality
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        required
+                                    >
+                                        {NATIONALITIES.map((nationality) => (
+                                            <option
+                                                key={nationality}
+                                                value={nationality}
+                                            >
+                                                {nationality}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.nationality && (
+                                        <p className="text-xs text-red-500">
+                                            {errors.nationality}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label
+                                        htmlFor="passport_number"
+                                        className="text-sm text-gray-700"
+                                    >
+                                        Passport number{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="passport_number"
+                                        name="passport_number"
+                                        value={formData.passport_number}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your passport number"
+                                        className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                            errors.passport_number
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                        required
+                                    />
+                                    {errors.passport_number && (
+                                        <p className="text-xs text-red-500">
+                                            {errors.passport_number}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
                         )}
                     </div>
-                ) : (
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="space-y-1">
-                            <label
-                                htmlFor="nationality"
-                                className="text-sm text-gray-700"
-                            >
-                                Nationality
-                            </label>
-                            <select
-                                id="nationality"
-                                name="nationality"
-                                value={formData.nationality}
-                                onChange={handleInputChange}
-                                className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                                    errors.nationality
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
-                                required
-                            >
-                                {NATIONALITIES.map((nationality) => (
-                                    <option
-                                        key={nationality}
-                                        value={nationality}
-                                    >
-                                        {nationality}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.nationality && (
-                                <p className="text-xs text-red-500">
-                                    {errors.nationality}
-                                </p>
-                            )}
-                        </div>
 
-                        <div className="space-y-1">
-                            <label
-                                htmlFor="passport_number"
-                                className="text-sm text-gray-700"
-                            >
-                                Passport number{" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                id="passport_number"
-                                name="passport_number"
-                                value={formData.passport_number}
-                                onChange={handleInputChange}
-                                placeholder="Enter your passport number"
-                                className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                                    errors.passport_number
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
-                                required
-                            />
-                            {errors.passport_number && (
-                                <p className="text-xs text-red-500">
-                                    {errors.passport_number}
-                                </p>
-                            )}
+                    <div className="space-y-1 px-3">
+                        <div className="flex flex-col md:flex-row gap-4 md:gap-10">
+                            <div className="space-y-1 flex-1">
+                                <label
+                                    htmlFor="gender"
+                                    className="text-sm text-gray-700"
+                                >
+                                    Gender{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="gender"
+                                    name="gender"
+                                    value={formData.gender}
+                                    onChange={handleInputChange}
+                                    className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                        errors.gender
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                    }`}
+                                    required
+                                >
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                {errors.gender && (
+                                    <p className="text-xs text-red-500">
+                                        {errors.gender}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-1 flex-1">
+                                <label
+                                    htmlFor="age"
+                                    className="text-sm text-gray-700"
+                                >
+                                    Age <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    id="age"
+                                    name="age"
+                                    value={formData.age || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your age"
+                                    min="0"
+                                    max="150"
+                                    className={`w-full px-4 py-[7px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                                        errors.age
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                    }`}
+                                    required
+                                />
+                                {errors.age && (
+                                    <p className="text-xs text-red-500">
+                                        {errors.age}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
-                )}
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10">
                     <div className="space-y-1">

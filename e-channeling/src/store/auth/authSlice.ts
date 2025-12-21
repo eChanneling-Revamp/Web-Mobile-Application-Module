@@ -24,6 +24,10 @@ export interface SignupData {
     company_name: string;
     employee_id: string;
     accepted_terms: boolean;
+    age: number;
+    gender: string;
+    is_number_verified?: boolean;
+    is_email_verified?: boolean;
 }
 
 // the user not store in the local storage yet
@@ -131,10 +135,9 @@ export const requestOtp = createAsyncThunk<
         const response = await axios.post("/api/auth/send-otp", payload);
         return response.data;
     } catch (error: unknown) {
-        const err = error as { response?: { data?: { message?: string } } };
+        const err = error as { response?: { data?: { error?: string } } };
         return rejectWithValue(
-            err.response?.data?.message ||
-                "An error occurred while sending OTP."
+            err.response?.data?.error || "An error occurred while sending OTP."
         );
     }
 });
@@ -164,12 +167,12 @@ export const signup = createAsyncThunk<
     { rejectValue: string }
 >("auth/signup", async (signupData, { rejectWithValue }) => {
     try {
-        const response = await api.post("/auth/register", signupData);
+        const response = await axios.post("api/auth/signup", signupData);
         return response.data;
     } catch (error: unknown) {
-        const err = error as { response?: { data?: { message?: string } } };
+        const err = error as { response?: { data?: { error?: string } } };
         return rejectWithValue(
-            err.response?.data?.message || "An error occurred during signup."
+            err.response?.data?.error || "An error occurred during signup."
         );
     }
 });
@@ -314,10 +317,8 @@ const authSlice = createSlice({
                 }
                 state.isSignupSuccess = true;
                 state.userToken = token;
-                const payload = safeDecodeJwt(token);
-                // get role and user id from the token payload
-                state.role = payload?.role ?? null;
-                state.userId = payload.sub ?? null;
+                //const payload = safeDecodeJwt(token);
+                // state.userId = action.payload?.data?.userId ?? null;
                 if (typeof window !== "undefined") {
                     localStorage.setItem("token", token);
                 }

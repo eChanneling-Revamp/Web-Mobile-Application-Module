@@ -1,3 +1,4 @@
+import prisma from "@/lib/db/prisma";
 import { redis } from "@/lib/db/redis";
 import { generateOtp } from "@/lib/otp/generateOtp";
 import { getOtpEmailHtml } from "@/lib/otp/getOtpEmailHtml";
@@ -21,13 +22,13 @@ export async function POST(req: Request) {
         }
 
         // if (phone) {
-        //     if (!/^\d{10}$/.test(phone)) {
-        //         return NextResponse.json(
-        //             {
-        //                 error: "Sri Lankan phone number must be exactly 10 digits and contain only numbers",
-        //             },
-        //             { status: 400 }
-        //         );
+        //     if (phone.length < 9 || phone.length > 13 || !/^\d+$/.test(phone)) {
+        //     return NextResponse.json(
+        //         {
+        //         error: "Phone number must be between 9 and 13 digits and contain only numbers",
+        //         },
+        //         { status: 400 }
+        //     );
         //     }
         // }
 
@@ -50,6 +51,30 @@ export async function POST(req: Request) {
                 { error: "Too many attempts" },
                 { status: 429 }
             );
+        }
+
+        if (email) {
+            const existingEmail = await prisma.users.findUnique({
+                where: { email: email },
+            });
+            if (existingEmail) {
+                return NextResponse.json(
+                    { error: "Email is already registered" },
+                    { status: 400 }
+                );
+            }
+        }
+
+        if (phone) {
+            const existingPhone = await prisma.users.findFirst({
+                where: { contactNumber: phone },
+            });
+            if (existingPhone) {
+                return NextResponse.json(
+                    { error: "Phone number is already registered" },
+                    { status: 400 }
+                );
+            }
         }
 
         const otp = generateOtp(6);
