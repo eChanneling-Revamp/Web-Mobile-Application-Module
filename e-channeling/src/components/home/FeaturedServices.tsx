@@ -8,28 +8,28 @@ const FeaturedServices = () => {
             title: "Teleconsultation",
             description: "Talk to doctors online via video consultation",
             icon: <Video className="w-8 h-8 text-green-500" />,
-            linkText: "Learn more",
+            
         },
         {
             id: 2,
             title: "Lab Tests",
             description: "Book lab tests and health checkups",
             icon: <TestTube className="w-8 h-8 text-blue-500" />,
-            linkText: "Learn more",
+            
         },
         {
             id: 3,
             title: "Medicines",
             description: "Order medicines and get them delivered",
             icon: <Pill className="w-8 h-8 text-green-500" />,
-            linkText: "Learn more",
+            
         },
         {
             id: 4,
             title: "Health Records",
             description: "Store and access your health records securely",
             icon: <FileText className="w-8 h-8 text-blue-500" />,
-            linkText: "Learn more",
+            
         },
     ];
 
@@ -40,9 +40,7 @@ const FeaturedServices = () => {
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
                         Featured Services
                     </h2>
-                    <button className="text-blue-500 hover:text-blue-600 font-medium text-sm sm:text-base self-start sm:self-auto">
-                        View All
-                    </button>
+                    
                 </div>
 
                 {/* Services Grid  */}
@@ -62,10 +60,7 @@ const FeaturedServices = () => {
                                 {service.description}
                             </p>
 
-                            <button className="text-blue-500 hover:text-blue-600 font-medium text-sm flex items-center group cursor-pointer">
-                                {service.linkText}
-                                <ChevronRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
-                            </button>
+                        
                         </div>
                     ))}
                 </div>
