@@ -178,7 +178,7 @@ export async function POST(req: Request) {
                     email: user.email,
                 },
                 ...(authData.accessToken && {
-                    token: authData.accessToken,
+                    accessToken: authData.accessToken,
                 }),
             },
             { status: 201 }

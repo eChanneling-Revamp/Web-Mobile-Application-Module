@@ -44,7 +44,18 @@ interface User {
 interface LoginResponse {
     message: string;
     user: User;
-    token: string;
+    accessToken: string;
+}
+
+interface SignupResponse {
+    message: string;
+    data: {
+        userId: string;
+        authUserId: string;
+        name: string;
+        email: string;
+    };
+    accessToken?: string;
 }
 
 interface LoginData {
@@ -155,7 +166,7 @@ export const verifyOtp = createAsyncThunk<
 
 // Sign up
 export const signup = createAsyncThunk<
-    { token: string },
+    SignupResponse,
     SignupData,
     { rejectValue: string }
 >("auth/signup", async (signupData, { rejectWithValue }) => {
@@ -177,7 +188,7 @@ export const login = createAsyncThunk<
     { rejectValue: string }
 >("auth/login", async (loginData, { rejectWithValue }) => {
     try {
-        const response = await api.post("/auth/login", loginData);
+        const response = await axios.post("/api/auth/login", loginData);
         return response.data;
     } catch (error: unknown) {
         const err = error as { response?: { data?: { error?: string } } };
@@ -229,7 +240,8 @@ const authSlice = createSlice({
             state.isLoginError = null;
             state.isLoginLoading = false;
             state.signupData = {};
-            if (typeof window !== "undefined") localStorage.removeItem("token");
+            if (typeof window !== "undefined")
+                localStorage.removeItem("accessToken");
         },
         setSignupData: (state, action: PayloadAction<Partial<SignupData>>) => {
             state.signupData = { ...state.signupData, ...action.payload };
@@ -258,21 +270,21 @@ const authSlice = createSlice({
                     state.isLoginLoading = false;
                     state.isLoginError = null;
                     // get the token only
-                    const token = action.payload?.token;
-                    if (!token) {
+                    const accessToken = action.payload?.accessToken;
+                    if (!accessToken) {
                         state.isLoginError =
                             "Login succeeded but token missing.";
                         state.isLoginSuccess = false;
                         return;
                     }
                     state.isLoginSuccess = true;
-                    state.userToken = token;
-                    const payload = safeDecodeJwt(token);
+                    state.userToken = accessToken;
+                    const payload = safeDecodeJwt(accessToken);
                     // get role and user id from the token payload
                     state.role = payload?.role ?? null;
                     state.userId = payload.sub ?? null;
                     if (typeof window !== "undefined") {
-                        localStorage.setItem("token", token);
+                        localStorage.setItem("accessToken", accessToken);
                     }
                 }
             )
@@ -320,24 +332,28 @@ const authSlice = createSlice({
                 state.isSignupLoading = true;
                 state.isSignupError = null;
             })
-            .addCase(signup.fulfilled, (state, action) => {
-                state.isSignupLoading = false;
-                state.isSignupError = null;
-                // get the token only
-                const token = action.payload?.token;
-                if (!token) {
-                    state.isSignupError = "Signup succeeded but token missing.";
-                    state.isSignupSuccess = false;
-                    return;
+            .addCase(
+                signup.fulfilled,
+                (state, action: PayloadAction<SignupResponse>) => {
+                    state.isSignupLoading = false;
+                    state.isSignupError = null;
+                    // get the token only
+                    const accessToken = action.payload?.accessToken;
+                    if (!accessToken) {
+                        state.isSignupError =
+                            "Signup succeeded but token missing.";
+                        state.isSignupSuccess = false;
+                        return;
+                    }
+                    state.isSignupSuccess = true;
+                    state.userToken = accessToken;
+                    //const payload = safeDecodeJwt(token);
+                    // state.userId = action.payload?.data?.userId ?? null;
+                    if (typeof window !== "undefined") {
+                        localStorage.setItem("accessToken", accessToken);
+                    }
                 }
-                state.isSignupSuccess = true;
-                state.userToken = token;
-                //const payload = safeDecodeJwt(token);
-                // state.userId = action.payload?.data?.userId ?? null;
-                if (typeof window !== "undefined") {
-                    localStorage.setItem("token", token);
-                }
-            })
+            )
             .addCase(signup.rejected, (state, action) => {
                 state.isSignupLoading = false;
                 state.isSignupError = action.payload || "Signup failed";
