@@ -17,8 +17,9 @@ const Welcome = () => {
             </h1>
 
             <p className="text-[13px] sm:text-[14px] md:text-[15px] leading-relaxed text-[#0B66D0]/65 max-w-full md:max-w-[420px]">
-              We’re glad to have you here. Manage your healthcare appointments
-              and services with ease and confidence.
+             Sri Lanka’s trusted digital healthcare platform.
+             We make it easy to connect with doctors, manage appointments,
+            and access essential healthcare services anytime, anywhere.
             </p>
           </div>
 
