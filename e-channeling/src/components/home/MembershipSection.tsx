@@ -57,12 +57,13 @@ const MembershipSection = () => {
                             ))}
                         </div>
 
-                        <Link
-                            className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-50 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base cursor-pointer"
-                            href="/help"
-                        >
-                            Learn More
-                        </Link>
+                    <Link
+                    className="mt-6 sm:mt-8 w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-50 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base cursor-pointer"
+                    href="/help"
+                    >
+                    Upgrade Membership
+                    </Link>
+
                     </div>
 
                     {/* Right Image  */}
