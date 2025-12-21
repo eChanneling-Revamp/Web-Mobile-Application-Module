@@ -207,15 +207,15 @@ const authSlice = createSlice({
         // Rehydrate auth state from localStorage (client-side only)
         rehydrateAuth: (state) => {
             if (typeof window !== "undefined") {
-                const token = localStorage.getItem("token");
-                if (token) {
-                    const payload = safeDecodeJwt(token);
+                const accessToken = localStorage.getItem("accessToken");
+                if (accessToken) {
+                    const payload = safeDecodeJwt(accessToken);
                     // Check if token is valid and not expired
                     if (
                         payload &&
                         (!payload.exp || payload.exp * 1000 > Date.now())
                     ) {
-                        state.userToken = token;
+                        state.userToken = accessToken;
                         state.role = payload.role ?? null;
                         state.userId = payload.sub ?? null;
                         state.isLoginSuccess = true;

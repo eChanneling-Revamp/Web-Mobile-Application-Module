@@ -12,7 +12,7 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         if (typeof window !== "undefined") {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("accessToken");
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
@@ -35,7 +35,7 @@ api.interceptors.response.use(
                     !currentPath.includes("/login") &&
                     !currentPath.includes("/signup")
                 ) {
-                    localStorage.removeItem("token");
+                    localStorage.removeItem("accessToken");
                     window.location.href = "/login";
                 }
             }
