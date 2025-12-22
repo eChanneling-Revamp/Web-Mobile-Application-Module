@@ -31,13 +31,12 @@ const SignUpPage = () => {
                 return null;
         }
     };
-    
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-300 to-gray-50 flex flex-col items-center  py-10 px-7">
+        <div className="min-h-screen bg-linear-to-b from-blue-300 to-gray-50 flex flex-col items-center  py-10 px-7">
             <div className="bg-white rounded-3xl shadow-2xl p-6  w-full max-w-md md:max-w-5xl relative overflow-hidden flex flex-col md:flex-row items-center justify-center gap-6 md:gap-16 transform -translate-y-6 md:translate-y-0 ">
                 {step !== 4 && (
-                    <div className="flex-shrink-0 ">
+                    <div className="shrink-0 ">
                         <Image
                             src="/signin-image.png"
                             alt="E-channeling Decorative"

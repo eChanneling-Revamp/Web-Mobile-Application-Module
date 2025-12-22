@@ -172,11 +172,19 @@ export const StepPersonalDetails = ({ setStep }: StepPackageSelectionProps) => {
         if (!formData.age || formData.age <= 0) {
             newErrors.age = "Please enter a valid age";
         }
-
         if (!formData.password) {
             newErrors.password = "Password is required";
         } else if (formData.password.length < 8) {
             newErrors.password = "Password must be at least 8 characters";
+        } else if (formData.password.length > 100) {
+            newErrors.password = "Password must be less than 100 characters";
+        } else if (
+            !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
+                formData.password
+            )
+        ) {
+            newErrors.password =
+                "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character";
         }
 
         if (!formData.confirm_password) {

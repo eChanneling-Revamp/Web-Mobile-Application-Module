@@ -270,6 +270,7 @@ model hospitals {
   updatedAt        DateTime
   status           hospital_status    @default(PENDING)
   profileImage     String?
+  hospitalType     String?
   doctor_hospitals doctor_hospitals[]
   nurse_details    nurse_details[]
   nurses           nurses[]
