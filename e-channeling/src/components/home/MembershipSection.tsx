@@ -31,7 +31,6 @@ const MembershipSection = () => {
         <section className="bg-gradient-to-r from-blue-500 to-green-500 py-12 sm:py-16 px-4 sm:px-6 mx-4 sm:mx-0 rounded-xl sm:rounded-2xl">
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col lg:flex-row items-center gap-8 sm:gap-12">
-                    {/* Left Content */}
                     <div className="flex-1 text-white text-center lg:text-left">
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
                             Get Premium Membership
@@ -41,7 +40,7 @@ const MembershipSection = () => {
                             Enjoy priority booking, discounts and more benefits
                         </p>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-12">
                             {benefits.map((benefit) => (
                                 <div
                                     key={benefit.id}
@@ -57,16 +56,14 @@ const MembershipSection = () => {
                             ))}
                         </div>
 
-                    <Link
-                    className="mt-6 sm:mt-8 w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-50 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base cursor-pointer"
-                    href="/help"
-                    >
-                    Upgrade Membership
-                    </Link>
-
+                        <Link
+                            className="mt-6 sm:mt-8 w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-200 hover:text-black px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base cursor-pointer"
+                            href="/help"
+                        >
+                            Upgrade Membership
+                        </Link>
                     </div>
 
-                    {/* Right Image  */}
                     <div className="w-full lg:flex-none lg:w-96 mt-6 lg:mt-0">
                         <div className="relative w-full h-64 sm:h-80 lg:h-96 rounded-xl sm:rounded-2xl overflow-hidden mx-auto max-w-md lg:max-w-none">
                             <Image

@@ -20,7 +20,7 @@ const Footer = () => {
     ];
 
     const companyLinks = [
-        { name: "About Us", href: "#about-us" }, // ✅ changed ONLY this
+        { name: "About Us", href: "#about-us" }, 
         { name: "Privacy Policy", href: "/privacy" },
         { name: "Terms & Conditions", href: "/terms" },
         { name: "Help Center", href: "/help" },
@@ -34,7 +34,7 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="bg-gray-50 border-t border-gray-300">
+        <footer className="bg-gray-100 border-t border-gray-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 lg:pt-13 pb-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-8">
                     {/* Quick Links */}
