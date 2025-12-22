@@ -13,51 +13,24 @@ const Footer = () => {
     const quickLinks = [
         { name: "Find a Doctor", href: "/search" },
         { name: "Book Appointment", href: "/book-appointment" },
-        { name: "Teleconsultation", href: "/teleconsultation" },
-        { name: "Lab Tests", href: "/lab-tests" },
-        { name: "Medicines", href: "/medicines" },
     ];
 
     const doctorLinks = [
         { name: "Register as Doctor", href: "/doctor/register" },
-        { name: "Doctor Login", href: "/doctor/login" },
-    ];
-
-    const hospitalLinks = [
-        { name: "Partner with Us", href: "/hospital/partner" },
-        { name: "Hospital Login", href: "/hospital/login" },
     ];
 
     const companyLinks = [
-        { name: "About Us", href: "/about" },
-        { name: "Contact Us", href: "/contact" },
-        { name: "Careers", href: "/careers" },
+        { name: "About Us", href: "#about-us" }, // ✅ changed ONLY this
         { name: "Privacy Policy", href: "/privacy" },
         { name: "Terms & Conditions", href: "/terms" },
         { name: "Help Center", href: "/help" },
     ];
 
     const socialLinks = [
-        {
-            name: "Facebook",
-            href: "#",
-            icon: <Facebook className="w-5 h-5" />,
-        },
-        {
-            name: "Twitter",
-            href: "#",
-            icon: <Twitter className="w-5 h-5" />,
-        },
-        {
-            name: "Instagram",
-            href: "#",
-            icon: <Instagram className="w-5 h-5" />,
-        },
-        {
-            name: "LinkedIn",
-            href: "#",
-            icon: <Linkedin className="w-5 h-5" />,
-        },
+        { name: "Facebook", href: "#", icon: <Facebook className="w-5 h-5" /> },
+        { name: "Twitter", href: "#", icon: <Twitter className="w-5 h-5" /> },
+        { name: "Instagram", href: "#", icon: <Instagram className="w-5 h-5" /> },
+        { name: "LinkedIn", href: "#", icon: <Linkedin className="w-5 h-5" /> },
     ];
 
     return (
@@ -69,12 +42,12 @@ const Footer = () => {
                         <h3 className="text-gray-800 font-semibold text-lg mb-4">
                             Quick Links
                         </h3>
-                        <ul className="space-y-3 text-center sm:text-left">
+                        <ul className="space-y-3">
                             {quickLinks.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-gray-600 hover:text-blue-600 transition-colors text-sm inline-block"
+                                        className="text-gray-600 hover:text-blue-600 transition-colors text-sm"
                                     >
                                         {link.name}
                                     </Link>
@@ -87,28 +60,12 @@ const Footer = () => {
                         <h3 className="text-gray-800 font-semibold text-lg mb-4">
                             For Doctors
                         </h3>
-                        <ul className="space-y-3 text-center sm:text-left">
+                        <ul className="space-y-3">
                             {doctorLinks.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-gray-600 hover:text-blue-600 transition-colors text-sm inline-block"
-                                    >
-                                        {link.name}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-
-                        <h3 className="text-gray-800 font-semibold text-lg mb-4 mt-8">
-                            For Hospitals
-                        </h3>
-                        <ul className="space-y-3 text-center sm:text-left">
-                            {hospitalLinks.map((link) => (
-                                <li key={link.name}>
-                                    <Link
-                                        href={link.href}
-                                        className="text-gray-600 hover:text-blue-600 transition-colors text-sm inline-block"
+                                        className="text-gray-600 hover:text-blue-600 transition-colors text-sm"
                                     >
                                         {link.name}
                                     </Link>
@@ -121,12 +78,12 @@ const Footer = () => {
                         <h3 className="text-gray-800 font-semibold text-lg mb-4">
                             Company
                         </h3>
-                        <ul className="space-y-3 text-center sm:text-left">
+                        <ul className="space-y-3">
                             {companyLinks.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-gray-600 hover:text-blue-600 transition-colors text-sm inline-block"
+                                        className="text-gray-600 hover:text-blue-600 transition-colors text-sm"
                                     >
                                         {link.name}
                                     </Link>
@@ -140,13 +97,12 @@ const Footer = () => {
                             Connect with us
                         </h3>
 
-                        <div className="flex items-center justify-center lg:justify-end space-x-4 mb-6">
+                        <div className="flex justify-center lg:justify-end space-x-4 mb-6">
                             {socialLinks.map((social) => (
                                 <Link
                                     key={social.name}
                                     href={social.href}
-                                    className="text-gray-500 hover:text-blue-600 transition-colors rounded-full hover:bg-blue-50"
-                                    aria-label={social.name}
+                                    className="text-gray-500 hover:text-blue-600 transition-colors"
                                 >
                                     {social.icon}
                                 </Link>
@@ -154,17 +110,17 @@ const Footer = () => {
                         </div>
 
                         <div className="space-y-3">
-                            <div className="flex items-center justify-center lg:justify-end space-x-3">
-                                <Phone className="w-5 h-5 text-green-600 flex-shrink-0" />
+                            <div className="flex justify-center lg:justify-end space-x-3">
+                                <Phone className="w-5 h-5 text-green-600" />
                                 <span className="text-gray-600 text-sm">
                                     +94 11 2 100 100
                                 </span>
                             </div>
 
-                            <div className="flex items-center justify-center lg:justify-end space-x-3">
-                                <Mail className="w-5 h-5 text-green-600 flex-shrink-0" />
+                            <div className="flex justify-center lg:justify-end space-x-3">
+                                <Mail className="w-5 h-5 text-green-600" />
                                 <span className="text-gray-600 text-sm">
-                                    support@echannelling.com
+                                    echanneling.revamp@gmail.com
                                 </span>
                             </div>
                         </div>
@@ -173,8 +129,7 @@ const Footer = () => {
 
                 <div className="border-t border-gray-300 mt-12 pt-8">
                     <div className="text-center text-gray-500 text-sm">
-                        © 2025 eChannelling by SLT Mobitel. All rights
-                        reserved.
+                        © 2025 eChannelling by SLT Mobitel. All rights reserved.
                     </div>
                 </div>
             </div>
