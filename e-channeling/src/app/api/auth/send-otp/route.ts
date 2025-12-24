@@ -4,8 +4,8 @@ import { generateOtp } from "@/lib/otp/generateOtp";
 import { getOtpEmailHtml } from "@/lib/otp/getOtpEmailHtml";
 import { hashOtp } from "@/lib/otp/hashOtp";
 import { rateLimit } from "@/lib/utils/rateLimit";
-import { sendEmailOtp } from "@/services/sendEmailOtp";
-import { sendSmsOtp } from "@/services/sendSmsOtp";
+import { sendEmailOtp } from "@/services/notification/sendEmailOtp";
+import { sendSmsOtp } from "@/services/notification/sendSmsOtp";
 import { NextResponse } from "next/server";
 
 // Send the OTP

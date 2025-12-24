@@ -1,6 +1,9 @@
-import { SignupInput, signupSchema } from "@/components/signup/validation";
 import prisma from "@/lib/db/prisma";
 import { rateLimit } from "@/lib/utils/rateLimit";
+import {
+    SignupInput,
+    signupSchema,
+} from "@/validations/signup/createUser.schema";
 import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
 import { v4 as UUIDv4 } from "uuid";

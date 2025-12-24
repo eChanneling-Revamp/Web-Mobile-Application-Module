@@ -63,6 +63,7 @@ model appointments {
   createdAt                      DateTime                         @default(now())
   updatedAt                      DateTime
   sessionId                      String
+  medicalReportUrl               String?
   users                          users                            @relation(fields: [bookedById], references: [id])
   sessions                       sessions                         @relation(fields: [sessionId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   corporate_package_appointments corporate_package_appointments[]

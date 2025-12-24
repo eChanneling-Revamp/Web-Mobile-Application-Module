@@ -3,7 +3,10 @@ import { redis } from "../db/redis";
 const MAX_ATTEMPTS = 3;
 const WINDOW_SECONDS = 60;
 
-export async function rateLimit(identifier: string): Promise<boolean> {
+export async function rateLimit(
+    identifier: string,
+    maxAttempts: number = MAX_ATTEMPTS
+): Promise<boolean> {
     // create a key
     const key = `rate_limit:${identifier}`;
 
