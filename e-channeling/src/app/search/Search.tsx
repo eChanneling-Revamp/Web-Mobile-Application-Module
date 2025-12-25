@@ -11,10 +11,10 @@ type Option = { label: string; value: string };
 
 const OPTIONS = {
   hospitalType: [
-    { label: "Private Hospital", value: "private hospital" },
-    { label: "Public Hospital", value: "public hospital" },
-    { label: "Ayurvedic Hospital", value: "ayurvedic hospital" },
-  ] as Option[],
+  { label: "Government", value: "government" },
+  { label: "Private", value: "private" },
+] as Option[],
+
 
   district: [
     { label: "Colombo", value: "colombo" },
@@ -98,6 +98,11 @@ export default function SearchPage() {
       )}&fee=${encodeURIComponent(doc?.fee ?? "")}`
     );
   };
+
+  const goDoctorInfo = (doc: any) => {
+  router.push(`/doctor/${encodeURIComponent(doc.id)}`);
+};
+
 
   /* ------- UI tokens ------- */
   const greenBtn =
@@ -315,9 +320,22 @@ export default function SearchPage() {
                   </div>
                 ) : null}
 
-                <button onClick={() => goBook(doc)} className={`${greenBtn} w-full mt-auto`}>
-                  Book
+                <div className="flex gap-2 mt-auto">
+                <button
+                    onClick={() => goBook(doc)}
+                    className={`${greenBtn} flex-1`}
+                >
+                    Book
                 </button>
+
+                <button
+                    onClick={() => goDoctorInfo(doc)}
+                    className={`${ghostBtn} flex-1`}
+                >
+                    Info
+                </button>
+                </div>
+
               </div>
             </div>
           ))}
