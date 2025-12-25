@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
@@ -11,23 +11,32 @@ type Option = { label: string; value: string };
 
 const OPTIONS = {
   hospitalType: [
-  { label: "Government", value: "government" },
-  { label: "Private", value: "private" },
-] as Option[],
-
+    { label: "Government", value: "government" },
+    { label: "Private", value: "private" },
+  ] as Option[],
 
   district: [
     { label: "Colombo", value: "colombo" },
     { label: "Kandy", value: "kandy" },
-    { label: "Gampaha", value: "gampaha" },
-    { label: "Jaffna", value: "jaffna" },
   ] as Option[],
 
   hospitalName: [
-    { label: "Lanka Hospital", value: "lanka hospital" },
+    { label: "Durdan", value: "durdan" },
+    {
+      label: "Sri Jayewardenepura General Hospital",
+      value: "sri jayewardenepura general hospital",
+    },
     { label: "Kandy General Hospital", value: "kandy general hospital" },
-    { label: "Gampaha General Hospital", value: "gampaha general hospital" },
-    { label: "Jaffna General Hospital", value: "jaffna general hospital" },
+    {
+      label: "Lady Ridgeway Hospital for Children",
+      value: "lady ridgeway hospital for children",
+    },
+    {
+      label: "National Hospital of Sri Lanka",
+      value: "national hospital of sri lanka",
+    },
+    { label: "Asiri Hospital", value: "asiri hospital" },
+    { label: "Joe", value: "joe" },
   ] as Option[],
 
   specialization: [
@@ -41,10 +50,24 @@ const OPTIONS = {
 
 // District -> Hospitals mapping (for dependent dropdown)
 const HOSPITALS_BY_DISTRICT: Record<string, Option[]> = {
-  colombo: [{ label: "Lanka Hospital", value: "lanka hospital" }],
+  colombo: [
+    { label: "Durdan", value: "durdan" },
+    {
+      label: "Sri Jayewardenepura General Hospital",
+      value: "sri jayewardenepura general hospital",
+    },
+    {
+      label: "Lady Ridgeway Hospital for Children",
+      value: "lady ridgeway hospital for children",
+    },
+    {
+      label: "National Hospital of Sri Lanka",
+      value: "national hospital of sri lanka",
+    },
+    { label: "Asiri Hospital", value: "asiri hospital" },
+    { label: "Joe", value: "joe" },
+  ],
   kandy: [{ label: "Kandy General Hospital", value: "kandy general hospital" }],
-  gampaha: [{ label: "Gampaha General Hospital", value: "gampaha general hospital" }],
-  jaffna: [{ label: "Jaffna General Hospital", value: "jaffna general hospital" }],
 };
 
 export default function SearchPage() {
@@ -69,14 +92,13 @@ export default function SearchPage() {
   // Hospital options depend on District
   const filteredHospitalOptions = useMemo(() => {
     const district = (normal.location || "").toLowerCase().trim();
-    if (!district) return OPTIONS.hospitalName; // show all if no district
-    return HOSPITALS_BY_DISTRICT[district] ?? OPTIONS.hospitalName; // fallback
+    if (!district) return OPTIONS.hospitalName;
+    return HOSPITALS_BY_DISTRICT[district] ?? OPTIONS.hospitalName;
   }, [normal.location]);
 
   // If district changes and selected hospital is not in that district, clear it
   useEffect(() => {
     if (!normal.location) return;
-
     const allowed = new Set(filteredHospitalOptions.map((h) => h.value));
     if (normal.hospital && !allowed.has(normal.hospital)) {
       dispatch(setNormalField({ key: "hospital", value: "" }));
@@ -100,9 +122,8 @@ export default function SearchPage() {
   };
 
   const goDoctorInfo = (doc: any) => {
-  router.push(`/doctor/${encodeURIComponent(doc.id)}`);
-};
-
+    router.push(`/doctor/${encodeURIComponent(doc.id)}`);
+  };
 
   /* ------- UI tokens ------- */
   const greenBtn =
@@ -115,6 +136,43 @@ export default function SearchPage() {
 
   const labelClass =
     "text-[12px] font-medium text-gray-600 mb-1 text-left self-start pl-2";
+
+  /* ---------------- Pagination (NEW) ---------------- */
+  const PAGE_SIZE = 12; // keeps your 4-col grid looking balanced
+
+  const [page, setPage] = useState(1);
+
+  // Reset to page 1 whenever new results arrive
+  useEffect(() => {
+    setPage(1);
+  }, [results]);
+
+  const total = results.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const paginatedResults = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return results.slice(start, start + PAGE_SIZE);
+  }, [results, page]);
+
+  const startItem = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const endItem = total === 0 ? 0 : Math.min(page * PAGE_SIZE, total);
+
+  const goPrev = () => setPage((p) => Math.max(1, p - 1));
+  const goNext = () => setPage((p) => Math.min(totalPages, p + 1));
+
+  // Simple page window (keeps UI clean)
+  const pageNumbers = useMemo(() => {
+    const windowSize = 5;
+    const half = Math.floor(windowSize / 2);
+    let start = Math.max(1, page - half);
+    let end = Math.min(totalPages, start + windowSize - 1);
+    start = Math.max(1, end - windowSize + 1);
+    const arr: number[] = [];
+    for (let i = start; i <= end; i++) arr.push(i);
+    return arr;
+  }, [page, totalPages]);
+  /* -------------------------------------------------- */
 
   return (
     <div className="min-h-screen bg-[#F7F8FB]">
@@ -148,10 +206,7 @@ export default function SearchPage() {
                 />
               </div>
 
-              {/* Filters row
-                  Order required:
-                  Speciality | Hospital Type | District | Hospital Name | Date | Find
-              */}
+              {/* Filters row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_120px] gap-3">
                 {/* Speciality */}
                 <div className="flex flex-col items-start">
@@ -210,7 +265,7 @@ export default function SearchPage() {
                   </select>
                 </div>
 
-                {/* Hospital Name (depends on District) */}
+                {/* Hospital Name */}
                 <div className="flex flex-col items-start">
                   <span className={labelClass}>Hospital Name</span>
                   <select
@@ -248,7 +303,7 @@ export default function SearchPage() {
                 </div>
               </div>
 
-              {/* Reset aligned under Find (right corner) */}
+              {/* Reset aligned under Find */}
               <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_120px] gap-3">
                 <div className="md:col-span-5" />
                 <button
@@ -283,7 +338,7 @@ export default function SearchPage() {
         )}
 
         <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {results.map((doc: any) => (
+          {paginatedResults.map((doc: any) => (
             <div
               key={doc.id}
               className="flex flex-col h-full rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
@@ -321,21 +376,20 @@ export default function SearchPage() {
                 ) : null}
 
                 <div className="flex gap-2 mt-auto">
-                <button
+                  <button
                     onClick={() => goBook(doc)}
                     className={`${greenBtn} flex-1`}
-                >
+                  >
                     Book
-                </button>
+                  </button>
 
-                <button
+                  <button
                     onClick={() => goDoctorInfo(doc)}
                     className={`${ghostBtn} flex-1`}
-                >
+                  >
                     Info
-                </button>
+                  </button>
                 </div>
-
               </div>
             </div>
           ))}
@@ -345,6 +399,46 @@ export default function SearchPage() {
           <div className="mt-10 text-center text-sm text-gray-600">
             No doctors found. Try adjusting your filters.
           </div>
+        )}
+
+        {/* Pagination (NEW) — uses existing tokens */}
+        {/* Pagination — centered */}
+        {!loading && total > 0 && (
+        <div className="mt-8 flex flex-col items-center justify-center gap-3">
+            <div className="text-sm text-gray-600">
+            Showing {startItem}–{endItem} of {total}
+            </div>
+
+            <div className="flex items-center justify-center gap-2">
+            <button
+                className={ghostBtn}
+                onClick={goPrev}
+                disabled={page === 1}
+                style={{ opacity: page === 1 ? 0.6 : 1 }}
+            >
+                Prev
+            </button>
+
+            {pageNumbers.map((p) => (
+                <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={p === page ? greenBtn : ghostBtn}
+                >
+                {p}
+                </button>
+            ))}
+
+            <button
+                className={ghostBtn}
+                onClick={goNext}
+                disabled={page === totalPages}
+                style={{ opacity: page === totalPages ? 0.6 : 1 }}
+            >
+                Next
+            </button>
+            </div>
+        </div>
         )}
       </section>
     </div>
