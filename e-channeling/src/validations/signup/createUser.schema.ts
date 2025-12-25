@@ -118,10 +118,7 @@ export const signupSchema = z
         // Employment & Package
         employee_id: z
             .string()
-            .max(50, "Employee ID must be less than 50 characters")
-            .optional()
-            .nullable()
-            .or(z.literal("")),
+            .max(50, "Employee ID must be less than 50 characters"),
 
         package: z
             .string()

@@ -77,7 +77,7 @@ export async function createBooking(data: Readonly<CreateBookingInput>) {
                 patientDateOfBirth: patientDateOfBirth,
                 // emergencyContactPhone: "",
                 medicalReportUrl: "",
-                status: "CONFIRMED",
+                status: "UNPAID",
                 consultationFee: consultationFee,
                 totalAmount: consultationFee,
                 paymentStatus: "PENDING",
@@ -125,6 +125,36 @@ export async function updateBooking(id: string, data: any) {
             data: {
                 ...data,
                 patientDateOfBirth: patientDateOfBirth,
+                updatedAt: new Date(),
+            },
+        });
+        return updatedBooking;
+    });
+}
+
+// update payment status
+export async function updatePaymentStatus(id: string) {
+    return await prisma.$transaction(async (tx) => {
+        const appoinment = await tx.appointments.findUnique({
+            where: {
+                appointmentNumber: id,
+            },
+            include: {
+                sessions: true,
+            },
+        });
+
+        if (!appoinment || appoinment.sessions.status !== "scheduled") {
+            throw new Error("Session not available for updates");
+        }
+
+        const updatedBooking = await tx.appointments.update({
+            where: {
+                appointmentNumber: id,
+            },
+            data: {
+                status: "CONFIRMED",
+                paymentStatus: "COMPLETED",
                 updatedAt: new Date(),
             },
         });
