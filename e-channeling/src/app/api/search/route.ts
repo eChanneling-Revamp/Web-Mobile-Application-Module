@@ -8,7 +8,7 @@ export async function GET(request: Request) {
         const forwarded = request.headers.get("x-forwarded-for");
         const ip = forwarded ? forwarded.split(",")[0] : "unknown";
 
-        const isAllowed = await rateLimit(`search:${ip}`, 20);
+        const isAllowed = await rateLimit(`search:${ip}`, 100);
         if (!isAllowed) {
             return NextResponse.json(
                 {
@@ -36,10 +36,26 @@ export async function GET(request: Request) {
         };
 
         if (keyword) {
-            whereClause.name = {
-                contains: keyword, //add the keyword filter
-                mode: "insensitive",
-            };
+            whereClause.OR = [
+                {
+                    name: { contains: keyword, mode: "insensitive" },
+                },
+                {
+                    specialization: { contains: keyword, mode: "insensitive" },
+                },
+                {
+                    doctor_hospitals: {
+                        some: {
+                            hospitals: {
+                                name: {
+                                    contains: keyword,
+                                    mode: "insensitive",
+                                },
+                            },
+                        },
+                    },
+                },
+            ];
         }
 
         if (specialtyId) {

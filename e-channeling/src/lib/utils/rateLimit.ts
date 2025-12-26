@@ -18,7 +18,7 @@ export async function rateLimit(
         await redis.expire(key, WINDOW_SECONDS);
     }
 
-    if (attempts > MAX_ATTEMPTS) return false;
+    if (attempts > maxAttempts) return false;
 
     return true;
 }
