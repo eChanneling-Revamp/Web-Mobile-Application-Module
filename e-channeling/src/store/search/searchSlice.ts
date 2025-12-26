@@ -1,302 +1,236 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import api from "@/lib/utils/api";
 
 /* ---------- Types ---------- */
 type NormalFilters = {
-    doctorName: string;
-    specialization: string;
-    hospital: string;
-    date: string; // ISO
-};
-
-type AdvancedFilters = {
-    hospitalType: string;
-    location: string;
-    hospitalName: string;
-    specialization: string;
-    gender: string;
-    sessionTime: string;
-    date: string;
-    priceRange: string; // below_1499 | 1500_2499 | ...
-    doctorName: string;
+  doctorName: string;      // -> keyword
+  specialization: string;  // -> specialtyId
+  hospitalType: string;    // -> hospitalType
+  location: string;        // -> district
+  hospital: string;        // -> hospitalId (mapped from hospital name)
+  date: string;            // -> date
 };
 
 export type Doctor = {
-    id: string;
-    name: string;
-    specialization: string;
-    hospitals: string[];
-    fee?: number;
-    image?: string;
+  id: string;
+  name?: string;
+  specialization?: string;
+  hospitals?: string[];
+  fee?: number | string;
+  image?: string;
 };
 
 type SearchState = {
-    normal: NormalFilters;
-    advanced: AdvancedFilters;
-    showAdvanced: boolean;
-    results: Doctor[];
-    loading: boolean;
-    error: string | null;
-    hasSearchedOnce: boolean;
+  normal: NormalFilters;
+  results: Doctor[];
+  loading: boolean;
+  error: string | null;
+  hasSearchedOnce: boolean;
 };
 
 const initialState: SearchState = {
-    normal: { doctorName: "", specialization: "", hospital: "", date: "" },
-    advanced: {
-        hospitalType: "",
-        location: "",
-        hospitalName: "",
-        specialization: "",
-        gender: "",
-        sessionTime: "",
-        date: "",
-        priceRange: "",
-        doctorName: "",
-    },
-    showAdvanced: false,
-    results: [],
-    loading: false,
-    error: null,
-    hasSearchedOnce: false,
+  normal: {
+    doctorName: "",
+    specialization: "",
+    hospitalType: "",
+    location: "",
+    hospital: "",
+    date: "",
+  },
+  results: [],
+  loading: false,
+  error: null,
+  hasSearchedOnce: false,
 };
 
-/* ---------- Helpers ---------- */
-function priceToMinMax(code?: string) {
-    switch (code) {
-        case "below_1499":
-            return { min: 0, max: 1499 };
-        case "1500_2499":
-            return { min: 1500, max: 2499 };
-        case "2500_3499":
-            return { min: 2500, max: 3499 };
-        case "3500_4499":
-            return { min: 3500, max: 4499 };
-        case "4500_5499":
-            return { min: 4500, max: 5499 };
-        default:
-            return undefined;
-    }
-}
+/* ---------- MAPPINGS (UI values -> API expected values) ---------- */
+
+/**
+ * ✅ District (UI stores lowercase values like "colombo")
+ * API expects title-case values like "Mannar", so we map properly.
+ */
+const DISTRICT_MAP: Record<string, string> = {
+  colombo: "Colombo",
+  kandy: "Kandy",
+//   gampaha: "Gampaha",
+//   jaffna: "Jaffna",
+};
+
+/**
+ * ✅ Hospital Type:
+ * UI values: "government" | "private"
+ * API example shows: hospitalType=PRIVATE
+ */
+const HOSPITAL_TYPE_MAP: Record<string, string> = {
+  private: "PRIVATE",
+  government: "GOVERNMENT", // if your backend expects "GOVERNMENT"
+};
+
+/**
+ * ✅ Speciality:
+ * UI values are lowercase (e.g., "cardiology")
+ * API expects a string in specialtyId (example: Surgery, Nephrology).
+ * We'll send proper label casing for your options.
+ */
+const SPECIALTY_MAP: Record<string, string> = {
+  nephrology: "Nephrology",
+  geriatrics: "Geriatrics",
+  "obstetrics and gynecology": "Obstetrics and Gynecology",
+  cardiology: "Cardiology",
+  surgery: "Surgery",
+};
+
+
+/**
+ * ✅ Hospital Name -> Hospital ID
+ * Your API filters by hospitalId. Your UI dropdown uses hospital *names*.
+ * So we MUST map hospital name -> hospitalId.
+ *
+ * ⚠️ IMPORTANT: Replace these IDs with your real hospital IDs from your DB.
+ * I only have ONE example from your screenshot.
+ */
+const HOSPITAL_ID_MAP: Record<string, string> = {
+  "durdan": "cmigxd6a40000v4n4b5tqtpbs",
+  "sri jayewardenepura general hospital": "cmihxkds10001v4p6j8a0tq9r",
+  "kandy general hospital": "cmihxkds20002v4p8k4b9u1ls",
+  "lady ridgeway hospital for children": "cmihxkds30003v4pb8s9rtzqw",
+  "national hospital of sri lanka": "cmihxkds40004v4pd2tq8amrx",
+  "asiri hospital": "cmiszgzoy0000v404s822jm9c",
+  "joe": "cmj0y7qbe0000ih048xnovh8k",
+};
+
 
 function normalize(v?: string) {
-    return (v || "").trim().toLowerCase();
+  return (v || "").trim().toLowerCase();
 }
 
-/** Client-side filtering for mock data so UX matches backend behavior */
-function filterDoctorsClient(
-    list: Doctor[],
-    mode: "normal" | "advanced",
-    normal: NormalFilters,
-    advanced: AdvancedFilters
-) {
-    let out = [...list];
+/* ---------- API Fetch ---------- */
+async function fetchDoctorsFromAPI(filters: NormalFilters): Promise<Doctor[]> {
+  // Use relative URL so it works on Vercel + local (no CORS issues)
+  const baseUrl = "/api/search";
 
-    if (mode === "normal") {
-        const n = {
-            doctorName: normalize(normal.doctorName),
-            specialization: normalize(normal.specialization),
-            hospital: normalize(normal.hospital),
-            date: normalize(normal.date), // available if your mock models it
-        };
+  const params = new URLSearchParams();
 
-        if (n.doctorName)
-            out = out.filter((d) => normalize(d.name).includes(n.doctorName));
-        if (n.specialization)
-            out = out.filter(
-                (d) => normalize(d.specialization) === n.specialization
-            );
-        if (n.hospital)
-            out = out.filter((d) =>
-                d.hospitals.some((h) => normalize(h) === n.hospital)
-            );
-        // date ignored in mock unless you add availability in your JSON
-        return out;
+  // 1) Doctor Name -> keyword
+  const keyword = filters.doctorName.trim();
+  if (keyword) params.set("keyword", keyword);
+
+  // 2) Speciality -> specialtyId
+  const specKey = normalize(filters.specialization);
+  if (specKey) params.set("specialtyId", SPECIALTY_MAP[specKey] ?? filters.specialization);
+
+  // 3) Date -> date (must be YYYY-MM-DD, your input already is)
+  if (filters.date) params.set("date", filters.date);
+
+  // 4) District -> district
+  const distKey = normalize(filters.location);
+  if (distKey) params.set("district", DISTRICT_MAP[distKey] ?? filters.location);
+
+  // 5) Hospital Type -> hospitalType
+  const typeKey = normalize(filters.hospitalType);
+  if (typeKey) params.set("hospitalType", HOSPITAL_TYPE_MAP[typeKey] ?? filters.hospitalType);
+
+  // 6) Hospital Name -> hospitalId (only if selected AND mapped)
+
+
+//   const hospitalKey = normalize(filters.hospital);
+//   if (hospitalKey) {
+//     const hospitalId = HOSPITAL_ID_MAP[hospitalKey];
+//     if (hospitalId) {
+//       params.set("hospitalId", hospitalId);
+//     }
+//     // If not mapped, we simply do NOT send hospitalId (so it won't break the search).
+//     // You should fill real IDs in HOSPITAL_ID_MAP for full functionality.
+//   }
+
+  const hospitalNameKey = (filters.hospital || "").trim().toLowerCase();
+    if (hospitalNameKey) {
+    const hospitalId = HOSPITAL_ID_MAP[hospitalNameKey];
+    if (hospitalId) params.set("hospitalId", hospitalId);
     }
 
-    // advanced
-    const a = {
-        hospitalType: normalize(advanced.hospitalType),
-        location: normalize(advanced.location),
-        hospitalName: normalize(advanced.hospitalName),
-        specialization: normalize(advanced.specialization),
-        gender: normalize(advanced.gender),
-        sessionTime: normalize(advanced.sessionTime),
-        date: normalize(advanced.date),
-        priceRange: advanced.priceRange,
-        doctorName: normalize(advanced.doctorName),
-    };
 
-    if (a.doctorName)
-        out = out.filter((d) => normalize(d.name).includes(a.doctorName));
-    if (a.specialization)
-        out = out.filter(
-            (d) => normalize(d.specialization) === a.specialization
-        );
+  const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
 
-    // hospitalName (advanced) — same as hospital in normal
-    if (a.hospitalName)
-        out = out.filter((d) =>
-            d.hospitals.some((h) => normalize(h) === a.hospitalName)
-        );
+  const res = await fetch(url, { method: "GET" });
 
-    // price range
-    const rng = priceToMinMax(a.priceRange);
-    if (rng)
-        out = out.filter(
-            (d) =>
-                typeof d.fee === "number" &&
-                d.fee! >= rng.min &&
-                d.fee! <= rng.max
-        );
+  if (!res.ok) {
+    throw new Error(`Search API failed (${res.status})`);
+  }
 
-    // hospitalType, location, gender, sessionTime, date — apply if you add these fields to mock JSON
-    // For now we skip them to avoid filtering everything out.
+  const data = await res.json();
 
-    return out;
+  // Support different response shapes:
+  // - array directly
+  // - { data: [...] }
+  // - { doctors: [...] }
+  const payload =
+    Array.isArray(data) ? data :
+    Array.isArray(data?.data) ? data.data :
+    Array.isArray(data?.doctors) ? data.doctors :
+    [];
+
+return (payload as any[]).map((d) => ({
+  ...d,
+
+  // ✅ for your card display (doc.hospitals.join(", "))
+  hospitals: Array.isArray(d?.doctor_hospitals)
+    ? d.doctor_hospitals
+        .map((x: any) => x?.hospitals?.name)
+        .filter(Boolean)
+    : [],
+
+  // ✅ for your card image (doc.image)
+  image: d?.profileImage || d?.image || null,
+
+  // ✅ for your card fee display (doc.fee)
+  fee: d?.consultationFee ?? d?.fee ?? null,
+})) as Doctor[];
+
 }
 
-/** Load mock JSON from /public/mock/doctors.json */
-async function loadMockDoctors(): Promise<Doctor[]> {
-    try {
-        const res = await fetch("/mock/doctors.json", { cache: "no-store" });
-        const data = await res.json();
-        // supports [ ... ] or { data: [ ... ] }
-        return (Array.isArray(data) ? data : data?.data) as Doctor[];
-    } catch {
-        // Last-resort inline sample so the UI never breaks
-        return [
-            {
-                id: "demo-1",
-                name: "Dr. Samantha Perera",
-                specialization: "cardiology",
-                hospitals: ["lanka hospital", "kandy general hospital"],
-                fee: 3500,
-            },
-            {
-                id: "demo-2",
-                name: "Dr. John Doe",
-                specialization: "dermatology",
-                hospitals: ["gampaha general hospital"],
-                fee: 2400,
-            },
-        ];
-    }
-}
-
-/* ---------- Thunk (backend-first, mock fallback) ---------- */
+/* ---------- Thunk ---------- */
 export const fetchDoctors = createAsyncThunk<
-    Doctor[],
-    { mode: "normal" | "advanced" },
-    { state: { search: SearchState } }
->("search/fetchDoctors", async ({ mode }, { getState }) => {
-    const { normal, advanced } = getState().search;
-
-    const useMock = process.env.NEXT_PUBLIC_USE_MOCK === "1";
-
-    // Params for backend
-    const params =
-        mode === "normal"
-            ? {
-                  doctorName: normal.doctorName || undefined,
-                  specialization: normal.specialization || undefined,
-                  hospital: normal.hospital || undefined,
-                  date: normal.date || undefined,
-                  mode,
-              }
-            : {
-                  hospitalType: advanced.hospitalType || undefined,
-                  location: advanced.location || undefined,
-                  hospitalName: advanced.hospitalName || undefined,
-                  specialization: advanced.specialization || undefined,
-                  gender: advanced.gender || undefined,
-                  sessionTime: advanced.sessionTime || undefined,
-                  date: advanced.date || undefined,
-                  priceRange: advanced.priceRange || undefined,
-                  doctorName: advanced.doctorName || undefined,
-                  mode,
-              };
-
-    // If forced mock, skip API entirely
-    if (useMock) {
-        const list = await loadMockDoctors();
-        return filterDoctorsClient(list, mode, normal, advanced);
-    }
-
-    // Try backend first
-    try {
-        const res = await api.get("/doctors/search", { params });
-        const payload = Array.isArray(res.data) ? res.data : res.data?.data;
-        if (payload && Array.isArray(payload) && payload.length > 0) {
-            return payload as Doctor[];
-        }
-        // If backend returns empty, fall through to mock (optional)
-    } catch {
-        // Swallow and fall back to mock
-    }
-
-    // Fallback to mock JSON
-    const list = await loadMockDoctors();
-    return filterDoctorsClient(list, mode, normal, advanced);
+  Doctor[],
+  { mode: "normal" },
+  { state: { search: SearchState } }
+>("search/fetchDoctors", async (_arg, { getState }) => {
+  const { normal } = getState().search;
+  return await fetchDoctorsFromAPI(normal);
 });
 
 /* ---------- Slice ---------- */
 const searchSlice = createSlice({
-    name: "search",
-    initialState,
-    reducers: {
-        setNormalField: (
-            state,
-            action: PayloadAction<{ key: keyof NormalFilters; value: string }>
-        ) => {
-            state.normal[action.payload.key] = action.payload.value;
-        },
-        setAdvancedField: (
-            state,
-            action: PayloadAction<{ key: keyof AdvancedFilters; value: string }>
-        ) => {
-            state.advanced[action.payload.key] = action.payload.value;
-        },
-        toggleAdvancedOpen: (
-            state,
-            action: PayloadAction<boolean | undefined>
-        ) => {
-            state.showAdvanced =
-                typeof action.payload === "boolean"
-                    ? action.payload
-                    : !state.showAdvanced;
-        },
-        resetAllFilters: (state) => {
-            state.normal = { ...initialState.normal };
-            state.advanced = { ...initialState.advanced };
-            state.error = null;
-        },
+  name: "search",
+  initialState,
+  reducers: {
+    setNormalField: (
+      state,
+      action: PayloadAction<{ key: keyof NormalFilters; value: string }>
+    ) => {
+      state.normal[action.payload.key] = action.payload.value;
     },
-    extraReducers(builder) {
-        builder
-            .addCase(fetchDoctors.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchDoctors.fulfilled, (state, action) => {
-                state.loading = false;
-                state.results = action.payload;
-                state.hasSearchedOnce = true;
-            })
-            .addCase(fetchDoctors.rejected, (state, action) => {
-                state.loading = false;
-                state.error =
-                    (action.payload as string) ||
-                    action.error.message ||
-                    "Something went wrong";
-            });
+    resetAllFilters: (state) => {
+      state.normal = { ...initialState.normal };
+      state.error = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchDoctors.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDoctors.fulfilled, (state, action) => {
+        state.loading = false;
+        state.results = action.payload;
+        state.hasSearchedOnce = true;
+      })
+      .addCase(fetchDoctors.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Something went wrong";
+      });
+  },
 });
 
-export const {
-    setNormalField,
-    setAdvancedField,
-    toggleAdvancedOpen,
-    resetAllFilters,
-} = searchSlice.actions;
-
+export const { setNormalField, resetAllFilters } = searchSlice.actions;
 export default searchSlice.reducer;
