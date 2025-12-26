@@ -72,12 +72,13 @@ const HOSPITAL_TYPE_MAP: Record<string, string> = {
  * We'll send proper label casing for your options.
  */
 const SPECIALTY_MAP: Record<string, string> = {
+  nephrology: "Nephrology",
+  geriatrics: "Geriatrics",
+  "obstetrics and gynecology": "Obstetrics and Gynecology",
   cardiology: "Cardiology",
-  dermatology: "Dermatology",
-  neurology: "Neurology",
-  "ent surgeon": "ENT Surgeon",
-  pediatrics: "Pediatrics",
+  surgery: "Surgery",
 };
+
 
 /**
  * ✅ Hospital Name -> Hospital ID

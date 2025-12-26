@@ -40,12 +40,13 @@ const OPTIONS = {
   ] as Option[],
 
   specialization: [
+    { label: "Nephrology", value: "nephrology" },
+    { label: "Geriatrics", value: "geriatrics" },
+    { label: "Obstetrics and Gynecology", value: "obstetrics and gynecology" },
     { label: "Cardiology", value: "cardiology" },
-    { label: "Dermatology", value: "dermatology" },
-    { label: "Neurology", value: "neurology" },
-    { label: "ENT Surgeon", value: "ent surgeon" },
-    { label: "Pediatrics", value: "pediatrics" },
-  ] as Option[],
+    { label: "Surgery", value: "surgery" },
+    ] as Option[],
+
 };
 
 // District -> Hospitals mapping (for dependent dropdown)
