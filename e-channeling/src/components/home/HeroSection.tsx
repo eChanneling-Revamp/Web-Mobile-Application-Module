@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { motion } from "framer-motion";
 
 const HeroSection = () => {
     const router = useRouter();
@@ -10,7 +11,11 @@ const HeroSection = () => {
     };
 
     return (
-        <section
+        <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className="px-4 sm:px-6 lg:px-20 py-10 sm:py-12 bg-gradient-to-r from-blue-500 to-green-500 mx-4 sm:mx-0 rounded-2xl relative overflow-hidden"
             style={{
                 backgroundImage:
@@ -117,7 +122,8 @@ const HeroSection = () => {
                             Find Doctors Here
                         </h2>
                         <p className="text-white/80 text-sm sm:text-base mb-6">
-                            Search top specialists by location and book instantly.
+                            Search top specialists by location and book
+                            instantly.
                         </p>
 
                         <button
@@ -134,13 +140,17 @@ const HeroSection = () => {
                                 viewBox="0 0 24 24"
                                 aria-hidden="true"
                             >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M9 5l7 7-7 7"
+                                />
                             </svg>
                         </button>
                     </div>
                 </div>
             </div>
-        </section>
+        </motion.section>
     );
 };
 

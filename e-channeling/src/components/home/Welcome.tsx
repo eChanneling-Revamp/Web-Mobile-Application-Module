@@ -1,8 +1,15 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 const Welcome = () => {
     return (
-        <section className="px-4 sm:px-6 lg:px-20 pb-8 sm:pb-5 pt-10 sm:pt-12">
+        <motion.section
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="px-4 sm:px-6 lg:px-20 pb-8 sm:pb-5 pt-10 sm:pt-12"
+        >
             <div className="mx-0 sm:mx-4 lg:mx-0 rounded-2xl border border-black/5 bg-white shadow-sm overflow-hidden">
                 <div className="flex flex-col md:flex-row w-full h-auto md:h-[350px]">
                     <div className="w-full md:w-[42%] flex flex-col justify-center gap-5 px-6 sm:px-8 md:px-10 py-6 md:py-0">
@@ -32,7 +39,7 @@ const Welcome = () => {
                     </div>
                 </div>
             </div>
-        </section>
+        </motion.section>
     );
 };
 

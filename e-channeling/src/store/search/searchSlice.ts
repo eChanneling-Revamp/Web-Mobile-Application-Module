@@ -89,9 +89,9 @@ export const fetchDoctors = createAsyncThunk<
         const response = await axios.get<SearchResponse>("/api/search");
         return response.data;
     } catch (error: unknown) {
-        const err = error as { response?: { data?: { message?: string } } };
+        const err = error as { response?: { data?: { error?: string } } };
         return rejectWithValue(
-            err.response?.data?.message || "Failed to fetch doctors!"
+            err.response?.data?.error || "Failed to fetch doctors!"
         );
     }
 });
@@ -128,9 +128,9 @@ export const searchDoctors = createAsyncThunk<
         );
         return response.data;
     } catch (error: unknown) {
-        const err = error as { response?: { data?: { message?: string } } };
+        const err = error as { response?: { data?: { error?: string } } };
         return rejectWithValue(
-            err.response?.data?.message || "Failed to search doctors!"
+            err.response?.data?.error || "Failed to search doctors!"
         );
     }
 });

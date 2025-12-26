@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const MembershipSection = () => {
     const benefits = [
@@ -28,7 +29,13 @@ const MembershipSection = () => {
     ];
 
     return (
-        <section className="bg-gradient-to-r from-blue-500 to-green-500 py-12 sm:py-16 px-4 sm:px-6 mx-4 sm:mx-0 rounded-xl sm:rounded-2xl">
+        <motion.section
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="bg-gradient-to-r from-blue-500 to-green-500 py-12 sm:py-16 px-4 sm:px-6 mx-4 sm:mx-0 rounded-xl sm:rounded-2xl"
+        >
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col lg:flex-row items-center gap-8 sm:gap-12">
                     <div className="flex-1 text-white text-center lg:text-left">
@@ -77,7 +84,7 @@ const MembershipSection = () => {
                     </div>
                 </div>
             </div>
-        </section>
+        </motion.section>
     );
 };
 

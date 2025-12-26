@@ -1,8 +1,23 @@
 import prisma from "@/lib/db/prisma";
+import { rateLimit } from "@/lib/utils/rateLimit";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
     try {
+        // rate limiting
+        const forwarded = request.headers.get("x-forwarded-for");
+        const ip = forwarded ? forwarded.split(",")[0] : "unknown";
+
+        const isAllowed = await rateLimit(`search:${ip}`, 20);
+        if (!isAllowed) {
+            return NextResponse.json(
+                {
+                    error: "Too many search attempts. Please try again later.",
+                },
+                { status: 429 }
+            );
+        }
+
         const { searchParams } = new URL(request.url);
 
         const keyword = searchParams.get("keyword") || undefined;

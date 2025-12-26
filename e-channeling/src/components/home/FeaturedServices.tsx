@@ -1,5 +1,6 @@
 import React from "react";
 import { Syringe, FileText, Users, Activity } from "lucide-react";
+import { motion } from "framer-motion";
 
 const FeaturedServices = () => {
     const services = [
@@ -35,17 +36,31 @@ const FeaturedServices = () => {
     return (
         <section className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-8 bg-white ">
             <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 gap-4">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 gap-4"
+                >
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
                         Featured Services
                     </h2>
-                </div>
+                </motion.div>
 
                 {/* Services Grid  */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                    {services.map((service) => (
-                        <div
+                    {services.map((service, index) => (
+                        <motion.div
                             key={service.id}
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.3 }}
+                            transition={{
+                                duration: 0.5,
+                                delay: index * 0.1,
+                                ease: "easeOut",
+                            }}
                             className=" bg-[#ecf1f9] hover:bg-white border border-blue-100 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-2xl transition-shadow"
                         >
                             <div className="mb-3 sm:mb-4">{service.icon}</div>
@@ -57,7 +72,7 @@ const FeaturedServices = () => {
                             <p className="text-gray-600 text-sm leading-relaxed mb-3 sm:mb-4">
                                 {service.description}
                             </p>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </div>
