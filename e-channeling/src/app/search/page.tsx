@@ -1,524 +1,583 @@
 "use client";
-
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store";
+import { AppDispatch, RootState } from "@/store";
 import {
-    setNormalField,
-    resetAllFilters,
     fetchDoctors,
+    searchDoctors,
+    type SearchFilters,
 } from "@/store/search/searchSlice";
-import { useRouter } from "next/navigation";
+import {
+    Search,
+    Calendar,
+    ChevronLeft,
+    ChevronRight,
+    AlertCircle,
+    Info,
+    Stethoscope,
+} from "lucide-react";
+import { DoctorCard, DoctorCardSkeleton } from "@/components/search/DoctorCard";
 
-type Option = { label: string; value: string };
+// Hospital options with IDs
+const HOSPITALS = [
+    { id: "cmigxd6a40000v4n4b5tqtpbs", name: "Durdan" },
+    {
+        id: "cmihxkds10001v4p6j8a0tq9r",
+        name: "Sri Jayewardenepura General Hospital",
+    },
+    { id: "cmihxkds20002v4p8k4b9u1ls", name: "Kandy General Hospital" },
+    {
+        id: "cmihxkds30003v4pb8s9rtzqw",
+        name: "Lady Ridgeway Hospital for Children",
+    },
+    { id: "cmihxkds40004v4pd2tq8amrx", name: "National Hospital of Sri Lanka" },
+    { id: "cmiszgzoy0000v404s822jm9c", name: "Asiri Hospital" },
+];
 
-const OPTIONS = {
-    hospitalType: [
-        { label: "Government", value: "government" },
-        { label: "Private", value: "private" },
-    ] as Option[],
+// Sri Lankan 25 Districts
+const DISTRICTS = [
+    "Ampara",
+    "Anuradhapura",
+    "Badulla",
+    "Batticaloa",
+    "Colombo",
+    "Galle",
+    "Gampaha",
+    "Hambantota",
+    "Jaffna",
+    "Kalutara",
+    "Kandy",
+    "Kegalle",
+    "Kilinochchi",
+    "Kurunegala",
+    "Mannar",
+    "Matale",
+    "Matara",
+    "Moneragala",
+    "Mullaitivu",
+    "Nuwara Eliya",
+    "Polonnaruwa",
+    "Puttalam",
+    "Ratnapura",
+    "Trincomalee",
+    "Vavuniya",
+];
 
-    district: [
-        { label: "Colombo", value: "colombo" },
-        { label: "Kandy", value: "kandy" },
-    ] as Option[],
+// Specializations
+const SPECIALIZATIONS = [
+    "Hematology",
+    "Psychiatry",
+    "Gastroenterology",
+    "Nephrology",
+    "Geriatrics",
+    "Obstetrics and Gynecology",
+    "Cardiology",
+    "Endocrinology",
+    "Surgery",
+];
 
-    hospitalName: [
-        { label: "Durdan", value: "durdan" },
-        {
-            label: "Sri Jayewardenepura General Hospital",
-            value: "sri jayewardenepura general hospital",
-        },
-        { label: "Kandy General Hospital", value: "kandy general hospital" },
-        {
-            label: "Lady Ridgeway Hospital for Children",
-            value: "lady ridgeway hospital for children",
-        },
-        {
-            label: "National Hospital of Sri Lanka",
-            value: "national hospital of sri lanka",
-        },
-        { label: "Asiri Hospital", value: "asiri hospital" },
-        { label: "Joe", value: "joe" },
-    ] as Option[],
-
-    specialization: [
-        { label: "Nephrology", value: "nephrology" },
-        { label: "Geriatrics", value: "geriatrics" },
-        {
-            label: "Obstetrics and Gynecology",
-            value: "obstetrics and gynecology",
-        },
-        { label: "Cardiology", value: "cardiology" },
-        { label: "Surgery", value: "surgery" },
-    ] as Option[],
-};
-
-// District -> Hospitals mapping (for dependent dropdown)
-const HOSPITALS_BY_DISTRICT: Record<string, Option[]> = {
-    colombo: [
-        { label: "Durdan", value: "durdan" },
-        {
-            label: "Sri Jayewardenepura General Hospital",
-            value: "sri jayewardenepura general hospital",
-        },
-        {
-            label: "Lady Ridgeway Hospital for Children",
-            value: "lady ridgeway hospital for children",
-        },
-        {
-            label: "National Hospital of Sri Lanka",
-            value: "national hospital of sri lanka",
-        },
-        { label: "Asiri Hospital", value: "asiri hospital" },
-        { label: "Joe", value: "joe" },
-    ],
-    kandy: [
-        { label: "Kandy General Hospital", value: "kandy general hospital" },
-    ],
-};
+// Hospital Types
+const HOSPITAL_TYPES = [
+    { label: "Government", value: "GOVERNMENT" },
+    { label: "Private", value: "PRIVATE" },
+];
 
 export default function SearchPage() {
     const dispatch = useDispatch<AppDispatch>();
-    const router = useRouter();
+    const {
+        doctors,
+        loading,
+        error,
+        count,
+        page: currentPage,
+        totalPages,
+    } = useSelector((state: RootState) => state.search);
 
-    const { normal, results, loading, error, hasSearchedOnce } = useSelector(
-        (s: RootState) => s.search
+    // Filter states
+    const [keyword, setKeyword] = useState("");
+    const [specialtyId, setSpecialtyId] = useState("");
+    const [hospitalType, setHospitalType] = useState("");
+    const [district, setDistrict] = useState("");
+    const [hospitalId, setHospitalId] = useState("");
+    const [date, setDate] = useState("");
+    const [page, setPage] = useState(1);
+    const [hasSearched, setHasSearched] = useState(false);
+    const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+    // Fetch all doctors on initial load
+    useEffect(() => {
+        if (!hasSearched) {
+            dispatch(fetchDoctors());
+            setHasSearched(true);
+        }
+    }, [dispatch, hasSearched]);
+
+    // Track when initial load completes
+    useEffect(() => {
+        if (!loading && hasSearched && !initialLoadComplete) {
+            setInitialLoadComplete(true);
+        }
+    }, [loading, hasSearched, initialLoadComplete]);
+
+    useEffect(() => {
+        // Don't trigger on initial load
+        if (!hasSearched) return;
+
+        const debounceTimer = setTimeout(() => {
+            const filters: SearchFilters = {
+                page: 1,
+                limit: 12,
+            };
+
+            // If keyword is empty, fetch all doctors
+            if (keyword.trim()) {
+                filters.keyword = keyword.trim();
+            }
+
+            // Include other active filters in the search
+            if (specialtyId) filters.specialtyId = specialtyId;
+            if (hospitalType) filters.hospitalType = hospitalType;
+            if (district) filters.district = district;
+            if (hospitalId) filters.hospitalId = hospitalId;
+            if (date) filters.date = date;
+
+            setPage(1);
+
+            // If keyword is empty and no other filters, fetch all doctors
+            if (
+                !keyword.trim() &&
+                !specialtyId &&
+                !hospitalType &&
+                !district &&
+                !hospitalId &&
+                !date
+            ) {
+                dispatch(fetchDoctors());
+            } else {
+                dispatch(searchDoctors(filters));
+            }
+        }, 300);
+
+        // Cleanup function to clear timeout if user continues typing
+        return () => clearTimeout(debounceTimer);
+    }, [keyword]);
+
+    // Handle search
+    const handleSearch = useCallback(() => {
+        const filters: SearchFilters = {
+            page: 1,
+            limit: 12,
+        };
+
+        if (keyword.trim()) filters.keyword = keyword.trim();
+        if (specialtyId) filters.specialtyId = specialtyId;
+        if (hospitalType) filters.hospitalType = hospitalType;
+        if (district) filters.district = district;
+        if (hospitalId) filters.hospitalId = hospitalId;
+        if (date) filters.date = date;
+
+        setPage(1);
+        dispatch(searchDoctors(filters));
+    }, [
+        keyword,
+        specialtyId,
+        hospitalType,
+        district,
+        hospitalId,
+        date,
+        dispatch,
+    ]);
+
+    // Handle pagination
+    const handlePageChange = useCallback(
+        (newPage: number) => {
+            const filters: SearchFilters = {
+                page: newPage,
+                limit: 12,
+            };
+
+            if (keyword.trim()) filters.keyword = keyword.trim();
+            if (specialtyId) filters.specialtyId = specialtyId;
+            if (hospitalType) filters.hospitalType = hospitalType;
+            if (district) filters.district = district;
+            if (hospitalId) filters.hospitalId = hospitalId;
+            if (date) filters.date = date;
+
+            setPage(newPage);
+            dispatch(searchDoctors(filters));
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        [
+            keyword,
+            specialtyId,
+            hospitalType,
+            district,
+            hospitalId,
+            date,
+            dispatch,
+        ]
     );
 
-    // initial load → show all
-    useEffect(() => {
-        if (!hasSearchedOnce) dispatch(fetchDoctors({ mode: "normal" }));
-    }, [dispatch, hasSearchedOnce]);
-
-    const onNormalSearch = useCallback(() => {
-        dispatch(fetchDoctors({ mode: "normal" }));
+    // Handle reset
+    const handleReset = useCallback(() => {
+        setKeyword("");
+        setSpecialtyId("");
+        setHospitalType("");
+        setDistrict("");
+        setHospitalId("");
+        setDate("");
+        setPage(1);
+        dispatch(fetchDoctors());
     }, [dispatch]);
 
-    const placeholderImg = useMemo(() => "/sample-doctor.png", []);
-
-    // Hospital options depend on District
-    const filteredHospitalOptions = useMemo(() => {
-        const district = (normal.location || "").toLowerCase().trim();
-        if (!district) return OPTIONS.hospitalName;
-        return HOSPITALS_BY_DISTRICT[district] ?? OPTIONS.hospitalName;
-    }, [normal.location]);
-
-    // If district changes and selected hospital is not in that district, clear it
-    useEffect(() => {
-        if (!normal.location) return;
-        const allowed = new Set(filteredHospitalOptions.map((h) => h.value));
-        if (normal.hospital && !allowed.has(normal.hospital)) {
-            dispatch(setNormalField({ key: "hospital", value: "" }));
+    // Handle Enter key in search input
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleSearch();
         }
-    }, [dispatch, normal.location, normal.hospital, filteredHospitalOptions]);
-
-    interface Doctor {
-        id?: string;
-        name?: string;
-        hospitals?: string | string[];
-        fee?: number | string;
-    }
-
-    const goBook = (doc: Doctor) => {
-        const hospital = Array.isArray(doc?.hospitals) ? doc.hospitals[0] : "";
-        router.push(
-            `/booking?doctorName=${encodeURIComponent(doc?.name || "")}&hospital=${encodeURIComponent(
-                hospital || ""
-            )}&fee=${encodeURIComponent(doc?.fee ?? "")}`
-        );
     };
 
-    const goDoctorInfo = (doc: any) => {
-        router.push(`/doctor/${encodeURIComponent(doc.id)}`);
-    };
-
-    /* ------- UI tokens ------- */
+    // UI Style Classes
     const greenBtn =
-        "h-10 px-6 rounded-md bg-green-500 hover:bg-green-600 text-white text-sm font-semibold cursor-pointer hover:opacity-95 active:opacity-100";
+        "h-10 px-6 rounded-md bg-green-500 hover:bg-green-600 text-white text-sm font-semibold cursor-pointer hover:opacity-95 active:opacity-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]";
     const ghostBtn =
-        "h-10 px-4 rounded-md border border-gray-400 text-sm bg-white hover:bg-gray-50 cursor-pointer";
+        "h-10 px-4 rounded-md border border-gray-400 text-sm bg-white hover:bg-gray-50 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
     const inputBase =
         "h-11 w-full rounded-md border border-gray-200 px-3 text-[14px] outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-100 bg-white";
     const selectBase = inputBase;
-
     const labelClass =
-        "text-[12px] font-medium text-gray-600 mb-1 text-left self-start pl-2";
-
-    /* ---------------- Pagination (NEW) ---------------- */
-    const PAGE_SIZE = 12; // keeps your 4-col grid looking balanced
-
-    const [page, setPage] = useState(1);
-
-    // Reset to page 1 whenever new results arrive
-    useEffect(() => {
-        setPage(1);
-    }, [results]);
-
-    const total = results.length;
-    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-
-    const paginatedResults = useMemo(() => {
-        const start = (page - 1) * PAGE_SIZE;
-        return results.slice(start, start + PAGE_SIZE);
-    }, [results, page]);
-
-    const startItem = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-    const endItem = total === 0 ? 0 : Math.min(page * PAGE_SIZE, total);
-
-    const goPrev = () => setPage((p) => Math.max(1, p - 1));
-    const goNext = () => setPage((p) => Math.min(totalPages, p + 1));
-
-    // Simple page window (keeps UI clean)
-    const pageNumbers = useMemo(() => {
-        const windowSize = 5;
-        const half = Math.floor(windowSize / 2);
-        let start = Math.max(1, page - half);
-        let end = Math.min(totalPages, start + windowSize - 1);
-        start = Math.max(1, end - windowSize + 1);
-        const arr: number[] = [];
-        for (let i = start; i <= end; i++) arr.push(i);
-        return arr;
-    }, [page, totalPages]);
-    /* -------------------------------------------------- */
+        "text-[12px] font-medium text-gray-600 mb-1 text-left self-start ml-1";
 
     return (
-        <div className="min-h-screen bg-[#F7F8FB]">
-            {/* HERO */}
-            <section className="mx-auto max-w-[1400px] px-10 pt-8">
+        <div className="min-h-screen bg-[#e7e9f0]">
+            <section className="mx-auto max-w-[1400px] px-10 sm:px-6 lg:px-10 pt-4 sm:pt-6 lg:pt-8 pb-8">
                 <div
-                    className="relative rounded-2xl overflow-hidden shadow-sm text-center"
+                    className="relative rounded-2xl overflow-hidden shadow-sm text-center mb-6 "
                     style={{
                         background:
                             "linear-gradient(135deg,#099d9b 0%,#1b74e8 100%)",
                     }}
                 >
-                    <h1 className="text-white font-bold tracking-tight text-2xl sm:text-3xl md:text-4xl leading-tight drop-shadow-lg px-6 pt-6">
+                    <h1 className="text-white font-bold tracking-tight text-2xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight drop-shadow-lg px-4 sm:px-6 pt-6 sm:pt-6">
                         Your Health, Our Priority
                     </h1>
-                    <p className="text-white/90 text-sm md:text-[15px] px-6 pb-2 mt-3">
-                        Find and book appointments with top doctors near you
+                    <p className="text-white/90 text-xs sm:text-sm md:text-[15px] px-4 sm:px-6 pb-2 mt-2 sm:mt-3">
+                        Find the best doctors using advanced filters tailored to
+                        your needs.
                     </p>
 
                     {/* Search box */}
-                    <div className="w-full flex justify-center pb-8 pt-6">
-                        <div className="w-[92%] md:w-[860px] bg-white/95 backdrop-blur rounded-xl shadow-md border border-white/70 p-4">
-                            {/* Search input */}
-                            <div className="mb-3">
+                    <div className="w-full flex justify-center pb-6 sm:pb-8 pt-4 sm:pt-6">
+                        <div className="w-[90%] sm:w-[92%] xl:w-[1100px] bg-white/95 backdrop-blur rounded-xl shadow-md border border-white/70 p-3 sm:p-4">
+                            <div className="mb-3 relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <input
-                                    className={inputBase}
+                                    type="text"
+                                    className={`${inputBase} pl-10`}
                                     placeholder="Search by doctor, specialty or hospital"
-                                    value={normal.doctorName}
-                                    onChange={(e) =>
-                                        dispatch(
-                                            setNormalField({
-                                                key: "doctorName",
-                                                value: e.target.value,
-                                            })
-                                        )
-                                    }
+                                    value={keyword}
+                                    onChange={(e) => setKeyword(e.target.value)}
+                                    onKeyPress={handleKeyPress}
                                 />
                             </div>
 
-                            {/* Filters row */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_120px] gap-3">
-                                {/* Speciality */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-3">
                                 <div className="flex flex-col items-start">
-                                    <span className={labelClass}>
+                                    <label className={labelClass}>
                                         Speciality
-                                    </span>
+                                    </label>
                                     <select
                                         className={selectBase}
-                                        value={normal.specialization}
+                                        value={specialtyId}
                                         onChange={(e) =>
-                                            dispatch(
-                                                setNormalField({
-                                                    key: "specialization",
-                                                    value: e.target.value,
-                                                })
-                                            )
+                                            setSpecialtyId(e.target.value)
                                         }
                                     >
                                         <option value="">
                                             All Specialties
                                         </option>
-                                        {OPTIONS.specialization.map((o) => (
-                                            <option
-                                                key={o.value}
-                                                value={o.value}
-                                            >
-                                                {o.label}
+                                        {SPECIALIZATIONS.map((spec) => (
+                                            <option key={spec} value={spec}>
+                                                {spec}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                {/* Hospital Type */}
                                 <div className="flex flex-col items-start">
-                                    <span className={labelClass}>
+                                    <label className={labelClass}>
                                         Hospital Type
-                                    </span>
+                                    </label>
                                     <select
                                         className={selectBase}
-                                        value={normal.hospitalType}
+                                        value={hospitalType}
                                         onChange={(e) =>
-                                            dispatch(
-                                                setNormalField({
-                                                    key: "hospitalType",
-                                                    value: e.target.value,
-                                                })
-                                            )
+                                            setHospitalType(e.target.value)
                                         }
                                     >
                                         <option value="">Any</option>
-                                        {OPTIONS.hospitalType.map((o) => (
+                                        {HOSPITAL_TYPES.map((type) => (
                                             <option
-                                                key={o.value}
-                                                value={o.value}
+                                                key={type.value}
+                                                value={type.value}
                                             >
-                                                {o.label}
+                                                {type.label}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                {/* District */}
                                 <div className="flex flex-col items-start">
-                                    <span className={labelClass}>District</span>
+                                    <label className={labelClass}>
+                                        District
+                                    </label>
                                     <select
                                         className={selectBase}
-                                        value={normal.location}
+                                        value={district}
                                         onChange={(e) =>
-                                            dispatch(
-                                                setNormalField({
-                                                    key: "location",
-                                                    value: e.target.value,
-                                                })
-                                            )
+                                            setDistrict(e.target.value)
                                         }
                                     >
                                         <option value="">Any</option>
-                                        {OPTIONS.district.map((o) => (
-                                            <option
-                                                key={o.value}
-                                                value={o.value}
-                                            >
-                                                {o.label}
+                                        {DISTRICTS.map((dist) => (
+                                            <option key={dist} value={dist}>
+                                                {dist}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                {/* Hospital Name */}
                                 <div className="flex flex-col items-start">
-                                    <span className={labelClass}>
+                                    <label className={labelClass}>
                                         Hospital Name
-                                    </span>
+                                    </label>
                                     <select
                                         className={selectBase}
-                                        value={normal.hospital}
+                                        value={hospitalId}
                                         onChange={(e) =>
-                                            dispatch(
-                                                setNormalField({
-                                                    key: "hospital",
-                                                    value: e.target.value,
-                                                })
-                                            )
+                                            setHospitalId(e.target.value)
                                         }
                                     >
                                         <option value="">All Hospitals</option>
-                                        {filteredHospitalOptions.map((o) => (
+                                        {HOSPITALS.map((hospital) => (
                                             <option
-                                                key={o.value}
-                                                value={o.value}
+                                                key={hospital.id}
+                                                value={hospital.id}
                                             >
-                                                {o.label}
+                                                {hospital.name}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                {/* Date */}
                                 <div className="flex flex-col items-start">
-                                    <span className={labelClass}>Date</span>
-                                    <input
-                                        type="date"
-                                        className={inputBase}
-                                        value={normal.date}
-                                        onChange={(e) =>
-                                            dispatch(
-                                                setNormalField({
-                                                    key: "date",
-                                                    value: e.target.value,
-                                                })
-                                            )
-                                        }
-                                    />
+                                    <label className={labelClass}>Date</label>
+                                    <div className="relative w-full">
+                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+                                        <input
+                                            type="date"
+                                            className={`${inputBase} pl-10`}
+                                            value={date}
+                                            onChange={(e) =>
+                                                setDate(e.target.value)
+                                            }
+                                            min={
+                                                new Date()
+                                                    .toISOString()
+                                                    .split("T")[0]
+                                            }
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* Find */}
-                                <div className="flex flex-col justify-end">
+                                <div className="flex flex-row sm:flex-col lg:flex-row items-end sm:items-stretch lg:items-end gap-3 justify-end mb-0.5">
                                     <button
-                                        onClick={onNormalSearch}
+                                        onClick={handleSearch}
+                                        disabled={loading}
                                         className={greenBtn}
+                                        type="button"
                                     >
-                                        Find
+                                        <span className="inline-block min-w-[70px] text-center">
+                                            {loading ? "Finding..." : "Find"}
+                                        </span>
+                                    </button>
+                                    <button
+                                        onClick={handleReset}
+                                        disabled={loading}
+                                        className="h-10 px-4 rounded-md border border-gray-400 text-sm text-red-900 bg-white hover:bg-gray-50 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        title="Reset all fields"
+                                        type="button"
+                                    >
+                                        Reset
                                     </button>
                                 </div>
-                            </div>
-
-                            {/* Reset aligned under Find */}
-                            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_120px] gap-3">
-                                <div className="md:col-span-5" />
-                                <button
-                                    onClick={async () => {
-                                        dispatch(resetAllFilters());
-                                        await dispatch(
-                                            fetchDoctors({ mode: "normal" })
-                                        );
-                                    }}
-                                    className={ghostBtn}
-                                    title="Reset all fields"
-                                >
-                                    Reset
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
 
-            {/* RESULTS */}
-            <section className="mx-auto max-w-[1400px] px-10 mt-10 pb-16">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-[22px] md:text-[24px] font-semibold text-[#0b1324]">
-                        Results
-                    </h2>
+                <div className="mt-10">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                            <Stethoscope className="w-5 h-5 sm:w-6 sm:h-6" />
+                            Results
+                        </h2>
+                        {!loading && doctors.length > 0 && (
+                            <p className="text-sm text-gray-600">
+                                Showing {doctors.length} of {count} doctors
+                            </p>
+                        )}
+                    </div>
+
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+                            <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                            <div>
+                                <h3 className="font-semibold text-red-800 mb-1">
+                                    Error
+                                </h3>
+                                <p className="text-sm text-red-700">{error}</p>
+                            </div>
+                        </div>
+                    )}
+
                     {loading && (
-                        <span className="text-sm text-gray-500">
-                            Searching…
-                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                            {[...Array(8)].map((_, i) => (
+                                <DoctorCardSkeleton key={i} />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Empty State - Only show after initial load completes and no results */}
+                    {!loading &&
+                        !error &&
+                        doctors.length === 0 &&
+                        initialLoadComplete && (
+                            <div className="bg-white rounded-lg shadow-md p-8 sm:p-12 text-center">
+                                <Info className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+                                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
+                                    No doctors found
+                                </h3>
+                                <p className="text-sm sm:text-base text-gray-600 mb-4">
+                                    Try adjusting your search filters or search
+                                    criteria.
+                                </p>
+                                <button
+                                    onClick={handleReset}
+                                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                                >
+                                    Clear Filters
+                                </button>
+                            </div>
+                        )}
+
+                    {/* Results Grid */}
+                    {!loading && !error && doctors.length > 0 && (
+                        <>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                                {doctors.map((doctor) => (
+                                    <DoctorCard
+                                        key={doctor.id}
+                                        doctor={doctor}
+                                    />
+                                ))}
+                            </div>
+
+                            {totalPages > 1 && (
+                                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <p className="text-sm text-gray-600">
+                                        Page {currentPage} of {totalPages} (
+                                        {count} total results)
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() =>
+                                                handlePageChange(
+                                                    currentPage - 1
+                                                )
+                                            }
+                                            disabled={
+                                                currentPage === 1 || loading
+                                            }
+                                            className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            <ChevronLeft className="w-5 h-5" />
+                                        </button>
+                                        <div className="flex items-center gap-1">
+                                            {[...Array(totalPages)].map(
+                                                (_, i) => {
+                                                    const pageNum = i + 1;
+                                                    // Show first page, last page, current page, and pages around current
+                                                    if (
+                                                        pageNum === 1 ||
+                                                        pageNum ===
+                                                            totalPages ||
+                                                        (pageNum >=
+                                                            currentPage - 1 &&
+                                                            pageNum <=
+                                                                currentPage + 1)
+                                                    ) {
+                                                        return (
+                                                            <button
+                                                                key={pageNum}
+                                                                onClick={() =>
+                                                                    handlePageChange(
+                                                                        pageNum
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    loading
+                                                                }
+                                                                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                                                                    currentPage ===
+                                                                    pageNum
+                                                                        ? "bg-green-500 text-white"
+                                                                        : "bg-white border border-gray-300 hover:bg-gray-50 text-gray-700"
+                                                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                            >
+                                                                {pageNum}
+                                                            </button>
+                                                        );
+                                                    } else if (
+                                                        pageNum ===
+                                                            currentPage - 2 ||
+                                                        pageNum ===
+                                                            currentPage + 2
+                                                    ) {
+                                                        return (
+                                                            <span
+                                                                key={pageNum}
+                                                                className="px-2 text-gray-500"
+                                                            >
+                                                                ...
+                                                            </span>
+                                                        );
+                                                    }
+                                                    return null;
+                                                }
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() =>
+                                                handlePageChange(
+                                                    currentPage + 1
+                                                )
+                                            }
+                                            disabled={
+                                                currentPage === totalPages ||
+                                                loading
+                                            }
+                                            className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            <ChevronRight className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
-
-                {error && (
-                    <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                        {error}
-                    </div>
-                )}
-
-                <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {paginatedResults.map((doc: any) => (
-                        <div
-                            key={doc.id}
-                            className="flex flex-col h-full rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden"
-                        >
-                            <div className="h-[220px] w-full bg-gray-100 relative">
-                                <Image
-                                    src={doc.image}
-                                    alt={doc.name || "Doctor"}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                                />
-                            </div>
-
-                            <div className="p-4 flex flex-col flex-1">
-                                <div className="text-[15px] font-semibold text-[#0b1324]">
-                                    {doc.name}
-                                </div>
-
-                                <div className="text-[12px] text-emerald-700 font-medium mt-1">
-                                    {doc.specialization || "—"}
-                                </div>
-
-                                <div className="text-[12px] text-gray-600 mt-2">
-                                    <span className="font-medium">
-                                        Hospitals:
-                                    </span>{" "}
-                                    {Array.isArray(doc.hospitals) &&
-                                    doc.hospitals.length > 0
-                                        ? doc.hospitals.join(", ")
-                                        : "—"}
-                                </div>
-
-                                {doc.fee ? (
-                                    <div className="text-[12px] text-gray-600 mt-1 pb-4">
-                                        <span className="font-medium">
-                                            Fee:
-                                        </span>{" "}
-                                        LKR {doc.fee}
-                                    </div>
-                                ) : null}
-
-                                <div className="flex gap-2 mt-auto">
-                                    <button
-                                        onClick={() => goBook(doc)}
-                                        className={`${greenBtn} flex-1`}
-                                    >
-                                        Book
-                                    </button>
-
-                                    <button
-                                        onClick={() => goDoctorInfo(doc)}
-                                        className={`${ghostBtn} flex-1`}
-                                    >
-                                        Info
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {!loading && results.length === 0 && (
-                    <div className="mt-10 text-center text-sm text-gray-600">
-                        No doctors found. Try adjusting your filters.
-                    </div>
-                )}
-
-                {/* Pagination (NEW) — uses existing tokens */}
-                {/* Pagination — centered */}
-                {!loading && total > 0 && (
-                    <div className="mt-8 flex flex-col items-center justify-center gap-3">
-                        <div className="text-sm text-gray-600">
-                            Showing {startItem}–{endItem} of {total}
-                        </div>
-
-                        <div className="flex items-center justify-center gap-2">
-                            <button
-                                className={ghostBtn}
-                                onClick={goPrev}
-                                disabled={page === 1}
-                                style={{ opacity: page === 1 ? 0.6 : 1 }}
-                            >
-                                Prev
-                            </button>
-
-                            {pageNumbers.map((p) => (
-                                <button
-                                    key={p}
-                                    onClick={() => setPage(p)}
-                                    className={p === page ? greenBtn : ghostBtn}
-                                >
-                                    {p}
-                                </button>
-                            ))}
-
-                            <button
-                                className={ghostBtn}
-                                onClick={goNext}
-                                disabled={page === totalPages}
-                                style={{
-                                    opacity: page === totalPages ? 0.6 : 1,
-                                }}
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </div>
-                )}
             </section>
         </div>
     );
