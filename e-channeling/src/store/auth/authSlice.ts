@@ -103,8 +103,8 @@ const initialState: AuthState = {
     isLoginLoading: false,
     isLoginError: null,
     isLoginSuccess:
-        !!decodedPayload &&
-        (!decodedPayload.exp || decodedPayload.exp * 1000 > Date.now()),
+        !!decodedPayload,
+       
 
     isSignupLoading: false,
     isSignupError: null,
