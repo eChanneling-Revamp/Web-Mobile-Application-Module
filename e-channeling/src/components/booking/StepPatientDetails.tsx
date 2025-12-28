@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { setPatientDetails } from "@/store/booking/bookingSlice";
+import { Gender } from "./types";
 
 interface StepPatientDetailsProps {
   onPrev: () => void;
@@ -27,46 +28,28 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
     phone: false,
     email: false,
     nic: false,
+    dateOfBirth: false,
+    gender: false,
   });
 
   // Check if "For You" was selected
   const isForYou = forWhom === "myself";
 
-  // ==================== AUTO-FILL FOR "FOR YOU" ====================
-  // 🔴 HARDCODED DATA FOR TESTING - REPLACE WITH ACTUAL USER DATA 🔴
-  useEffect(() => {
-    if (isForYou && !patientDetails.fullName) {
-      // Auto-fill with hardcoded data for testing
-      dispatch(
-        setPatientDetails({
-          fullName: "John Doe",
-          phone: "0771234567",
-          email: "johndoe@example.com",
-          nic: "199512345678",
-          disease: "",
-        })
-      );
-    }
-  }, [isForYou, dispatch, patientDetails.fullName]);
-
-  // ==================== UNCOMMENT WHEN BACKEND IS READY ====================
-  /*
-  useEffect(() => {
-    if (isForYou && !patientDetails.fullName && authState.user) {
-      // Auto-fill with actual logged-in user data
-      dispatch(
-        setPatientDetails({
-          fullName: authState.user.fullName || "",
-          phone: authState.user.phone || "",
-          email: authState.user.email || "",
-          nic: authState.user.nic || "",
-          disease: "",
-        })
-      );
-    }
-  }, [isForYou, authState.user, dispatch, patientDetails.fullName]);
-  */
-  // ==================== END BACKEND CONNECTION CODE ====================
+  // useEffect(() => {
+  //   if (isForYou && !patientDetails.fullName && authState.user) {
+  //     // Auto-fill with actual logged-in user data when available
+  //     dispatch(
+  //       setPatientDetails({
+  //         fullName: authState.user.fullName || "",
+  //         phone: authState.user.phone || "",
+  //         email: authState.user.email || "",
+  //         nic: authState.user.nic || "",
+  //         dateOfBirth: authState.user.dateOfBirth || "",
+  //         gender: (authState.user.gender as Gender) || "",
+  //       })
+  //     );
+  //   }
+  // }, [isForYou, authState.user, dispatch, patientDetails.fullName]);
 
   // Handle input change
   const handleChange = (
@@ -88,7 +71,8 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
   };
 
   const isValidPhone = (phone: string) => {
-    return /^\d{10}$/.test(phone.trim());
+    // Accept 10-15 digits, can start with +
+    return /^\+?\d{10,15}$/.test(phone.trim());
   };
 
   const isValidNIC = (nic: string) => {
@@ -96,12 +80,33 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
     return /^([0-9]{9}[vVxX]|[0-9]{12})$/.test(nic.trim());
   };
 
+  const isValidDateOfBirth = (dob: string) => {
+    if (!dob) return false;
+    const date = new Date(dob);
+    const today = new Date();
+    return date <= today && !isNaN(date.getTime());
+  };
+
+  const isValidName = (name: string) => {
+    // Max 50 characters, only letters, spaces, hyphens, apostrophes
+    return name.trim().length > 0 && 
+           name.length <= 50 && 
+           /^[a-zA-Z\s'-]+$/.test(name);
+  };
+
+  const isValidEmergencyPhone = (phone: string) => {
+    if (!phone.trim()) return true; // Optional field
+    return /^\+?\d{10,15}$/.test(phone.trim());
+  };
+
   // Validation errors
   const errors = {
-    fullName: patientDetails.fullName.trim() === "",
+    fullName: !isValidName(patientDetails.fullName),
     phone: !isValidPhone(patientDetails.phone),
     email: !isValidEmail(patientDetails.email),
     nic: !isValidNIC(patientDetails.nic),
+    dateOfBirth: !isValidDateOfBirth(patientDetails.dateOfBirth),
+    gender: !patientDetails.gender,
   };
 
   // Show errors only for touched fields
@@ -110,11 +115,19 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
     phone: touched.phone && errors.phone,
     email: touched.email && errors.email,
     nic: touched.nic && errors.nic,
+    dateOfBirth: touched.dateOfBirth && errors.dateOfBirth,
+    gender: touched.gender && errors.gender,
   };
 
   // Form is valid if all required fields are valid
   const isFormValid =
-    !errors.fullName && !errors.phone && !errors.email && !errors.nic;
+    !errors.fullName && 
+    !errors.phone && 
+    !errors.email && 
+    !errors.nic &&
+    !errors.dateOfBirth &&
+    !errors.gender &&
+    isValidEmergencyPhone(patientDetails.emergencyContactPhone);
 
   // Handle form submit
   const handleSubmit = (e: React.FormEvent) => {
@@ -165,14 +178,16 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
         <div>
           <input
             type="text"
-            placeholder="Full Name"
+            placeholder="Full Name *"
             value={patientDetails.fullName}
             onChange={(e) => handleChange("fullName", e.target.value)}
             onBlur={() => handleBlur("fullName")}
             className={`${inputClass} ${showErrors.fullName ? errorClass : ""}`}
           />
           {showErrors.fullName && (
-            <p className="text-sm text-red-600 mt-1">Full name is required</p>
+            <p className="text-sm text-red-600 mt-1">
+              Full name is required (max 50 chars, letters only)
+            </p>
           )}
         </div>
 
@@ -180,7 +195,7 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
         <div>
           <input
             type="text"
-            placeholder="NIC (e.g., 199512345678 or 951234567V)"
+            placeholder="NIC (e.g., 199512345678 or 951234567V) *"
             value={patientDetails.nic}
             onChange={(e) => handleChange("nic", e.target.value)}
             onBlur={() => handleBlur("nic")}
@@ -200,7 +215,7 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
         <div>
           <input
             type="tel"
-            placeholder="Phone Number"
+            placeholder="Phone Number *"
             value={patientDetails.phone}
             onChange={(e) => handleChange("phone", e.target.value)}
             onBlur={() => handleBlur("phone")}
@@ -208,16 +223,16 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
           />
           {showErrors.phone && (
             <p className="text-sm text-red-600 mt-1">
-              Enter a valid 10-digit phone number
+              Enter a valid phone number (10-15 digits, can start with +)
             </p>
           )}
         </div>
 
-        {/* Email (Optional) */}
+        {/* Email */}
         <div>
           <input
             type="email"
-            placeholder="Email (Optional)"
+            placeholder="Email"
             value={patientDetails.email}
             onChange={(e) => handleChange("email", e.target.value)}
             onBlur={() => handleBlur("email")}
@@ -231,10 +246,62 @@ export const StepPatientDetails: React.FC<StepPatientDetailsProps> = ({
         </div>
       </div>
 
-      {/* Disease (Optional) */}
+      {/* Date of Birth and Gender Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Date of Birth */}
+        <div>
+          <input
+            type="date"
+            placeholder="Date of Birth *"
+            value={patientDetails.dateOfBirth}
+            onChange={(e) => handleChange("dateOfBirth", e.target.value)}
+            onBlur={() => handleBlur("dateOfBirth")}
+            max={new Date().toISOString().split('T')[0]}
+            className={`${inputClass} ${showErrors.dateOfBirth ? errorClass : ""}`}
+          />
+          {showErrors.dateOfBirth && (
+            <p className="text-sm text-red-600 mt-1">
+              Date of birth is required and must be in the past
+            </p>
+          )}
+        </div>
+
+        {/* Gender */}
+        <div>
+          <select
+            value={patientDetails.gender}
+            onChange={(e) => handleChange("gender", e.target.value)}
+            onBlur={() => handleBlur("gender")}
+            className={`${inputClass} ${showErrors.gender ? errorClass : ""}`}
+          >
+            <option value="">Select Gender *</option>
+            <option value={Gender.MALE}>Male</option>
+            <option value={Gender.FEMALE}>Female</option>
+            <option value={Gender.OTHER}>Other</option>
+          </select>
+          {showErrors.gender && (
+            <p className="text-sm text-red-600 mt-1">
+              Please select a gender
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Emergency Contact Phone */}
+      <div>
+        <input
+          type="tel"
+          placeholder="Emergency Contact Phone (Optional)"
+          value={patientDetails.emergencyContactPhone}
+          onChange={(e) => handleChange("emergencyContactPhone", e.target.value)}
+          className={inputClass}
+        />
+      </div>
+
+      {/* Disease/Notes (Optional) */}
       <div>
         <textarea
-          placeholder="What is the disease? (Optional)"
+          placeholder="Medical Notes or Reason for Visit (Optional)"
           value={patientDetails.disease}
           onChange={(e) => handleChange("disease", e.target.value)}
           rows={3}

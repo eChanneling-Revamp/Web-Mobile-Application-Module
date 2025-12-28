@@ -18,43 +18,16 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
   onBackHome,
   onViewAppointments,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
+  // Get confirmation data from Redux (set by createBooking thunk)
   const { 
-    selectedHospitalId, 
+    confirmationData,
     selectedHospitalName,
     selectedDate, 
-    selectedSessionId,
-    selectedSessionName,
     selectedSessionStartTime,
-    patientDetails, 
     isCreatingBooking, 
-    error 
+    isProcessingPayment,
+    bookingError 
   } = useSelector((state: RootState) => state.booking);
-
-  // State for confirmation data
-  const [confirmationData, setConfirmationData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Create booking on component mount (after successful payment)
-  useEffect(() => {
-    // For now, use mock data while backend is being built
-    // In production, this will call the real backend API
-    
-    setTimeout(() => {
-      if (selectedHospitalId && selectedDate && selectedSessionId && patientDetails.fullName) {
-        setConfirmationData({
-          appointmentId: `APT-${Date.now().toString().slice(-8)}`,
-          patientNumber: Math.floor(Math.random() * 10) + 1,
-          hospitalName: selectedHospitalName,
-          roomNumber: "Room 305",
-          patientName: patientDetails.fullName,
-          doctorName: doctorName,
-          date: selectedDate,
-          time: selectedSessionStartTime,
-        });
-      }
-    }, 500);
-  }, [selectedHospitalId, selectedDate, selectedSessionId, patientDetails, doctorName, selectedHospitalName, selectedSessionStartTime]);
 
   // Format date for display
   const formatDate = (dateStr: string) => {
@@ -68,6 +41,8 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
 
   // Download receipt as PDF
   const downloadReceipt = () => {
+    if (!confirmationData) return;
+    
     const doc = new jsPDF();
 
     // Title
@@ -86,28 +61,31 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
     let yPos = 40;
     const lineHeight = 10;
 
-    doc.text(`Appointment ID: ${confirmationData.appointmentId}`, 20, yPos);
+    doc.text(`Appointment Number: ${confirmationData.data.appointmentNumber}`, 20, yPos);
     yPos += lineHeight;
 
-    doc.text(`Hospital: ${confirmationData.hospitalName}`, 20, yPos);
+    doc.text(`Appointment ID: ${confirmationData.data.appointmentId}`, 20, yPos);
     yPos += lineHeight;
 
-    doc.text(`Room Number: ${confirmationData.roomNumber}`, 20, yPos);
+    doc.text(`Hospital: ${selectedHospitalName || 'N/A'}`, 20, yPos);
     yPos += lineHeight;
 
-    doc.text(`Patient Name: ${confirmationData.patientName}`, 20, yPos);
+    doc.text(`Queue Position: #${confirmationData.data.queuePosition}`, 20, yPos);
     yPos += lineHeight;
 
-    doc.text(`Patient Number: ${confirmationData.patientNumber}`, 20, yPos);
+    doc.text(`Patient Name: ${confirmationData.data.patientName}`, 20, yPos);
     yPos += lineHeight;
 
-    doc.text(`Doctor Name: ${confirmationData.doctorName}`, 20, yPos);
+    doc.text(`Patient NIC: ${confirmationData.data.patientNIC}`, 20, yPos);
     yPos += lineHeight;
 
-    doc.text(`Date: ${formatDate(confirmationData.date)}`, 20, yPos);
+    doc.text(`Doctor Name: ${doctorName}`, 20, yPos);
     yPos += lineHeight;
 
-    doc.text(`Time: ${confirmationData.time}`, 20, yPos);
+    doc.text(`Date: ${formatDate(selectedDate!)}`, 20, yPos);
+    yPos += lineHeight;
+
+    doc.text(`Time: ${selectedSessionStartTime}`, 20, yPos);
     yPos += lineHeight + 10;
 
     // Amount details
@@ -116,7 +94,7 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
     yPos += lineHeight;
 
     doc.setFont("helvetica", "normal");
-    doc.text(`Consultation Fee: Rs. ${doctorFee.toFixed(2)}`, 20, yPos);
+    doc.text(`Consultation Fee: Rs. ${confirmationData.data.consultationFee.toFixed(2)}`, 20, yPos);
     yPos += lineHeight;
 
     doc.text(`Platform Fee: Rs. 200.00`, 20, yPos);
@@ -124,10 +102,13 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
 
     doc.setFont("helvetica", "bold");
     doc.text(
-      `Total Amount Paid: Rs. ${(doctorFee + 200).toFixed(2)}`,
+      `Total Amount Paid: Rs. ${(confirmationData.data.consultationFee + 200).toFixed(2)}`,
       20,
       yPos
     );
+    yPos += lineHeight;
+
+    doc.text(`Payment Status: ${confirmationData.data.paymentStatus}`, 20, yPos);
     yPos += lineHeight + 10;
 
     // Footer
@@ -141,27 +122,29 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
     );
 
     // Save PDF
-    doc.save(`Appointment_${confirmationData.appointmentId}.pdf`);
+    doc.save(`Appointment_${confirmationData.data.appointmentNumber}.pdf`);
   };
 
   // Loading state
-  if (isLoading || isCreatingBooking) {
+  if (isCreatingBooking || isProcessingPayment) {
     return (
       <div className="w-full flex items-center justify-center py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Creating your appointment...</p>
+          <p className="mt-4 text-gray-600">
+            {isCreatingBooking ? "Creating your appointment..." : "Processing payment..."}
+          </p>
         </div>
       </div>
     );
   }
 
   // Error state
-  if (error) {
+  if (bookingError) {
     return (
       <div className="w-full flex items-center justify-center py-8">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-red-600 mb-4">{bookingError}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
@@ -221,11 +204,11 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
         {/* Appointment Details Card */}
         <div className="bg-white rounded-3xl border-2 border-gray-200 p-4 mb-4">
           <div className="space-y-0.5">
-            {/* Appointment ID */}
+            {/* Appointment Number */}
             <div>
-              <span className="font-bold text-gray-900">Appointment ID:</span>
+              <span className="font-bold text-gray-900">Appointment Number:</span>
               <span className="text-gray-700 ml-2">
-                {confirmationData.appointmentId}
+                {confirmationData.data.appointmentNumber}
               </span>
             </div>
 
@@ -233,39 +216,39 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
             <div>
               <span className="font-bold text-gray-900">Hospital:</span>
               <span className="text-gray-700 ml-2">
-                {confirmationData.hospitalName}
+                {selectedHospitalName || "N/A"}
               </span>
             </div>
 
-            {/* Room Number */}
+            {/* Queue Position */}
             <div>
-                <span className="font-bold text-gray-900">Room Number:</span>
-                <span className="text-gray-700 ml-2">
-                    {confirmationData.roomNumber}
-                </span>
+              <span className="font-bold text-gray-900">Queue Position:</span>
+              <span className="text-gray-700 ml-2">
+                #{confirmationData.data.queuePosition}
+              </span>
             </div>
 
             {/* Patient Name */}
             <div>
               <span className="font-bold text-gray-900">Patient Name:</span>
               <span className="text-gray-700 ml-2">
-                {confirmationData.patientName}
+                {confirmationData.data.patientName}
               </span>
             </div>
 
-            {/* Patient Number */}
+            {/* Patient NIC */}
             <div>
-                <span className="font-bold text-gray-900">Patient Number:</span>
-                <span className="text-gray-700 ml-2">
-                    {confirmationData.patientNumber}
-                </span>
+              <span className="font-bold text-gray-900">Patient NIC:</span>
+              <span className="text-gray-700 ml-2">
+                {confirmationData.data.patientNIC}
+              </span>
             </div>
 
             {/* Doctor Name */}
             <div>
               <span className="font-bold text-gray-900">Doctor Name:</span>
               <span className="text-gray-700 ml-2">
-                {confirmationData.doctorName}
+                {doctorName}
               </span>
             </div>
 
@@ -273,7 +256,7 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
             <div>
               <span className="font-bold text-gray-900">Date:</span>
               <span className="text-gray-700 ml-2">
-                {formatDate(confirmationData.date)}
+                {formatDate(selectedDate!)}
               </span>
             </div>
 
@@ -281,7 +264,21 @@ export const StepConfirmation: React.FC<StepConfirmationProps> = ({
             <div>
               <span className="font-bold text-gray-900">Time:</span>
               <span className="text-gray-700 ml-2">
-                {confirmationData.time}
+                {selectedSessionStartTime}
+              </span>
+            </div>
+
+            {/* Payment Status */}
+            <div>
+              <span className="font-bold text-gray-900">Payment Status:</span>
+              <span className="text-gray-700 ml-2">
+                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                  confirmationData.data.paymentStatus === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                  confirmationData.data.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {confirmationData.data.paymentStatus}
+                </span>
               </span>
             </div>
           </div>

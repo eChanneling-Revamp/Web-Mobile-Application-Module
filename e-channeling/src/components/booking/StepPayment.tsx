@@ -1,29 +1,34 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { setPaymentDetails, createBooking, processPayment } from "@/store/booking/bookingSlice";
 
 interface StepPaymentProps {
   doctorFee: number;
+  userId: string;
   onPrev: () => void;
   onNext: () => void;
 }
 
 export const StepPayment: React.FC<StepPaymentProps> = ({
   doctorFee,
+  userId,
   onPrev,
   onNext,
 }) => {
-  // Payment form state
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardHolderName, setcardHolderName] = useState("");
-  const [validDate, setValidDate] = useState("");
-  const [securityCode, setSecurityCode] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  
+  // Get Redux state
+  const { paymentDetails, isCreatingBooking, isProcessingPayment, bookingError, paymentError, confirmationData } = 
+    useSelector((state: RootState) => state.booking);
 
   // Track touched fields for validation
   const [touched, setTouched] = useState({
     cardNumber: false,
     cardHolderName: false,
-    validDate: false,
-    securityCode: false,
+    expiryDate: false,
+    cvv: false,
   });
 
   // Fixed platform fee
@@ -32,10 +37,22 @@ export const StepPayment: React.FC<StepPaymentProps> = ({
   // Calculate total
   const totalAmount = doctorFee + platformFee;
 
+  // Handle input changes
+  const handleChange = (field: keyof typeof paymentDetails, value: string) => {
+    dispatch(setPaymentDetails({ [field]: value }));
+  };
+
   // Validation functions
   const isValidCardNumber = (num: string) => {
     const digits = num.replace(/\s/g, "");
-    return /^\d{13,19}$/.test(digits);
+    return /^\d{16}$/.test(digits); // Backend requires exactly 16 digits
+  };
+
+  const isValidCardHolderName = (name: string) => {
+    // 3-50 chars, letters and spaces only
+    return name.trim().length >= 3 && 
+           name.length <= 50 && 
+           /^[A-Za-z\s]+$/.test(name);
   };
 
   const isValidDate = (date: string) => {
@@ -48,53 +65,68 @@ export const StepPayment: React.FC<StepPaymentProps> = ({
 
   // Validation errors
   const errors = {
-    cardNumber: !isValidCardNumber(cardNumber),
-    cardHolderName: cardHolderName.trim() === "",
-    validDate: !isValidDate(validDate),
-    securityCode: !isValidSecurityCode(securityCode),
+    cardNumber: !isValidCardNumber(paymentDetails.cardNumber),
+    cardHolderName: !isValidCardHolderName(paymentDetails.cardHolderName),
+    expiryDate: !isValidDate(paymentDetails.expiryDate),
+    cvv: !isValidSecurityCode(paymentDetails.cvv),
   };
 
   // Show errors only for touched fields
   const showErrors = {
     cardNumber: touched.cardNumber && errors.cardNumber,
     cardHolderName: touched.cardHolderName && errors.cardHolderName,
-    validDate: touched.validDate && errors.validDate,
-    securityCode: touched.securityCode && errors.securityCode,
+    expiryDate: touched.expiryDate && errors.expiryDate,
+    cvv: touched.cvv && errors.cvv,
   };
 
   // Form is valid
   const isFormValid =
     !errors.cardNumber &&
     !errors.cardHolderName &&
-    !errors.validDate &&
-    !errors.securityCode;
+    !errors.expiryDate &&
+    !errors.cvv;
 
   // Handle blur
   const handleBlur = (field: keyof typeof touched) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
   };
 
-  // Handle card number formatting (add spaces)
+  // Handle card number formatting (add spaces every 4 digits)
   const handleCardNumberChange = (value: string) => {
     const digits = value.replace(/\D/g, "");
     const formatted = digits.replace(/(\d{4})/g, "$1 ").trim();
-    setCardNumber(formatted);
+    handleChange("cardNumber", formatted);
   };
 
-  // Handle valid date formatting
-  const handleValidDateChange = (value: string) => {
+  // Handle expiry date formatting
+  const handleExpiryDateChange = (value: string) => {
     let cleaned = value.replace(/\D/g, "");
     if (cleaned.length >= 2) {
       cleaned = cleaned.slice(0, 2) + "/" + cleaned.slice(2, 4);
     }
-    setValidDate(cleaned);
+    handleChange("expiryDate", cleaned);
   };
 
-  // Handle form submit
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle form submit - Create booking first, then process payment
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid) {
+    if (!isFormValid) return;
+
+    try {
+      // Step 1: Create booking
+      const bookingResult = await dispatch(createBooking({ userId })).unwrap();
+      
+      // Step 2: Process payment with the appointment number from booking
+      await dispatch(processPayment({ 
+        appointmentNumber: bookingResult.data.appointmentNumber,
+        amount: totalAmount
+      })).unwrap();
+
+      // Success - move to confirmation
       onNext();
+    } catch (error: any) {
+      // Error is handled in Redux state
+      console.error("Payment processing error:", error);
     }
   };
 
@@ -109,20 +141,35 @@ export const StepPayment: React.FC<StepPaymentProps> = ({
         <div className="space-y-3">
           <h2 className="text-2xl font-bold text-gray-900">Payment Details</h2>
 
+          {/* Show booking error */}
+          {bookingError && (
+            <div className="rounded-xl bg-red-50 border-2 border-red-200 p-4 text-red-800">
+              {bookingError}
+            </div>
+          )}
+
+          {/* Show payment error */}
+          {paymentError && (
+            <div className="rounded-xl bg-red-50 border-2 border-red-200 p-4 text-red-800">
+              {paymentError}
+            </div>
+          )}
+
           {/* Card Number */}
           <div>
             <input
               type="text"
-              placeholder="Credit Card Number"
-              value={cardNumber}
+              placeholder="Credit Card Number *"
+              value={paymentDetails.cardNumber}
               onChange={(e) => handleCardNumberChange(e.target.value)}
               onBlur={() => handleBlur("cardNumber")}
               maxLength={19}
+              disabled={isCreatingBooking || isProcessingPayment}
               className={`${inputClass} ${showErrors.cardNumber ? errorClass : ""}`}
             />
             {showErrors.cardNumber && (
               <p className="text-sm text-red-600 mt-1">
-                Enter a valid card number (13-19 digits)
+                Enter a valid 16-digit card number
               </p>
             )}
           </div>
@@ -131,52 +178,55 @@ export const StepPayment: React.FC<StepPaymentProps> = ({
           <div>
             <input
               type="text"
-              placeholder="Card Holder Name"
-              value={cardHolderName}
-              onChange={(e) => setcardHolderName(e.target.value)}
+              placeholder="Card Holder Name *"
+              value={paymentDetails.cardHolderName}
+              onChange={(e) => handleChange("cardHolderName", e.target.value)}
               onBlur={() => handleBlur("cardHolderName")}
+              disabled={isCreatingBooking || isProcessingPayment}
               className={`${inputClass} ${showErrors.cardHolderName ? errorClass : ""}`}
             />
             {showErrors.cardHolderName && (
               <p className="text-sm text-red-600 mt-1">
-                Card holder name is required
+                Name must be 3-50 characters, letters and spaces only
               </p>
             )}
           </div>
 
-          {/* Valid Date and Security Code */}
+          {/* Expiry Date and CVV */}
           <div className="grid grid-cols-2 gap-4">
-            {/* Valid Date */}
+            {/* Expiry Date */}
             <div>
               <input
                 type="text"
-                placeholder="Valid Date (MM/YY)"
-                value={validDate}
-                onChange={(e) => handleValidDateChange(e.target.value)}
-                onBlur={() => handleBlur("validDate")}
+                placeholder="Expiry Date (MM/YY) *"
+                value={paymentDetails.expiryDate}
+                onChange={(e) => handleExpiryDateChange(e.target.value)}
+                onBlur={() => handleBlur("expiryDate")}
                 maxLength={5}
-                className={`${inputClass} ${showErrors.validDate ? errorClass : ""}`}
+                disabled={isCreatingBooking || isProcessingPayment}
+                className={`${inputClass} ${showErrors.expiryDate ? errorClass : ""}`}
               />
-              {showErrors.validDate && (
+              {showErrors.expiryDate && (
                 <p className="text-sm text-red-600 mt-1">Format: MM/YY</p>
               )}
             </div>
 
-            {/* Security Code */}
+            {/* CVV */}
             <div>
               <input
                 type="text"
-                placeholder="Security Code (CVV)"
-                value={securityCode}
+                placeholder="CVV *"
+                value={paymentDetails.cvv}
                 onChange={(e) => {
                   const digits = e.target.value.replace(/\D/g, "");
-                  setSecurityCode(digits);
+                  handleChange("cvv", digits);
                 }}
-                onBlur={() => handleBlur("securityCode")}
+                onBlur={() => handleBlur("cvv")}
                 maxLength={4}
-                className={`${inputClass} ${showErrors.securityCode ? errorClass : ""}`}
+                disabled={isCreatingBooking || isProcessingPayment}
+                className={`${inputClass} ${showErrors.cvv ? errorClass : ""}`}
               />
-              {showErrors.securityCode && (
+              {showErrors.cvv && (
                 <p className="text-sm text-red-600 mt-1">3-4 digits</p>
               )}
             </div>
@@ -230,17 +280,18 @@ export const StepPayment: React.FC<StepPaymentProps> = ({
         <button
           type="button"
           onClick={onPrev}
-          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          disabled={isCreatingBooking || isProcessingPayment}
+          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           ← Previous
         </button>
 
         <button
           type="submit"
-          disabled={!isFormValid}
+          disabled={!isFormValid || isCreatingBooking || isProcessingPayment}
           className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition ease-in-out duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300"
         >
-          Confirm and Pay →
+          {isCreatingBooking ? "Creating Booking..." : isProcessingPayment ? "Processing Payment..." : "Confirm and Pay →"}
         </button>
       </div>
     </form>

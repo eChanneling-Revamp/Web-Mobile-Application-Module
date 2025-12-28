@@ -6,7 +6,12 @@ import type {
   Hospital,
   AvailableDate,
   SessionSlot,
-  SessionCard
+  SessionCard,
+  CreateBookingRequest,
+  CreateBookingResponse,
+  PaymentRequest,
+  PaymentResponse,
+  Gender
 } from "@/components/booking/types";
 
 // Initial state
@@ -29,18 +34,32 @@ const initialState: BookingState = {
     phone: "",
     email: "",
     nic: "",
+    dateOfBirth: "",
+    gender: "",
+    emergencyContactPhone: "",
     disease: "",
   },
 
+  // Step 4
+  paymentDetails: {
+    cardNumber: "",
+    cardHolderName: "",
+    expiryDate: "",
+    cvv: "",
+  },
+
+  // Confirmation
+  confirmationData: null,
+
   // Loading states
   isLoadingDoctor: false,
-  isLoadingHospitals: false,
-  isLoadingDates: false,
   isLoadingSessions: false,
   isCreatingBooking: false,
+  isProcessingPayment: false,
 
-  // Error
-  error: null,
+  // Errors
+  bookingError: null,
+  paymentError: null,
 };
 
 // ==================== ASYNC THUNKS ====================
@@ -62,121 +81,121 @@ export const fetchDoctorById = createAsyncThunk<
   }
 });
 
-// Fetch available hospitals for a doctor
-export const fetchDoctorHospitals = createAsyncThunk<
-  Hospital[],
-  string,
-  { rejectValue: string }
->("booking/fetchDoctorHospitals", async (doctorId, { rejectWithValue }) => {
-  try {
-    const response = await api.get(`/doctors/${doctorId}/hospitals`);
-    return response.data;
-  } catch (error: unknown) {
-    const err = error as { response?: { data?: { message?: string } } };
-    return rejectWithValue(
-      err.response?.data?.message || "Failed to fetch hospitals"
-    );
-  }
-});
-
-// Fetch available dates (next 7 days with availability)
-export const fetchAvailableDates = createAsyncThunk<
-  AvailableDate[],
-  { doctorId: string; hospitalId: string },
-  { rejectValue: string }
->(
-  "booking/fetchAvailableDates",
-  async ({ doctorId, hospitalId }, { rejectWithValue }) => {
-    try {
-      const response = await api.get(
-        `/doctors/${doctorId}/available-dates?hospitalId=${hospitalId}`
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch available dates"
-      );
-    }
-  }
-);
-
-// Fetch available session slots for a specific date
-export const fetchSessionSlots = createAsyncThunk<
-  SessionSlot[],
-  { doctorId: string; hospitalId: string; date: string },
-  { rejectValue: string }
->(
-  "booking/fetchSessionSlots",
-  async ({ doctorId, hospitalId, date }, { rejectWithValue }) => {
-    try {
-      const response = await api.get(
-        `/sessions/available-slots?doctorId=${doctorId}&hospitalId=${hospitalId}&date=${date}`
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch session slots"
-      );
-    }
-  }
-);
-
-// NEW: Fetch all available sessions for next 7 days
-export const fetchAllSessions = createAsyncThunk<
+// Search sessions - INTEGRATED WITH BACKEND
+// Uses backend GET /api/search with filters
+export const searchSessions = createAsyncThunk<
   SessionCard[],
-  { doctorId: string; hospitalId?: string },
+  {
+    doctorId?: string;
+    date?: string;
+    specialization?: string;
+    location?: string;
+    limit?: number;
+    offset?: number;
+  },
   { rejectValue: string }
 >(
-  "booking/fetchAllSessions",
-  async ({ doctorId, hospitalId }, { rejectWithValue }) => {
+  "booking/searchSessions",
+  async (filters, { rejectWithValue }) => {
     try {
-      const url = hospitalId
-        ? `/doctors/${doctorId}/sessions?hospitalId=${hospitalId}`
-        : `/doctors/${doctorId}/sessions`;
-      const response = await api.get(url);
+      const params = new URLSearchParams();
+      if (filters.doctorId) params.append("doctorId", filters.doctorId);
+      if (filters.date) params.append("date", filters.date);
+      if (filters.specialization) params.append("specialization", filters.specialization);
+      if (filters.location) params.append("location", filters.location);
+      if (filters.limit) params.append("limit", filters.limit.toString());
+      if (filters.offset) params.append("offset", filters.offset.toString());
+      
+      const response = await api.get(`/search?${params.toString()}`);
       return response.data;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch sessions"
+        err.response?.data?.message || "Failed to search sessions"
       );
     }
   }
 );
 
-// Create booking with sequential patient numbering
+// Create booking - INTEGRATED WITH BACKEND
 export const createBooking = createAsyncThunk<
-  {
-    appointmentId: string;
-    patientNumber: number;
-    hospitalName: string;
-    roomNumber: string;
-    patientName: string;
-    doctorName: string;
-    date: string;
-    time: string;
-  },
-  {
-    doctorId: string;
-    hospitalId: string;
-    date: string;
-    sessionId: string;
-    patientDetails: BookingState["patientDetails"];
-    totalAmount: number;
-  },
+  CreateBookingResponse,
+  { userId: string },
   { rejectValue: string }
 >(
   "booking/createBooking",
-  async (bookingData, { rejectWithValue }) => {
+  async ({ userId }, { getState, rejectWithValue }) => {
     try {
-      const response = await api.post("/bookings/create", bookingData);
+      const state = getState() as { booking: BookingState };
+      const { selectedSessionId, patientDetails } = state.booking;
+      
+      if (!selectedSessionId) {
+        throw new Error("Session ID is required");
+      }
+
+      // Validate required fields
+      if (!patientDetails.fullName || !patientDetails.phone || !patientDetails.nic || 
+          !patientDetails.dateOfBirth || !patientDetails.gender) {
+        throw new Error("All required patient details must be filled");
+      }
+      
+      const requestData: CreateBookingRequest = {
+        userId,
+        sessionId: selectedSessionId,
+        patientName: patientDetails.fullName,
+        patientEmail: patientDetails.email || "",
+        patientPhone: patientDetails.phone,
+        patientNIC: patientDetails.nic,
+        patientDateOfBirth: patientDetails.dateOfBirth,
+        patientGender: patientDetails.gender as Gender,
+        emergencyContactPhone: patientDetails.emergencyContactPhone || undefined,
+      };
+      
+      const response = await api.post<CreateBookingResponse>("/bookings", requestData);
       return response.data;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+    } catch (error: any) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to create booking"
+        error.response?.data?.error || error.message || "Failed to create booking"
+      );
+    }
+  }
+);
+
+// Process payment - INTEGRATED WITH BACKEND
+export const processPayment = createAsyncThunk<
+  PaymentResponse,
+  { appointmentNumber: string; amount: number },
+  { rejectValue: string }
+>(
+  "booking/processPayment",
+  async ({ appointmentNumber, amount }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { booking: BookingState };
+      const { paymentDetails } = state.booking;
+      
+      // Validate payment details
+      if (!paymentDetails.cardNumber || !paymentDetails.cardHolderName || 
+          !paymentDetails.expiryDate || !paymentDetails.cvv) {
+        throw new Error("All payment details must be filled");
+      }
+
+      // Remove spaces from card number for backend
+      const cleanCardNumber = paymentDetails.cardNumber.replace(/\s/g, "");
+      
+      const requestData: PaymentRequest = {
+        appointmentNumber,
+        amount,
+        cardNumber: cleanCardNumber,
+        cardHolderName: paymentDetails.cardHolderName,
+        expiryDate: paymentDetails.expiryDate,
+        cvv: paymentDetails.cvv,
+      };
+      
+      const response = await api.post<PaymentResponse>("/payments", requestData);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.error || error.message || "Payment failed"
       );
     }
   }
@@ -204,14 +223,7 @@ const bookingSlice = createSlice({
     setSelectedSessionId: (state, action: PayloadAction<string>) => {
       state.selectedSessionId = action.payload;
     },
-    setSelectedSessionInfo: (
-      state,
-      action: PayloadAction<{ name: string; startTime: string }>
-    ) => {
-      state.selectedSessionName = action.payload.name;
-      state.selectedSessionStartTime = action.payload.startTime;
-    },
-    // NEW: Set all session details at once when card is selected
+    // Set all session details at once when card is selected
     setSelectedSessionCard: (
       state,
       action: PayloadAction<{
@@ -242,9 +254,20 @@ const bookingSlice = createSlice({
       state.patientDetails = { ...state.patientDetails, ...action.payload };
     },
 
+    // Step 4 actions
+    setPaymentDetails: (
+      state,
+      action: PayloadAction<Partial<BookingState["paymentDetails"]>>
+    ) => {
+      state.paymentDetails = { ...state.paymentDetails, ...action.payload };
+    },
+
     // Clear errors
-    clearErrors: (state) => {
-      state.error = null;
+    clearBookingError: (state) => {
+      state.bookingError = null;
+    },
+    clearPaymentError: (state) => {
+      state.paymentError = null;
     },
 
     // Reset booking
@@ -256,84 +279,57 @@ const bookingSlice = createSlice({
     builder
       .addCase(fetchDoctorById.pending, (state) => {
         state.isLoadingDoctor = true;
-        state.error = null;
+        state.bookingError = null;
       })
       .addCase(fetchDoctorById.fulfilled, (state) => {
         state.isLoadingDoctor = false;
       })
       .addCase(fetchDoctorById.rejected, (state, action) => {
         state.isLoadingDoctor = false;
-        state.error = action.payload || "Failed to fetch doctor";
+        state.bookingError = action.payload || "Failed to fetch doctor";
       });
 
-    // Fetch hospitals
+    // Search sessions
     builder
-      .addCase(fetchDoctorHospitals.pending, (state) => {
-        state.isLoadingHospitals = true;
-        state.error = null;
-      })
-      .addCase(fetchDoctorHospitals.fulfilled, (state) => {
-        state.isLoadingHospitals = false;
-      })
-      .addCase(fetchDoctorHospitals.rejected, (state, action) => {
-        state.isLoadingHospitals = false;
-        state.error = action.payload || "Failed to fetch hospitals";
-      });
-
-    // Fetch available dates
-    builder
-      .addCase(fetchAvailableDates.pending, (state) => {
-        state.isLoadingDates = true;
-        state.error = null;
-      })
-      .addCase(fetchAvailableDates.fulfilled, (state) => {
-        state.isLoadingDates = false;
-      })
-      .addCase(fetchAvailableDates.rejected, (state, action) => {
-        state.isLoadingDates = false;
-        state.error = action.payload || "Failed to fetch dates";
-      });
-
-    // Fetch session slots
-    builder
-      .addCase(fetchSessionSlots.pending, (state) => {
+      .addCase(searchSessions.pending, (state) => {
         state.isLoadingSessions = true;
-        state.error = null;
+        state.bookingError = null;
       })
-      .addCase(fetchSessionSlots.fulfilled, (state) => {
+      .addCase(searchSessions.fulfilled, (state) => {
         state.isLoadingSessions = false;
       })
-      .addCase(fetchSessionSlots.rejected, (state, action) => {
+      .addCase(searchSessions.rejected, (state, action) => {
         state.isLoadingSessions = false;
-        state.error = action.payload || "Failed to fetch sessions";
-      });
-
-    // NEW: Fetch all sessions
-    builder
-      .addCase(fetchAllSessions.pending, (state) => {
-        state.isLoadingSessions = true;
-        state.error = null;
-      })
-      .addCase(fetchAllSessions.fulfilled, (state) => {
-        state.isLoadingSessions = false;
-      })
-      .addCase(fetchAllSessions.rejected, (state, action) => {
-        state.isLoadingSessions = false;
-        state.error = action.payload || "Failed to fetch sessions";
+        state.bookingError = action.payload || "Failed to search sessions";
       });
 
     // Create booking
     builder
       .addCase(createBooking.pending, (state) => {
         state.isCreatingBooking = true;
-        state.error = null;
+        state.bookingError = null;
       })
-      .addCase(createBooking.fulfilled, (state) => {
+      .addCase(createBooking.fulfilled, (state, action) => {
         state.isCreatingBooking = false;
+        state.confirmationData = action.payload;
       })
       .addCase(createBooking.rejected, (state, action) => {
         state.isCreatingBooking = false;
-        state.error = action.payload || "Failed to create booking";
+        state.bookingError = action.payload || "Failed to create booking";
+      });
+
+    // Process payment
+    builder
+      .addCase(processPayment.pending, (state) => {
+        state.isProcessingPayment = true;
+        state.paymentError = null;
+      })
+      .addCase(processPayment.fulfilled, (state) => {
+        state.isProcessingPayment = false;
+      })
+      .addCase(processPayment.rejected, (state, action) => {
+        state.isProcessingPayment = false;
+        state.paymentError = action.payload || "Payment failed";
       });
   },
 });
@@ -344,11 +340,12 @@ export const {
   setSelectedHospitalName,
   setSelectedDate,
   setSelectedSessionId,
-  setSelectedSessionInfo,
   setSelectedSessionCard,
   setForWhom,
   setPatientDetails,
-  clearErrors,
+  setPaymentDetails,
+  clearBookingError,
+  clearPaymentError,
   resetBooking,
 } = bookingSlice.actions;
 
