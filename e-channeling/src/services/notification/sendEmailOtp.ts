@@ -1,4 +1,8 @@
 import nodemailer from "nodemailer";
+//import { Resend } from "resend";
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -10,9 +14,15 @@ export const transporter = nodemailer.createTransport({
     },
 });
 
+//const resend = new Resend(process.env.RESEND_API_KEY);
+
 export const sendEmailOtp = async (to: string, otp: string, html: string) => {
-    await transporter.sendMail({
-        from: `"E-Channeling" <${process.env.MAIL_USER}>`,
+    await sgMail.send({
+        //from: "Auth <onboarding@resend.dev>",
+        from: {
+            email: "echanneling.revamp.v3@gmail.com", // verified sender
+            name: "eChanneling",
+        },
         to,
         subject: "E-Channeling Verification",
         html,
