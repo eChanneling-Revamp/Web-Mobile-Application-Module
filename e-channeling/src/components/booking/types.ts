@@ -25,6 +25,32 @@ export interface SessionSlot {
 }
 
 export type ForWhomType = "myself" | "someone_else";
+export type AppointmentType = "in-person" | "video-consultation";
+
+// Backend enums
+export enum Gender {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+  OTHER = "OTHER"
+}
+
+export enum AppointmentStatus {
+  CONFIRMED = "CONFIRMED",
+  CANCELLED = "CANCELLED",
+  COMPLETED = "COMPLETED",
+  NO_SHOW = "NO_SHOW",
+  RESCHEDULED = "RESCHEDULED",
+  UNPAID = "UNPAID"
+}
+
+export enum PaymentStatus {
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  REFUNDED = "REFUNDED",
+  CANCELLED = "CANCELLED",
+  UNPAID = "UNPAID"
+}
 
 export interface BookingState {
   // Step 1 data
@@ -36,27 +62,94 @@ export interface BookingState {
   selectedSessionName: string | null;
   selectedSessionStartTime: string | null;
 
-  // Step 2 data (will add later)
+  // Step 2 data
   forWhom: ForWhomType | null;
 
-  // Step 3 data (will add later)
+  // Step 3 data - Updated to match backend schema
   patientDetails: {
     fullName: string;
     phone: string;
     email: string;
     nic: string;
-    disease: string;
+    dateOfBirth: string; // YYYY-MM-DD format
+    gender: Gender | "";
+    emergencyContactPhone: string;
+    disease: string; // Optional notes
   };
+
+  // Step 4 - Payment data
+  paymentDetails: {
+    cardNumber: string;
+    cardHolderName: string;
+    expiryDate: string; // MM/YY
+    cvv: string;
+  };
+
+  // Confirmation data from backend
+  confirmationData: CreateBookingResponse | null;
 
   // Loading states
   isLoadingDoctor: boolean;
-  isLoadingHospitals: boolean;
-  isLoadingDates: boolean;
   isLoadingSessions: boolean;
   isCreatingBooking: boolean;
+  isProcessingPayment: boolean;
 
   // Error states
-  error: string | null;
+  bookingError: string | null;
+  paymentError: string | null;
+}
+
+// API Request/Response types matching backend
+export interface CreateBookingRequest {
+  userId: string;
+  sessionId: string;
+  patientName: string;
+  patientEmail: string;
+  patientPhone: string;
+  patientNIC: string;
+  patientDateOfBirth: string; // YYYY-MM-DD
+  patientGender: Gender;
+  emergencyContactPhone?: string;
+  medicalReports?: string;
+}
+
+export interface CreateBookingResponse {
+  success: boolean;
+  message: string;
+  data: {
+    appointmentId: string;
+    appointmentNumber: string;
+    sessionId: string;
+    bookedByUserId: string;
+    patientName: string;
+    patientEmail: string;
+    patientPhone: string;
+    patientNIC: string;
+    patientDateOfBirth: Date;
+    patientGender: Gender;
+    status: AppointmentStatus;
+    consultationFee: number;
+    paymentStatus: PaymentStatus;
+    queuePosition: number;
+  };
+}
+
+export interface PaymentRequest {
+  appointmentNumber: string;
+  amount: number;
+  cardNumber: string;
+  cardHolderName: string;
+  expiryDate: string; // MM/YY
+  cvv: string;
+}
+
+export interface PaymentResponse {
+  success: boolean;
+  data: {
+    payments: boolean;
+    updateAppointment: any;
+  };
+  message: string;
 }
 
 export interface BookingConfirmation {
@@ -84,4 +177,5 @@ export interface SessionCard {
   date: string; 
   dateFormatted: string;
   startTime: string;
+  appointmentType: AppointmentType;
 }

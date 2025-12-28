@@ -27,37 +27,17 @@ const BookingPage = () => {
   const [step, setStepState] = useState<UIStep>(1);
 
   // Redux state
-  const { isLoadingDoctor, error } = useSelector(
+  const { isLoadingDoctor, bookingError } = useSelector(
     (state: RootState) => state.booking
   );
+  
+  // Get user ID from auth state
+  const { userId } = useSelector((state: RootState) => state.auth);
 
-  // ==================== DOCTOR DATA FROM URL PARAMETERS ====================
-  // This will now display the selected doctor's details dynamically
-  const [doctor, setDoctor] = useState<Doctor>({
-    id: doctorId || "123",
-    name: doctorName,
-    specialization: specialization,
-    image: "/doctor-placeholder.jpg",
-    fee: fee || 3500,
-  });
-  // ==================== END DOCTOR DATA ====================
-
-  // Update doctor state when URL parameters change
-  useEffect(() => {
-    setDoctor({
-      id: doctorId || "123",
-      name: doctorName || "Dr. Samantha Perera",
-      specialization: specialization || "Cardiologist",
-      image: "/doctor-placeholder.jpg",
-      fee: fee || 3500
-    });
-  }, [doctorId, doctorName, specialization]);
-
-  // ==================== UNCOMMENT WHEN CONNECTING TO BACKEND ====================
-  /*
+  // Doctor data from backend
   const [doctor, setDoctor] = useState<Doctor | null>(null);
 
-  // Fetch doctor details on mount
+  // Fetch doctor details from backend on mount
   useEffect(() => {
     if (doctorId) {
       dispatch(setSelectedDoctorId(doctorId));
@@ -67,8 +47,6 @@ const BookingPage = () => {
         .catch((error) => console.error("Error fetching doctor:", error));
     }
   }, [doctorId, dispatch]);
-  */
-  // ==================== END BACKEND CONNECTION CODE ====================
 
   // Scroll to top on step change
   const setStep = useCallback((newStep: UIStep) => {
@@ -110,7 +88,8 @@ const BookingPage = () => {
       case 4:
         return (
           <StepPayment
-            doctorFee={doctor.fee}
+            doctorFee={doctor?.fee || 0}
+            userId={userId || ""}
             onPrev={() => setStep(3)}
             onNext={() => setStep(5)}
           />
@@ -118,8 +97,8 @@ const BookingPage = () => {
       case 5:
         return (
           <StepConfirmation
-            doctorName={doctor.name}
-            doctorFee={doctor.fee}
+            doctorName={doctor?.name || ""}
+            doctorFee={doctor?.fee || 0}
             onBackHome={() => {
               dispatch(resetBooking());
               window.location.href = "/";
@@ -147,11 +126,11 @@ const BookingPage = () => {
   }
 
   // Error state
-  if (error) {
+  if (bookingError) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600">{error}</p>
+          <p className="text-red-600">{bookingError}</p>
           <button
             onClick={() => window.history.back()}
             className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full"
@@ -190,25 +169,37 @@ const BookingPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8">
             {/* Left: Doctor Info Card */}
             <aside className="rounded-2xl bg-gray-50 shadow-md p-5 h-fit">
-              <div className="flex items-start gap-3 mb-0.5">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                  {doctor.image ? (
-                    <img
-                      src={doctor.image}
-                      alt={doctor.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-300"></div>
-                  )}
+              {doctor ? (
+                <div className="flex items-start gap-3 mb-0.5">
+                  <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                    {doctor.image ? (
+                      <img
+                        src={doctor.image}
+                        alt={doctor.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-300"></div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-lg">{doctor.name}</p>
+                    <p className="text-sm text-gray-600">
+                      {doctor.specialization}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-lg">{doctor.name}</p>
-                  <p className="text-sm text-gray-600">
-                    {doctor.specialization}
-                  </p>
+              ) : (
+                <div className="animate-pulse">
+                  <div className="flex items-start gap-3">
+                    <div className="w-16 h-16 rounded-full bg-gray-300"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-5 bg-gray-300 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </aside>
 
             {/* Step Content */}
