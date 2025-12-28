@@ -73,7 +73,7 @@ const AppointmentsPage: React.FC = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch('/api/appointments');
+        const response = await fetch('/api/appoinments');
         const data = await response.json();
         setAppointments(data);
       } catch (error) {

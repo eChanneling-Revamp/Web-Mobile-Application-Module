@@ -1,5 +1,27 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Appointment, User } from "@/components/profile/types";
+
+interface User {
+    name: string;
+    email: string;
+}
+
+interface AppointmentActions {
+    canJoin: boolean;
+    canCancel: boolean;
+    canReschedule: boolean;
+}
+
+interface Appointment {
+    id: string;
+    doctorName: string;
+    specialty: string;
+    date: string;
+    type: string;
+    time: string;
+    location?: string;
+    status: "upcoming" | "past" | "cancelled";
+    actions: AppointmentActions;
+}
 
 interface ProfileState {
     user: User;
