@@ -7,7 +7,7 @@ import jsPDF from "jspdf";
 
 interface StepConfirmationProps {
   doctorName: string;
-  doctorFee: number;
+  doctorFee: string;
   onBackHome: () => void;
   onViewAppointments: () => void;
 }

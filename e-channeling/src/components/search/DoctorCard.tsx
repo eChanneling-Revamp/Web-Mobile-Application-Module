@@ -41,7 +41,7 @@ export const DoctorCard = ({ doctor }: { doctor: Doctor }) => {
     //     hospitals: JSON.stringify(hospitalNames),
     //     fee: doctor.consultationFee || "0",
     // });
-    
+
     const handleBook = () => {
         router.push(`/booking/${doctor.id}`);
     };

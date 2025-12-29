@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from "@/store";
 import { setPaymentDetails, createBooking, processPayment } from "@/store/booking/bookingSlice";
 
 interface StepPaymentProps {
-  doctorFee: number;
+  doctorFee: string;
   userId: string;
   onPrev: () => void;
   onNext: () => void;
@@ -35,7 +35,7 @@ export const StepPayment: React.FC<StepPaymentProps> = ({
   const platformFee = 200.0;
 
   // Calculate total
-  const totalAmount = doctorFee + platformFee;
+  const totalAmount = parseFloat(doctorFee) + platformFee;
 
   // Handle input changes
   const handleChange = (field: keyof typeof paymentDetails, value: string) => {
@@ -243,7 +243,7 @@ export const StepPayment: React.FC<StepPaymentProps> = ({
             <div className="flex items-center justify-between text-base">
               <span className="text-gray-700">Consultation Fee</span>
               <span className="font-medium text-gray-900">
-                Rs. {doctorFee.toFixed(2)}
+                Rs. {doctorFee}
               </span>
             </div>
 
