@@ -6,6 +6,15 @@ import { v4 as UUIDv4 } from "uuid";
 // create appointment
 export async function createBooking(data: Readonly<CreateBookingInput>) {
     return await prisma.$transaction(async (tx) => {
+        // Verify the user exists
+        const user = await tx.users.findUnique({
+            where: { id: data.userId },
+        });
+
+        if (!user) {
+            throw new Error("User not found. Please ensure you are logged in.");
+        }
+
         // check session is still AVAILABLE
         const session = await tx.sessions.findUnique({
             where: { id: data.sessionId },
