@@ -43,6 +43,7 @@ interface User {
 interface LoginResponse {
     message: string;
     user: User;
+    userId:string;
     accessToken: string;
 }
 
@@ -281,7 +282,7 @@ const authSlice = createSlice({
                     const payload = safeDecodeJwt(accessToken);
                     // get role and user id from the token payload
                     state.role = payload?.role ?? null;
-                    state.userId = payload.sub ?? null;
+                    state.userId = action.payload.userId;
                     if (typeof window !== "undefined") {
                         localStorage.setItem("accessToken", accessToken);
                     }
