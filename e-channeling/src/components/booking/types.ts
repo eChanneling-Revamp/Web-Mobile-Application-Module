@@ -53,6 +53,16 @@ export interface User {
   gender: "male" | "female" | "other";
 }
 
+export interface PatientDetails {
+    fullName: string;
+    phone: string;
+    email: string;
+    nic: string;
+    dateOfBirth: string; // YYYY-MM-DD format
+    gender: Gender | "";
+    disease: string; // Optional notes
+}
+
 export interface Hospital {
     id: string;
     name: string;
@@ -135,9 +145,12 @@ export interface BookingState {
         nic: string;
         dateOfBirth: string; // YYYY-MM-DD format
         gender: Gender | "";
-        emergencyContactPhone: string;
         disease: string; // Optional notes
     };
+
+    isCreateBookingSuccess:boolean
+    createBookingLoading: boolean
+    createBookingError: string | null
 
     // Step 4 - Payment data
     paymentDetails: {
@@ -161,7 +174,7 @@ export interface BookingState {
 
 // API Request/Response types matching backend
 export interface CreateBookingRequest {
-    userId: string;
+    userId: string | null;
     sessionId: string;
     patientName: string;
     patientEmail: string;
@@ -169,14 +182,10 @@ export interface CreateBookingRequest {
     patientNIC: string;
     patientDateOfBirth: string; // YYYY-MM-DD
     patientGender: Gender;
-    emergencyContactPhone?: string;
-    medicalReports?: string;
+    medicalReport?: string;
 }
 
 export interface CreateBookingResponse {
-    success: boolean;
-    message: string;
-    data: {
         appointmentId: string;
         appointmentNumber: string;
         sessionId: string;
@@ -191,7 +200,6 @@ export interface CreateBookingResponse {
         consultationFee: number;
         paymentStatus: PaymentStatus;
         queuePosition: number;
-    };
 }
 
 export interface PaymentRequest {

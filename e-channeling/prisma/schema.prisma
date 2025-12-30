@@ -20,17 +20,18 @@ model activity_logs {
 }
 
 model agents {
-  id          String   @id
-  name        String
-  email       String   @unique
-  companyName String?
-  phone       String?
-  address     String?
-  userId      String   @unique
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime
-  users       users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String         @id
+  name         String
+  email        String         @unique
+  companyName  String?
+  phone        String?
+  address      String?
+  userId       String         @unique
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  users        users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments appointments[]
 }
 
 model appointments {
@@ -64,6 +65,8 @@ model appointments {
   updatedAt                      DateTime
   sessionId                      String
   medicalReportUrl               String?
+  agentId                        String
+  agents                         agents                           @relation(fields: [agentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users                          users                            @relation(fields: [bookedById], references: [id])
   sessions                       sessions                         @relation(fields: [sessionId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   corporate_package_appointments corporate_package_appointments[]
@@ -307,6 +310,7 @@ model notifications {
   readAt    DateTime?
   data      Json?
   createdAt DateTime         @default(now())
+  agentId   String
   users     users            @relation(fields: [userId], references: [id])
 }
 
@@ -539,9 +543,10 @@ model sessions {
   status               String         @default("scheduled")
   createdAt            DateTime       @default(now()) @db.Timestamp(6)
   scheduledAt          DateTime       @db.Timestamp(6)
-  startTime            DateTime       @db.Timestamp(6)
-  endTime              DateTime       @db.Timestamp(6)
-  currentRunningNumber String         @default("00")
+  startTime            DateTime?      @db.Timestamp(6)
+  endTime              DateTime?      @db.Timestamp(6)
+  currentRunningNumber String         @default("01")
+  duration             DateTime?      @db.Timestamp(6)
   appointments         appointments[]
   doctors              doctors        @relation(fields: [doctorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doctorId")
   hospitals            hospitals      @relation(fields: [hospitalId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "hospitalId")
@@ -691,6 +696,9 @@ enum AppointmentStatus {
   NO_SHOW
   RESCHEDULED
   UNPAID
+  ABSENT
+  CALLED
+  SKIPPED
 }
 
 enum CommunicationMethod {
@@ -843,4 +851,11 @@ enum hospital_status {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum session_status_list {
+  scheduled
+  ongoing
+  paused
+  ended
 }

@@ -26,6 +26,8 @@ const initialState: BookingState = {
     selectedSessionName: null,
     selectedSessionStartTime: null,
 
+    //-------------------------------
+
     selectedDoctorId: null,
     selectedSessionId: null,
 
@@ -55,9 +57,12 @@ const initialState: BookingState = {
         nic: "",
         dateOfBirth: "",
         gender: "",
-        emergencyContactPhone: "",
         disease: "",
     },
+
+    isCreateBookingSuccess: false,
+    createBookingLoading: false,
+    createBookingError: null,
 
     // Step 4
     paymentDetails: {
@@ -167,7 +172,7 @@ export const fetchUserDetails = createAsyncThunk<
 // Create booking - INTEGRATED WITH BACKEND
 export const createBooking = createAsyncThunk<
     CreateBookingResponse,
-    { userId: string },
+    { userId: string | null },
     { rejectValue: string }
 >(
     "booking/createBooking",
@@ -200,15 +205,13 @@ export const createBooking = createAsyncThunk<
                 patientNIC: patientDetails.nic,
                 patientDateOfBirth: patientDetails.dateOfBirth,
                 patientGender: patientDetails.gender as Gender,
-                emergencyContactPhone:
-                    patientDetails.emergencyContactPhone || undefined,
+                medicalReport: patientDetails.disease,
             };
 
-            const response = await api.post<CreateBookingResponse>(
-                "/bookings",
-                requestData
-            );
-            return response.data;
+            console.log("requestData ", requestData);
+
+            const response = await api.post("/bookings", requestData);
+            return response.data.data;
         } catch (error: any) {
             return rejectWithValue(
                 error.response?.data?.error ||
@@ -288,7 +291,7 @@ const bookingSlice = createSlice({
         setSelectedDate: (state, action: PayloadAction<string>) => {
             state.selectedDate = action.payload;
         },
-        setSelectedSessionId: (state, action: PayloadAction<string>) => {
+        setSelectedSessionId: (state, action: PayloadAction<string | null>) => {
             state.selectedSessionId = action.payload;
         },
         // Set all session details at once when card is selected
@@ -417,16 +420,18 @@ const bookingSlice = createSlice({
 
             // Create booking
             .addCase(createBooking.pending, (state) => {
-                state.isCreatingBooking = true;
-                state.bookingError = null;
+                state.createBookingLoading = true;
+                state.createBookingError = null;
             })
             .addCase(createBooking.fulfilled, (state, action) => {
-                state.isCreatingBooking = false;
+                state.createBookingLoading = false;
+                state.createBookingError = null;
+                state.isCreateBookingSuccess = true;
                 state.confirmationData = action.payload;
             })
             .addCase(createBooking.rejected, (state, action) => {
-                state.isCreatingBooking = false;
-                state.bookingError =
+                state.createBookingLoading = false;
+                state.createBookingError =
                     action.payload || "Failed to create booking";
             })
 

@@ -59,17 +59,7 @@ export const bookingSchema = z.object({
         message: "Gender must be MALE, FEMALE, or OTHER",
     }),
 
-    emergencyContactPhone: z
-        .string()
-        .regex(
-            /^\+?\d+$/,
-            "Emergency contact phone must contain only digits and optional + prefix"
-        )
-        .min(10, "Emergency contact phone must be at least 10 digits")
-        .max(15, "Emergency contact phone must be less than 15 digits")
-        .or(z.literal("")),
-
-    medicalReports: z.string().url("Invalid format").optional(),
+    medicalReport: z.string().optional(),
 });
 
 export type CreateBookingInput = z.infer<typeof bookingSchema>;

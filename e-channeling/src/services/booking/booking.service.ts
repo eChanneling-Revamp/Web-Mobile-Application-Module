@@ -75,15 +75,14 @@ export async function createBooking(data: Readonly<CreateBookingInput>) {
                 patientNIC: data.patientNIC,
                 patientGender: data.patientGender,
                 patientDateOfBirth: patientDateOfBirth,
-                // emergencyContactPhone: "",
-                medicalReportUrl: "",
+                medicalReportUrl: data.medicalReport || null,
                 status: "UNPAID",
                 consultationFee: consultationFee,
                 totalAmount: consultationFee,
                 paymentStatus: "PENDING",
                 queuePosition: newQueuePosition,
-                createdAt: new Date(),
                 updatedAt: new Date(),
+                agentId: "1fd2313d-7dab-438c-8d37-f85a3dcbf1a3",
             },
         });
 
