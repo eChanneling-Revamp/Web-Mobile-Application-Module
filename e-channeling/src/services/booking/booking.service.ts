@@ -15,6 +15,7 @@ export async function createBooking(data: Readonly<CreateBookingInput>) {
             throw new Error("User not found. Please ensure you are logged in.");
         }
 
+
         // check session is still AVAILABLE
         const session = await tx.sessions.findUnique({
             where: { id: data.sessionId },
@@ -23,9 +24,10 @@ export async function createBooking(data: Readonly<CreateBookingInput>) {
             },
         });
 
-        if (!session || session.status !== "scheduled") {
+        if (!session || session.status !== "SCHEDULED") {
             throw new Error("Session not available");
         }
+
 
         // get all previous appointments for this patient
         const patientAppointments = await tx.appointments.findMany({

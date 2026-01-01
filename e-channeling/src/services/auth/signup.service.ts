@@ -128,6 +128,7 @@ export async function registerUser(validatedData: SignupInput) {
                 name: user.name,
                 email: user.email,
             },
+            userId: user.id,
             ...(authData.accessToken && {
                 accessToken: authData.accessToken,
             }),

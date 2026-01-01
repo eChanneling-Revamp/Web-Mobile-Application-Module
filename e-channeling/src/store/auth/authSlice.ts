@@ -43,7 +43,7 @@ interface User {
 interface LoginResponse {
     message: string;
     user: User;
-    userId:string;
+    userId: string;
     accessToken: string;
 }
 
@@ -55,6 +55,7 @@ interface SignupResponse {
         name: string;
         email: string;
     };
+    userId: string;
     accessToken?: string;
 }
 
@@ -208,7 +209,8 @@ const authSlice = createSlice({
         rehydrateAuth: (state) => {
             if (typeof window !== "undefined") {
                 const accessToken = localStorage.getItem("accessToken");
-                if (accessToken) {
+                const userId = localStorage.getItem("userId");
+                if (accessToken && userId) {
                     const payload = safeDecodeJwt(accessToken);
                     // Check if token is valid and not expired
                     if (
@@ -217,11 +219,12 @@ const authSlice = createSlice({
                     ) {
                         state.userToken = accessToken;
                         state.role = payload.role ?? null;
-                        state.userId = payload.sub ?? null;
+                        state.userId = userId;
                         state.isLoginSuccess = true;
                     } else {
                         // Token is invalid or expired, remove it
                         localStorage.removeItem("token");
+                        localStorage.removeItem("userId");
                     }
                 }
             }
@@ -282,9 +285,13 @@ const authSlice = createSlice({
                     const payload = safeDecodeJwt(accessToken);
                     // get role and user id from the token payload
                     state.role = payload?.role ?? null;
-                    state.userId = action.payload.userId;
+
+                    // get the user id from the response
+                    const userId = action.payload.userId;
+                    state.userId = userId;
                     if (typeof window !== "undefined") {
                         localStorage.setItem("accessToken", accessToken);
+                        localStorage.setItem("userId", userId);
                     }
                 }
             )
@@ -347,10 +354,12 @@ const authSlice = createSlice({
                     }
                     state.isSignupSuccess = true;
                     state.userToken = accessToken;
-                    //const payload = safeDecodeJwt(token);
-                    // state.userId = action.payload?.data?.userId ?? null;
+                    const userId = action.payload.userId;
+
+                    state.userId = userId;
                     if (typeof window !== "undefined") {
                         localStorage.setItem("accessToken", accessToken);
+                        localStorage.setItem("userId", userId);
                     }
                 }
             )
